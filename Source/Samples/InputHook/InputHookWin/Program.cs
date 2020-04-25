@@ -15,7 +15,7 @@ namespace InputHookWin
         [STAThread]
         static void Main()
         {
-            HooksManager.SetHooks((IntPtr)HooksManager.MouseMessages.WM_LBUTTONDOWN);
+            HooksManager.SetHooks(Keys.K);
             Application.Run();
         }
     }
