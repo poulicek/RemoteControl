@@ -15,7 +15,7 @@ namespace InputHookWin
         [STAThread]
         static void Main()
         {
-            HooksManager.SetHooks(Keys.K);
+            HooksManager.SetHooks(Keys.Escape, Keys.ControlKey);
             Application.Run();
         }
     }

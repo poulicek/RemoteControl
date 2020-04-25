@@ -70,7 +70,6 @@ namespace InputHook
         private static IntPtr mouseHookId = IntPtr.Zero;
         private static IntPtr keyboardHookId = IntPtr.Zero;
 
-        private static bool modifierPressed;
         private static Keys unhookKey;
         private static Keys unhookKeyModifier;
 
@@ -98,16 +97,38 @@ namespace InputHook
 
         private static IntPtr keyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            var key = (KeyboardHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
-            
-            if ((Keys)key.VirtualKeyCode == unhookKey)
+            var key = getKey(lParam);
+            if (isKeyModifier(key))
+                return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
+
+            if (key == unhookKey)
             {
-                var s = (GetKeyState(0x10) & 0x80) == 0x80;
-                UnHook();
-                return new IntPtr(-1);
+                if (unhookKeyModifier == Keys.None || (GetKeyState((int)unhookKeyModifier) & 0x80) == 0x80)
+                    UnHook();
             }
 
             return new IntPtr(-1);
+        }
+
+        private static Keys getKey(IntPtr ptr)
+        {
+            return (Keys)((KeyboardHookStruct)Marshal.PtrToStructure(ptr, typeof(KeyboardHookStruct))).VirtualKeyCode;
+        }
+
+
+        private static bool isKeyModifier(Keys key)
+        {
+            switch (key)
+            {
+                case Keys.LShiftKey:
+                case Keys.RShiftKey:
+                case Keys.RControlKey:
+                case Keys.LControlKey:
+                case Keys.Alt:
+                    return true;
+            }
+
+            return false;
         }
     }
 }
