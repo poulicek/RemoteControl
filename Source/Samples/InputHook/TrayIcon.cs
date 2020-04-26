@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Media;
 using System.Reflection;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -8,42 +10,32 @@ namespace InputHookWin
 {
     public class TrayIcon : Form
     {
+        private DateTime lastKeyBlockedNotification;
         private NotifyIcon trayIcon;
         private readonly InputBlocker inputBlocker;
 
 
         public TrayIcon()
         {
-            this.inputBlocker = new InputBlocker(new KeyCombination(Keys.Pause));
+            this.Text = "InputLocker";
+            this.inputBlocker = new InputBlocker(Keys.Pause);
+            this.inputBlocker.InputBlocked += onInputBlocked;
+            this.inputBlocker.BlockingStateChanged += onBlockingStateChanged;
         }
 
-
-        /// <summary>
-        /// Returns the icon from the resource
-        /// </summary>
-        private Icon getIcon()
-        {
-            var lightMode = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", true)?.GetValue("SystemUsesLightTheme") as int? == 1;
-
-            using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(lightMode ? "InputHookWin.IconLight.png" : "InputHookWin.IconDark.png"))
-            using (var bmp = new Bitmap(s))
-                return Icon.FromHandle(bmp.GetHicon());
-        }
-
+        #region UI
 
         protected override void OnLoad(EventArgs e)
         {
-            this.hideMainWindow();
+            this.Visible = false;
+            this.ShowInTaskbar = false;
             this.trayIcon = this.createTrayIcon();
         }
 
-        /// <summary>
-        /// Hides the main window
-        /// </summary>
-        private void hideMainWindow()
+        protected override void Dispose(bool disposing)
         {
-            this.Visible = false;
-            this.ShowInTaskbar = false;
+            base.Dispose(disposing);
+            this.inputBlocker.StopBlocking();
         }
 
 
@@ -60,16 +52,22 @@ namespace InputHookWin
                 Visible = true
             };
 
-            trayIcon.Click += onTrayIconClick;
+            trayIcon.MouseUp += onTrayIconClick;
             return trayIcon;
         }
 
 
-        private void onTrayIconClick(object sender, EventArgs e)
+        /// <summary>
+        /// Returns the icon from the resource
+        /// </summary>
+        private Icon getIcon()
         {
-            this.inputBlocker.StartBlocking();
-        }
+            var lightMode = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", true)?.GetValue("SystemUsesLightTheme") as int? == 1;
 
+            using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(lightMode ? "InputHookWin.IconLight.png" : "InputHookWin.IconDark.png"))
+            using (var bmp = new Bitmap(s))
+                return Icon.FromHandle(bmp.GetHicon());
+        }
 
         /// <summary>
         /// Creates the context menu
@@ -78,15 +76,124 @@ namespace InputHookWin
         {
             var trayMenu = new ContextMenu();
 
-
-            //trayMenu.MenuItems.Add("-");
-            //trayMenu.MenuItems.Add("Turn off screen", onTurnOff);
-            //trayMenu.MenuItems.Add("-");
-            //trayMenu.MenuItems.Add("Start with Windows", onStartUp).Checked = this.startsWithWindows();
-            //trayMenu.MenuItems.Add("About...", onAbout);
+            trayMenu.MenuItems.Add("Start with Windows", this.onStartUp).Checked = this.startsWithWindows();
+            trayMenu.MenuItems.Add("About...", this.onAbout);
+            trayMenu.MenuItems.Add("-");
             trayMenu.MenuItems.Add("Exit", this.onMenuExit);
 
             return trayMenu;
+        }
+
+        #endregion
+
+        #region Interactions
+
+        /// <summary>
+        /// Shows the tooltip
+        /// </summary>
+        private void showToolTip(bool blockingState)
+        {
+            if (blockingState != this.inputBlocker.IsBlocking)
+                return;
+
+            this.trayIcon.Visible = true;
+            if (blockingState)
+                this.trayIcon.ShowBalloonTip(10000, null, $"Your keyboard and mouse is locked. Press \"{this.inputBlocker.ControlKey}\" to unlock.", ToolTipIcon.Warning);
+            else
+                this.trayIcon.ShowBalloonTip(1000, null, "Your keyboard and mouse is unlocked.", ToolTipIcon.Info);                
+        }
+
+        
+        /// <summary>
+        /// Plays the notification
+        /// </summary>
+        private void playNotificationSound(bool blocking)
+        {
+            try
+            {
+                var soundFile = $"{Environment.ExpandEnvironmentVariables("%SystemRoot%")}/Media/{(blocking ? "Speech On.wav" :"Speech Sleep.wav")}";
+                using (var player = new SoundPlayer(soundFile))
+                    player.Play();
+            }
+            catch { }
+        }
+
+        #endregion
+
+        #region Start-up Handling
+
+        /// <summary>
+        /// Setting the startup state
+        /// </summary>
+        private bool startsWithWindows()
+        {
+            try
+            {
+                return Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true).GetValue(this.Text) as string == Application.ExecutablePath.ToString();
+            }
+            catch { return false; }
+        }
+
+
+        /// <summary>
+        /// Setting the startup state
+        /// </summary>
+        private bool setStartup(bool set)
+        {
+            try
+            {
+                var rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+                if (set)
+                    rk.SetValue(this.Text, Application.ExecutablePath.ToString());
+                else
+                    rk.DeleteValue(this.Text, false);
+
+                return set;
+            }
+            catch { return !set; }
+        }
+
+        #endregion
+
+        #region Input Handlers
+
+        private void onTrayIconClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                this.inputBlocker.StartBlocking();
+        }
+
+
+        private void onBlockingStateChanged(bool state)
+        {
+            if (state)
+                Cursor.Hide();
+            this.playNotificationSound(state);
+            this.showToolTip(state);
+        }
+
+        private void onInputBlocked()
+        {
+            if ((DateTime.Now - lastKeyBlockedNotification).TotalSeconds < 5)
+                return;
+
+            lastKeyBlockedNotification = DateTime.Now;
+            this.showToolTip(true);
+        }
+
+        #endregion
+
+        #region Menu Handlers
+
+        private void onStartUp(object sender, EventArgs e)
+        {
+            var btn = (sender as MenuItem);
+            btn.Checked = this.setStartup(!btn.Checked);
+        }
+
+        private void onAbout(object sender, EventArgs e)
+        {
+            Process.Start(new ProcessStartInfo("https://github.com/poulicek/BrightnessControl"));
         }
 
 
@@ -95,10 +202,6 @@ namespace InputHookWin
             Application.Exit();
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            this.inputBlocker.StopBlocking();
-        }
+        #endregion
     }
 }

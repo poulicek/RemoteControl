@@ -70,10 +70,11 @@ namespace InputHook
         private static IntPtr keyboardHookId = IntPtr.Zero;
 
         private static KeyCombination triggerKey;
-        
+
+        public static event Action InputBlocked;
         public static event Action KeyCombinationTriggered;
 
-        public static bool InputBlocked { get; private set; }
+        public static bool BlockInput { get; private set; }
 
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace InputHook
         /// </summary>
         public static void SetHooks(KeyCombination trigger)
         {
-            SetHooks(trigger, InputBlocked);
+            SetHooks(trigger, BlockInput);
         }
 
 
@@ -92,7 +93,7 @@ namespace InputHook
         {
             UnHook();
 
-            HooksManager.InputBlocked = blockInput;
+            HooksManager.BlockInput = blockInput;
             HooksManager.triggerKey = trigger;
             
             keyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardHookCallback, Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);            
@@ -116,6 +117,9 @@ namespace InputHook
         /// </summary>
         private static IntPtr mouseBlockingHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
+            if ((MouseMessages)wParam == MouseMessages.WM_LBUTTONDOWN || (MouseMessages)wParam == MouseMessages.WM_RBUTTONDOWN)
+                InputBlocked?.Invoke();
+
             return new IntPtr(-1);
         }
 
@@ -126,14 +130,18 @@ namespace InputHook
         private static IntPtr keyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             var key = getKey(lParam);
+            var isDown = (int)wParam == WM_KEYDOWN;
 
             // detection of the trigger key
-            if ((int)wParam == WM_KEYDOWN && isTriggerKey(key) && KeyCombinationTriggered != null)
-                KeyCombinationTriggered.Invoke();
+            if (isDown && isTriggerKey(key))
+                KeyCombinationTriggered?.Invoke();
 
             // modifiers are always allowed
-            else if (!InputBlocked || isKeyModifier(key))
+            else if (!BlockInput || isKeyModifier(key))
                 return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
+
+            if (isDown)
+                InputBlocked?.Invoke();
 
             // blocking the input;
             return new IntPtr(-1);
@@ -160,10 +168,9 @@ namespace InputHook
                 return false;
 
             // checking if all modifiers are pressed
-            if (triggerKey.Modifiers != null)
-                foreach (var modifierKey in triggerKey.Modifiers)
-                    if ((GetKeyState((int)modifierKey) & 0x80) != 0x80)
-                        return false;
+            foreach (var modifierKey in triggerKey.Modifiers)
+                if ((GetKeyState((int)modifierKey) & 0x80) != 0x80)
+                    return false;
 
             return true;
         }
