@@ -136,6 +136,8 @@ namespace InputHook
             if (isDown && isTriggerKey(key))
                 KeyCombinationTriggered?.Invoke();
 
+#warning Instead of letting all modifiers to go through, only those in the trigger key could be considered
+
             // modifiers are always allowed
             else if (!BlockInput || isKeyModifier(key))
                 return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
