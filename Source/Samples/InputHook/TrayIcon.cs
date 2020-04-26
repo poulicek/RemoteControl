@@ -35,7 +35,7 @@ namespace InputHookWin
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            this.inputBlocker.StopBlocking();
+            this.inputBlocker.Dispose();
         }
 
 

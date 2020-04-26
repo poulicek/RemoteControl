@@ -3,7 +3,7 @@ using InputHook;
 
 namespace InputHookWin
 {
-    public class InputBlocker
+    public class InputBlocker : IDisposable
     {
         private KeyCombination controlKey;
 
@@ -24,15 +24,19 @@ namespace InputHookWin
 
         public void StartBlocking()
         {
+            var state = HooksManager.BlockInput;
             HooksManager.SetHooks(this.controlKey, true);
-            this.BlockingStateChanged?.Invoke(HooksManager.BlockInput);
+            if (state != true)
+                this.BlockingStateChanged?.Invoke(HooksManager.BlockInput);
         }
 
 
         public void StopBlocking()
         {
+            var state = HooksManager.BlockInput;
             HooksManager.SetHooks(this.controlKey, false);
-            this.BlockingStateChanged?.Invoke(HooksManager.BlockInput);
+            if (state != false)
+                this.BlockingStateChanged?.Invoke(HooksManager.BlockInput);
         }
 
         private void onControlKeyTriggered()
@@ -41,6 +45,11 @@ namespace InputHookWin
                 this.StopBlocking();
             else
                 this.StartBlocking();
+        }
+
+        public void Dispose()
+        {
+            this.StopBlocking();
         }
     }
 }
