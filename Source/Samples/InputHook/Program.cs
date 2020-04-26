@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using InputHook;
 
 namespace InputHookWin
 {
@@ -15,7 +11,7 @@ namespace InputHookWin
         [STAThread]
         static void Main()
         {
-            HooksManager.SetHooks(Keys.Escape, Keys.ControlKey);
+            var inputBLocker = new InputBlocker(new KeyCombination(Keys.Pause));
             Application.Run();
         }
     }
