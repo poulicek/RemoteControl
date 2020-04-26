@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("InputHookWin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Keyboard Locker")]
+[assembly: AssemblyDescription("Allows blocking and unblocking of user input via shortcut key")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("InputHookWin")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCompany("BitIT s.r.o.")]
+[assembly: AssemblyProduct("Keyboard Locker")]
+[assembly: AssemblyCopyright("Copyright © BitIT s.r.o. 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

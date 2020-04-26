@@ -3,12 +3,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Media;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
-namespace InputHookWin
-{
-    public class TrayIcon : Form
+namespace KeyboardLocker
+{    public class TrayIcon : Form
     {
         private DateTime lastKeyBlockedNotification;
         private NotifyIcon trayIcon;
@@ -30,6 +30,8 @@ namespace InputHookWin
             this.Visible = false;
             this.ShowInTaskbar = false;
             this.trayIcon = this.createTrayIcon();
+
+            SystemEvents.DisplaySettingsChanged += this.onDisplaySettingsChanged;
         }
 
         protected override void Dispose(bool disposing)
@@ -58,16 +60,28 @@ namespace InputHookWin
 
 
         /// <summary>
+        /// Updates the look
+        /// </summary>
+        private void updateLook()
+        {
+            this.trayIcon.Icon = this.getIcon();
+        }
+
+
+        /// <summary>
         /// Returns the icon from the resource
         /// </summary>
         private Icon getIcon()
         {
             var lightMode = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", true)?.GetValue("SystemUsesLightTheme") as int? == 1;
+            var locked = this.inputBlocker.IsBlocking;
+            var iconName = $"{this.GetType().Namespace}.Icon{(locked ? "Locked" : "Unlocked")}{(lightMode ? "Light" : "Dark")}.png";
 
-            using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(lightMode ? "InputHookWin.IconLight.png" : "InputHookWin.IconDark.png"))
+            using (var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(iconName))
             using (var bmp = new Bitmap(s))
                 return Icon.FromHandle(bmp.GetHicon());
         }
+
 
         /// <summary>
         /// Creates the context menu
@@ -99,8 +113,8 @@ namespace InputHookWin
             this.trayIcon.Visible = true;
             if (blockingState)
                 this.trayIcon.ShowBalloonTip(10000, null, $"Your keyboard and mouse is locked. Press \"{this.inputBlocker.ControlKey}\" to unlock.", ToolTipIcon.Warning);
-            else
-                this.trayIcon.ShowBalloonTip(1000, null, "Your keyboard and mouse is unlocked.", ToolTipIcon.Info);                
+            //else
+            //    this.trayIcon.ShowBalloonTip(1000, null, "Your keyboard and mouse is unlocked.", ToolTipIcon.Info);
         }
 
         
@@ -155,7 +169,16 @@ namespace InputHookWin
 
         #endregion
 
-        #region Input Handlers
+        #region Event Handlers
+
+        async private void onDisplaySettingsChanged(object sender, EventArgs e)
+        {
+            await Task.Delay(500);
+            this.updateLook();
+
+            await Task.Delay(1000);
+            this.updateLook();
+        }
 
         private void onTrayIconClick(object sender, MouseEventArgs e)
         {
@@ -166,8 +189,7 @@ namespace InputHookWin
 
         private void onBlockingStateChanged(bool state)
         {
-            if (state)
-                Cursor.Hide();
+            this.updateLook();
             this.playNotificationSound(state);
             this.showToolTip(state);
         }

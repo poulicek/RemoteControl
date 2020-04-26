@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using InputHookWin;
+using KeyboardLocker;
 
 namespace InputHook
 {

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C402FC83-5D9C-4AE2-AED1-23806DD84AA4}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>InputHookWin</RootNamespace>
-    <AssemblyName>InputHookWin</AssemblyName>
+    <RootNamespace>KeyboardLocker</RootNamespace>
+    <AssemblyName>Keyboard Locker</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -55,8 +55,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="IconDark.png" />
-    <EmbeddedResource Include="IconLight.png" />
+    <EmbeddedResource Include="IconUnlockedDark.png" />
+    <EmbeddedResource Include="IconUnlockedLight.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IconLockedLight.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IconLockedDark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

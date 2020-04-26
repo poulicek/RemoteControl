@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace InputHookWin
+namespace KeyboardLocker
 {
     static class Program
     {
