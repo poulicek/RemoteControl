@@ -11,8 +11,9 @@ namespace InputHookWin
         [STAThread]
         static void Main()
         {
-            var inputBLocker = new InputBlocker(new KeyCombination(Keys.Pause));
-            Application.Run();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new TrayIcon());
         }
     }
 }

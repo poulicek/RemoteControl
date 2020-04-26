@@ -16,13 +16,13 @@ namespace InputHookWin
             this.ControlKey = controlKey;
         }
 
-        public void Block()
+        public void StartBlocking()
         {
             HooksManager.SetHooks(this.controlKey, true);
         }
 
 
-        public void Unblock()
+        public void StopBlocking()
         {
             HooksManager.SetHooks(this.controlKey, false);
         }
@@ -30,9 +30,9 @@ namespace InputHookWin
         private void onControlKeyTriggered()
         {
             if (HooksManager.InputBlocked)
-                this.Unblock();
+                this.StopBlocking();
             else
-                this.Block();
+                this.StartBlocking();
         }
     }
 }
