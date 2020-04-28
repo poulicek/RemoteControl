@@ -19,8 +19,8 @@ namespace KeyboardLocker
         {
             this.Text = "InputLocker";
             this.inputBlocker = new InputBlocker(Keys.Pause);
-            this.inputBlocker.InputBlocked += onInputBlocked;
-            this.inputBlocker.BlockingStateChanged += onBlockingStateChanged;
+            this.inputBlocker.InputBlocked += this.onInputBlocked;
+            this.inputBlocker.BlockingStateChanged += this.onBlockingStateChanged;
         }
 
         #region UI
@@ -107,14 +107,18 @@ namespace KeyboardLocker
         /// </summary>
         private void showToolTip(bool blockingState)
         {
-            if (blockingState != this.inputBlocker.IsBlocking)
-                return;
+            try
+            {
+                if (blockingState != this.inputBlocker.IsBlocking)
+                    return;
 
-            this.trayIcon.Visible = true;
-            if (blockingState)
-                this.trayIcon.ShowBalloonTip(10000, null, $"Your keyboard and mouse is locked. Press \"{this.inputBlocker.ControlKey}\" to unlock.", ToolTipIcon.Warning);
-            //else
-            //    this.trayIcon.ShowBalloonTip(1000, null, "Your keyboard and mouse is unlocked.", ToolTipIcon.Info);
+                this.trayIcon.Visible = true;
+                if (blockingState)
+                    this.trayIcon.ShowBalloonTip(10000, null, $"Your keyboard and mouse is locked. Press \"{this.inputBlocker.ControlKey}\" to unlock.", ToolTipIcon.Warning);
+                //else
+                //    this.trayIcon.ShowBalloonTip(1000, null, "Your keyboard and mouse is unlocked.", ToolTipIcon.Info);
+            }
+            catch { }
         }
 
         
@@ -196,6 +200,7 @@ namespace KeyboardLocker
 
         private void onInputBlocked()
         {
+            // avoids too frequent notificaitons
             if ((DateTime.Now - lastKeyBlockedNotification).TotalSeconds < 5)
                 return;
 

@@ -123,8 +123,12 @@ namespace InputHook
         /// </summary>
         private static IntPtr mouseBlockingHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if ((MouseMessages)wParam == MouseMessages.WM_LBUTTONDOWN || (MouseMessages)wParam == MouseMessages.WM_RBUTTONDOWN)
-                InputBlocked?.Invoke();
+            try
+            {
+                if (wParam == (IntPtr)MouseMessages.WM_LBUTTONDOWN || wParam == (IntPtr)MouseMessages.WM_RBUTTONDOWN)
+                    InputBlocked?.Invoke();                
+            }
+            catch { }
 
             return new IntPtr(-1);
         }
@@ -135,21 +139,28 @@ namespace InputHook
         /// </summary>
         private static IntPtr keyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            var key = getKey(lParam);
-            var isDown = (int)wParam == WM_KEYDOWN;
+            try
+            {
+                var key = getKey(lParam);
+                var isDown = wParam == (IntPtr)WM_KEYDOWN;
 
-            // detection of the trigger key
-            if (isDown && isTriggerKey(key))
-                KeyCombinationTriggered?.Invoke();
+                // detection of the trigger key
+                if (isDown && isTriggerKey(key))
+                    KeyCombinationTriggered?.Invoke();
 
-#warning Instead of letting all modifiers to go through, only those in the trigger key could be considered
+                // propagate event if input is not blocked
+                if (!BlockInput)
+                    return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
 
-            // modifiers are always allowed
-            else if (!BlockInput || isKeyModifier(key))
-                return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
+                // modifiers are always allowed
+                if (isKeyAllowed(key))
+                    return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
 
-            if (isDown)
-                InputBlocked?.Invoke();
+                // inform about the blocked key
+                if (isDown)
+                    InputBlocked?.Invoke();
+            }
+            catch { }
 
             // blocking the input;
             return new IntPtr(-1);
@@ -171,6 +182,9 @@ namespace InputHook
         /// </summary>
         private static bool isTriggerKey(Keys key)
         {
+            if (triggerKey == null)
+                return false;
+
             // checking the main key
             if (triggerKey.MainKey != key)
                 return false;
@@ -187,17 +201,23 @@ namespace InputHook
         /// <summary>
         /// Returns true if the key is a modifier
         /// </summary>
-        private static bool isKeyModifier(Keys key)
+        private static bool isKeyAllowed(Keys key)
         {
-            switch (key)
+            if (triggerKey != null)
+                return false;
+
+            foreach (var modifierKey in triggerKey.Modifiers)
             {
-                case Keys.LShiftKey:
-                case Keys.RShiftKey:
-                case Keys.RControlKey:
-                case Keys.LControlKey:
-                case Keys.Alt:
+                if (modifierKey == key)
                     return true;
+
+                if (modifierKey == Keys.ControlKey)
+                    return key == Keys.LControlKey || key == Keys.RControlKey;
+
+                if (modifierKey == Keys.ShiftKey)
+                    return key == Keys.LShiftKey || key == Keys.RShiftKey;
             }
+
             return false;
         }
 

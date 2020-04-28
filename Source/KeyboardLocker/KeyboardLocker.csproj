@@ -61,17 +61,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="IconUnlockedDark.png" />
-    <EmbeddedResource Include="IconUnlockedLight.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="IconLockedLight.png" />
+    <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="IconLockedDark.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Icon.ico" />
+    <EmbeddedResource Include="IconLockedLight.png" />
+    <EmbeddedResource Include="IconUnlockedDark.png" />
+    <EmbeddedResource Include="IconUnlockedLight.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
