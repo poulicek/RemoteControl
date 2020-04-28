@@ -48,7 +48,7 @@ namespace KeyboardLocker
         {
             var trayIcon = new NotifyIcon()
             {
-                Text = "Brightness Control",
+                Text = "Keyboard Locker",
                 Icon = this.getIcon(),
                 ContextMenu = this.createContextMenu(),
                 Visible = true
