@@ -18,7 +18,15 @@ namespace KeyboardLocker
             if (!mutex.WaitOne(0, false))
                 return;
 
+            AppDomain.CurrentDomain.UnhandledException += onUnhandledException;
             Application.Run(new TrayIcon());
+        }
+
+        private static void onUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+#if DEBUG
+            throw e.ExceptionObject as Exception;
+#endif
         }
     }
 }

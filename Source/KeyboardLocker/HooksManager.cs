@@ -107,8 +107,14 @@ namespace InputHook
         /// </summary>
         public static void UnHook()
         {
-            UnhookWindowsHookEx(mouseHookId);
-            UnhookWindowsHookEx(keyboardHookId);
+            if (mouseHookId != IntPtr.Zero)
+                UnhookWindowsHookEx(mouseHookId);
+
+            if (keyboardHookId != IntPtr.Zero)
+                UnhookWindowsHookEx(keyboardHookId);
+
+            mouseHookId = IntPtr.Zero;
+            keyboardHookId = IntPtr.Zero;
         }
 
 
