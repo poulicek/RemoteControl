@@ -50,7 +50,7 @@ namespace InputHook
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
+        private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelCallbackProc lpfn, IntPtr hMod, uint dwThreadId);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -62,7 +62,7 @@ namespace InputHook
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         private static extern short GetKeyState(int vKey);
 
-        private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
+        private delegate IntPtr LowLevelCallbackProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         #endregion
 
@@ -70,6 +70,8 @@ namespace InputHook
         private static IntPtr keyboardHookId = IntPtr.Zero;
 
         private static KeyCombination triggerKey;
+        private static LowLevelCallbackProc mouseCallback;
+        private static LowLevelCallbackProc keyboardCallback;
 
         public static event Action InputBlocked;
         public static event Action KeyCombinationTriggered;
@@ -96,9 +98,10 @@ namespace InputHook
             HooksManager.BlockInput = blockInput;
             HooksManager.triggerKey = trigger;
             
-            keyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardHookCallback, Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);            
+            // callbacks have their instance variables to prevent their destrcution by garbage collector
+            keyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardCallback = new LowLevelCallbackProc(keyboardHookCallback), Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);            
             if (blockInput)
-                mouseHookId = SetWindowsHookEx(WH_MOUSE_LL, mouseBlockingHookCallback, Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);
+                mouseHookId = SetWindowsHookEx(WH_MOUSE_LL, mouseCallback = new LowLevelCallbackProc(mouseBlockingHookCallback), Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);
         }
 
 
@@ -115,6 +118,9 @@ namespace InputHook
 
             mouseHookId = IntPtr.Zero;
             keyboardHookId = IntPtr.Zero;
+
+            mouseCallback = null;
+            keyboardCallback = null;
         }
 
 
