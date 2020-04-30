@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace KeyboardLocker
+namespace KeyboardLocker.Input
 {
     public class KeyCombination
     {

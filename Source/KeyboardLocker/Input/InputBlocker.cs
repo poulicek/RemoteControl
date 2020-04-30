@@ -1,7 +1,6 @@
 ﻿using System;
-using InputHook;
 
-namespace KeyboardLocker
+namespace KeyboardLocker.Input
 {
     public class InputBlocker : IDisposable
     {

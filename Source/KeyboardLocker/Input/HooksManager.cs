@@ -2,9 +2,8 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using KeyboardLocker;
 
-namespace InputHook
+namespace KeyboardLocker.Input
 {
     public static class HooksManager
     {
