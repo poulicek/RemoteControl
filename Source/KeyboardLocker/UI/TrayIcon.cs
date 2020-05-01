@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Media;
 using System.Windows.Forms;
 using Common;
@@ -8,15 +9,17 @@ namespace KeyboardLocker.UI
 {
     public class TrayIcon : TrayIconBase
     {
-        private DateTime lastKeyBlockedNotification;
+        private readonly Bitmap notificationIcon;
         private readonly InputBlocker inputBlocker;
 
 
-        public TrayIcon() : base("Keyboard tLocker")
+        public TrayIcon() : base("Keyboard Locker")
         {
             this.inputBlocker = new InputBlocker(Keys.Pause);
             this.inputBlocker.InputBlocked += this.onInputBlocked;
             this.inputBlocker.BlockingStateChanged += this.onBlockingStateChanged;
+
+            this.notificationIcon = this.getResourceImage("Resources.IconLocked.png");
         }
 
         #region UI
@@ -50,14 +53,9 @@ namespace KeyboardLocker.UI
 
                 this.trayIcon.Visible = true;
                 if (blockingState)
-                {
-                    //NotificationHelper.Show("test", 5000);
-                    this.trayIcon.ShowBalloonTip(10000, null, $"Your keyboard and mouse is locked. Press \"{this.inputBlocker.ControlKey}\" to unlock.", ToolTipIcon.Warning);
-                }
+                    NotificationHelper.Show(this.notificationIcon, $"Your keyboard and mouse is locked.{Environment.NewLine}Press \"{this.inputBlocker.ControlKey}\" to unlock.", 5000);
                 else
-                {
                     NotificationHelper.Hide();
-                }
             }
             catch { }
         }
@@ -97,11 +95,6 @@ namespace KeyboardLocker.UI
 
         private void onInputBlocked()
         {
-            // avoids too frequent notificaitons
-            if ((DateTime.Now - lastKeyBlockedNotification).TotalSeconds < 5)
-                return;
-
-            lastKeyBlockedNotification = DateTime.Now;
             this.showToolTip(true);
         }
 

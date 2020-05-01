@@ -60,6 +60,7 @@
     <Compile Include="Input\KeyCombination.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\BalloonTooltip.cs" />
     <Compile Include="UI\NotificationHelper.cs" />
     <Compile Include="UI\TrayIcon.cs">
       <SubType>Form</SubType>
@@ -67,6 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Icon.ico" />
+    <EmbeddedResource Include="Resources\IconLocked.png" />
+    <EmbeddedResource Include="Resources\IconUnlocked.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\IconLockedDark.png" />
