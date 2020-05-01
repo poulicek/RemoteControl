@@ -1,13 +1,30 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace KeyboardLocker.UI
 {
     public class BalloonTooltip : IDisposable
     {
-        private readonly Form form = new Form();
+        #region P/Invoke
+
+        private const int SW_SHOWNOACTIVATE = 4;
+        private const int HWND_TOPMOST = -1;
+        private const uint SWP_NOACTIVATE = 0x10;
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
+        private static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        #endregion
+
+        private class UnfocusedForm : Form { protected override bool ShowWithoutActivation => true;}
+
+        private readonly UnfocusedForm form;
         private readonly StringFormat sf = new StringFormat() { LineAlignment = StringAlignment.Center };
 
         public Bitmap Icon { get; set; }
@@ -15,14 +32,17 @@ namespace KeyboardLocker.UI
 
         public BalloonTooltip()
         {
-            this.form.BackColor = Color.FromArgb(36, 36, 36);
-            this.form.ClientSize = new Size(364, 102);
-            this.form.FormBorderStyle = FormBorderStyle.None;
-            this.form.ShowInTaskbar = false;
-            this.form.TopMost = true;
+            this.form = new UnfocusedForm()
+            {
+                BackColor = Color.FromArgb(36, 36, 36),
+                ClientSize = new Size(364, 102),
+                FormBorderStyle = FormBorderStyle.None,
+                ShowInTaskbar = false,
+                TopMost = true,
+                StartPosition = FormStartPosition.Manual,
+            };
 
             this.form.Paint += this.onFormPaint;
-            this.form.Resize += this.onFormResize;
         }
 
         #region Event Handlers
@@ -32,18 +52,15 @@ namespace KeyboardLocker.UI
             this.drawContents(e.Graphics);
         }
 
-        private void onFormResize(object sender, EventArgs e)
-        {
-            this.setLocation();
-        }
-
         #endregion
 
         #region Interface
 
         public void Show()
         {
-            this.form.Show();
+            var loc = this.getCornerLocation();
+            ShowWindow(this.form.Handle, SW_SHOWNOACTIVATE);
+            SetWindowPos(this.form.Handle.ToInt32(), 0, loc.X, loc.Y, this.form.Width, this.form.Height, SWP_NOACTIVATE);
         }
 
         public void Hide()
@@ -63,10 +80,10 @@ namespace KeyboardLocker.UI
         /// <summary>
         /// Sets the desired location
         /// </summary>
-        private void setLocation()
+        private Point getCornerLocation()
         {
             var screenArea = Screen.GetWorkingArea(this.form);
-            this.form.Location = new Point(screenArea.Width - 24 - this.form.Width, screenArea.Height - 16 - this.form.Height);
+            return new Point(screenArea.Width - 24 - this.form.Width, screenArea.Height - 16 - this.form.Height);
         }
 
         /// <summary>

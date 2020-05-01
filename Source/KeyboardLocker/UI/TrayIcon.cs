@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using System.Media;
 using System.Windows.Forms;
 using Common;
@@ -10,6 +11,8 @@ namespace KeyboardLocker.UI
     public class TrayIcon : TrayIconBase
     {
         private readonly Bitmap notificationIcon;
+        private readonly SoundPlayer soundBlock;
+        private readonly SoundPlayer soundUnblock;
         private readonly InputBlocker inputBlocker;
 
 
@@ -19,6 +22,9 @@ namespace KeyboardLocker.UI
             this.inputBlocker.InputBlocked += this.onInputBlocked;
             this.inputBlocker.BlockingStateChanged += this.onBlockingStateChanged;
 
+            this.soundBlock = this.getSound(true);
+            this.soundUnblock = this.getSound(false);
+
             this.notificationIcon = this.getResourceImage("Resources.IconLocked.png");
         }
 
@@ -27,7 +33,11 @@ namespace KeyboardLocker.UI
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
+            this.soundBlock.Dispose();
+            this.soundUnblock.Dispose();
             this.inputBlocker.Dispose();
+            this.notificationIcon.Dispose();
         }
 
 
@@ -59,20 +69,25 @@ namespace KeyboardLocker.UI
             }
             catch { }
         }
+        
 
+        /// <summary>
+        /// Returns the sound object
+        /// </summary>
+        private SoundPlayer getSound(bool block)
+        {
+            return new SoundPlayer(this.getResourceStream($"Resources.{(block ? "Lock" : "Unlock")}.wav"));
+        }
         
         /// <summary>
         /// Plays the notification
         /// </summary>
-        private void playNotificationSound(bool blocking)
+        private void playNotificationSound(bool block)
         {
-            try
-            {
-                var soundFile = $"{Environment.ExpandEnvironmentVariables("%SystemRoot%")}/Media/{(blocking ? "Speech On.wav" :"Speech Sleep.wav")}";
-                using (var player = new SoundPlayer(soundFile))
-                    player.Play();
-            }
-            catch { }
+            if (block)
+                this.soundBlock?.Play();
+            else
+                this.soundUnblock?.Play();
         }
 
         #endregion

@@ -68,6 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\Icon.ico" />
+    <EmbeddedResource Include="Resources\Lock.wav" />
+    <EmbeddedResource Include="Resources\Unlock.wav" />
     <EmbeddedResource Include="Resources\IconLocked.png" />
     <EmbeddedResource Include="Resources\IconUnlocked.png" />
   </ItemGroup>

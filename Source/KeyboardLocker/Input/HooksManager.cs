@@ -65,6 +65,8 @@ namespace KeyboardLocker.Input
 
         #endregion
 
+        private static bool eventTriggered;
+
         private static IntPtr mouseHookId = IntPtr.Zero;
         private static IntPtr keyboardHookId = IntPtr.Zero;
 
@@ -150,8 +152,16 @@ namespace KeyboardLocker.Input
                 var isDown = wParam == (IntPtr)WM_KEYDOWN;
 
                 // detection of the trigger key
-                if (isDown && isTriggerKey(key))
-                    KeyCombinationTriggered?.Invoke();
+                if (isTriggerKey(key))
+                {
+                    if (!isDown)
+                        eventTriggered = false;
+                    else if (!eventTriggered)
+                    {
+                        KeyCombinationTriggered?.Invoke();
+                        eventTriggered = true;
+                    }
+                }
 
                 // propagate event if input is not blocked
                 if (!BlockInput)
