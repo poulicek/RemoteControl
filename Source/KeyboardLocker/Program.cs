@@ -8,7 +8,7 @@ namespace KeyboardLocker
 {
     static class Program
     {
-        private static readonly Mutex mutex = new Mutex(false, "Global\\" + Assembly.GetExecutingAssembly().GetName().Name);
+        private static readonly Mutex mutex = new Mutex(false, Assembly.GetExecutingAssembly().GetName().Name);
 
         /// <summary>
         /// The main entry point for the application.
