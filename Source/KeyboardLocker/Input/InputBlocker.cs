@@ -5,6 +5,7 @@ namespace KeyboardLocker.Input
     public class InputBlocker : IDisposable
     {
         public event Action ScreenOffRequested;
+        public event Action ScreenTurnedOff;
         public event Action<bool> BlockingStateChanged;
 
         public bool IsBlocking { get { return HooksManager.BlockInput; } }
@@ -46,6 +47,7 @@ namespace KeyboardLocker.Input
 #if !DEBUG
             SystemControls.TurnOffScreen();
 #endif
+            this.ScreenTurnedOff?.Invoke();
             return true;
         }
 

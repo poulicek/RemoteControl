@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
@@ -15,34 +16,34 @@ namespace KeyboardLocker.UI
             #region P/Invoke
 
             private const int SW_SHOWNOACTIVATE = 4;
-            private const int HWND_TOPMOST = -1;
             private const uint SWP_NOACTIVATE = 0x10;
 
             [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
             private static extern bool SetWindowPos(int hWnd, int hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
-
             [DllImport("user32.dll")]
             private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-            #endregion
 
-            private readonly StringFormat sf = new StringFormat() { LineAlignment = StringAlignment.Center };
+            #endregion
 
             public new Bitmap Icon { get; set; }
             public string Message { get; set; }
-
-            protected override bool ShowWithoutActivation => true;
+            public string Note { get; set; }
 
             public BalloonControl()
             {
                 this.BackColor = Color.FromArgb(36, 36, 36);
                 this.ClientSize = new Size(364, 102);
+                this.StartPosition = FormStartPosition.Manual;
                 this.FormBorderStyle = FormBorderStyle.None;
                 this.ShowInTaskbar = false;
                 this.TopMost = true;
-                this.StartPosition = FormStartPosition.Manual;
                 this.DoubleBuffered = true;
+
+                this.AutoScaleDimensions = new SizeF(96F, 96F);
+                this.AutoScaleMode = AutoScaleMode.Dpi;
             }
+
 
             /// <summary>
             /// Gets the desired location
@@ -60,8 +61,8 @@ namespace KeyboardLocker.UI
             public void ShowUnfocused()
             {
                 var loc = this.getCornerLocation();
-                ShowWindow(this.Handle, SW_SHOWNOACTIVATE);
                 SetWindowPos(this.Handle.ToInt32(), 0, loc.X, loc.Y, this.Width, this.Height, SWP_NOACTIVATE);
+                ShowWindow(this.Handle, SW_SHOWNOACTIVATE);
                 this.Invalidate();
             }
 
@@ -72,17 +73,16 @@ namespace KeyboardLocker.UI
                 this.drawContents(e.Graphics);
             }
 
+
             /// <summary>
             /// Draws the contents
             /// </summary>
             private void drawContents(Graphics g)
             {
-                g.CompositingQuality = CompositingQuality.HighQuality;
-                g.SmoothingMode = SmoothingMode.HighQuality;
-
-                var textRect = Rectangle.Inflate(this.ClientRectangle, -16, -16);
-                var iconRect = this.drawIcon(g, textRect);
-                var textMargin = iconRect.IsEmpty ? 0 : iconRect.Width + 16;
+                var margin = (int)(16 * g.DpiX / 96);
+                var textRect = Rectangle.Inflate(this.ClientRectangle, -margin, -margin);
+                var iconRect = this.drawIcon(g, textRect, margin);
+                var textMargin = iconRect.IsEmpty ? 0 : iconRect.Width + margin;
 
                 this.drawMessage(g, textRect, textMargin);
             }
@@ -99,11 +99,24 @@ namespace KeyboardLocker.UI
                 rect.X += margin;
                 rect.Width -= margin;
 
-                using (var fontpath = new GraphicsPath())
-                using (var fontFamily = new FontFamily("Segoe UI"))
+                g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
+                g.SmoothingMode = SmoothingMode.HighQuality;
+
+                if (string.IsNullOrEmpty(this.Note))
                 {
-                    fontpath.AddString(this.Message, fontFamily, (int)FontStyle.Regular, 16, rect, this.sf);
-                    g.FillPath(Brushes.White, fontpath);
+                    using (var f = new Font("Segoe UI", 11, FontStyle.Bold, GraphicsUnit.Point))
+                    using (var sf = new StringFormat() { LineAlignment = StringAlignment.Center })
+                        g.DrawString(this.Message, f, Brushes.White, rect, sf);
+                }
+                else
+                {
+                    using (var f = new Font("Segoe UI", 11, FontStyle.Bold, GraphicsUnit.Point))
+                    using (var sf = new StringFormat() { LineAlignment = StringAlignment.Near })
+                        g.DrawString(this.Message, f, Brushes.White, new Rectangle(rect.X, rect.Y, rect.Width, 2 * rect.Height / 3), sf);
+
+                    using (var f = new Font("Segoe UI", 9, GraphicsUnit.Point))
+                    using (var sf = new StringFormat() { LineAlignment = StringAlignment.Far })
+                        g.DrawString(this.Note, f, Brushes.White, new Rectangle(rect.X, rect.Y + 2 * rect.Height / 3, rect.Width, rect.Height / 3), sf);
                 }
 
                 return rect;
@@ -113,14 +126,14 @@ namespace KeyboardLocker.UI
             /// <summary>
             /// Draws the icon
             /// </summary>
-            private Rectangle drawIcon(Graphics g, Rectangle rect)
+            private Rectangle drawIcon(Graphics g, Rectangle rect, int margin)
             {
                 if (this.Icon == null)
                     return Rectangle.Empty;
 
-                var height = rect.Height - 32;
+                var height = rect.Height - margin - margin;
                 var width = this.Icon.Width * height / this.Icon.Height;
-                var iconRect = new Rectangle(rect.X, rect.Y + 16, width, height);
+                var iconRect = new Rectangle(rect.X, rect.Y + margin, width, height);
 
                 g.DrawImage(this.Icon, iconRect);
 
@@ -132,8 +145,9 @@ namespace KeyboardLocker.UI
 
         #endregion
 
+        private static BalloonControl tooltip = new BalloonControl();
         private static readonly Timer timer = new Timer();
-        private static readonly BalloonControl tooltip = new BalloonControl();
+        
 
         static BalloonTooltip()
         {
@@ -159,12 +173,13 @@ namespace KeyboardLocker.UI
         /// <summary>
         /// Shows the notification
         /// </summary>
-        public static void Show(Bitmap icon, string message, int timeout = 0)
+        public static void Show(Bitmap icon, string message, string note = null, int timeout = 0)
         {
             resetTimer(timeout);
 
             tooltip.Icon = icon;
             tooltip.Message = message;
+            tooltip.Note = note;
             tooltip.ShowUnfocused();
         }
 
@@ -180,7 +195,7 @@ namespace KeyboardLocker.UI
 
         private static void onTimerTick(object sender, EventArgs e)
         {
-            tooltip.Hide();
+            Hide();
         }
     }
 }

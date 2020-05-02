@@ -20,6 +20,9 @@ namespace KeyboardLocker
                 return;
 
             AppDomain.CurrentDomain.UnhandledException += onUnhandledException;
+
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new TrayIcon());
         }
 

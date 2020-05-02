@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Common;
 using KeyboardLocker.Input;
@@ -9,6 +10,8 @@ namespace KeyboardLocker.UI
 {
     public class TrayIcon : TrayIconBase
     {
+
+
         private readonly Bitmap iconLock;
         private readonly Bitmap iconScreen;
         private readonly SoundPlayer soundBlock;
@@ -26,6 +29,7 @@ namespace KeyboardLocker.UI
 #endif
 
             this.inputBlocker = new InputBlocker(Keys.Pause, Keys.Pause);
+            this.inputBlocker.ScreenTurnedOff += this.onScreenTurnedOff;
             this.inputBlocker.ScreenOffRequested += this.onScreenOffRequested;
             this.inputBlocker.BlockingStateChanged += this.onBlockingStateChanged;
 
@@ -72,7 +76,11 @@ namespace KeyboardLocker.UI
 
                 this.trayIcon.Visible = true;
                 if (blockingState)
-                    BalloonTooltip.Show(this.iconLock, $"Your keyboard and mouse is locked.{Environment.NewLine}Press \"{this.inputBlocker.UnblockingKey}\" to unlock.", 5000);
+                    BalloonTooltip.Show(
+                        this.iconLock,
+                        $"Your keyboard and mouse is locked.{Environment.NewLine}Press \"{this.inputBlocker.UnblockingKey}\" to unlock.",
+                        $"Hold \"{this.inputBlocker.UnblockingKey}\" to turn off the screen.",
+                        5000);
                 else
                     BalloonTooltip.Hide();
             }
@@ -131,6 +139,11 @@ namespace KeyboardLocker.UI
         private void onKeyPressed(Keys key)
         {
             BalloonTooltip.Show(this.iconLock, key.ToString());
+        }
+
+        private void onScreenTurnedOff()
+        {
+            BalloonTooltip.Hide();
         }
 
         #endregion
