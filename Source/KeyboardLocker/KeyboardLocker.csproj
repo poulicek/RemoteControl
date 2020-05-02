@@ -55,13 +55,13 @@
       <Link>UI\TrayIconBase.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Input\HooksManager.cs" />
-    <Compile Include="Input\InputBlocker.cs" />
-    <Compile Include="Input\KeyCombination.cs" />
+    <Compile Include="Resources\Input\HooksManager.cs" />
+    <Compile Include="Resources\Input\InputBlocker.cs" />
+    <Compile Include="Resources\Input\KeyCombination.cs" />
+    <Compile Include="Resources\Input\SystemControls.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\BalloonTooltip.cs" />
-    <Compile Include="UI\NotificationHelper.cs" />
     <Compile Include="UI\TrayIcon.cs">
       <SubType>Form</SubType>
     </Compile>

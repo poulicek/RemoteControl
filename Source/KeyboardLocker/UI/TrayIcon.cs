@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Media;
 using System.Windows.Forms;
 using Common;
@@ -18,14 +17,23 @@ namespace KeyboardLocker.UI
 
         public TrayIcon() : base("Keyboard Locker")
         {
-            this.inputBlocker = new InputBlocker(Keys.Pause);
-            this.inputBlocker.InputBlocked += this.onInputBlocked;
+#if DEBUG
+            HooksManager.KeyPressed += this.onKeyPressed;
+#endif
+            HooksManager.KeyBlocked += this.onKeyBlocked;
+
+            this.inputBlocker = new InputBlocker(Keys.Pause, Keys.Pause, Keys.Pause | Keys.Control);
             this.inputBlocker.BlockingStateChanged += this.onBlockingStateChanged;
 
             this.soundBlock = this.getSound(true);
             this.soundUnblock = this.getSound(false);
 
             this.notificationIcon = this.getResourceImage("Resources.IconLocked.png");
+        }
+
+        private void onKeyPressed(Keys key)
+        {
+            BalloonTooltip.Show(this.notificationIcon, key.ToString());
         }
 
         #region UI
@@ -63,9 +71,9 @@ namespace KeyboardLocker.UI
 
                 this.trayIcon.Visible = true;
                 if (blockingState)
-                    NotificationHelper.Show(this.notificationIcon, $"Your keyboard and mouse is locked.{Environment.NewLine}Press \"{this.inputBlocker.ControlKey}\" to unlock.", 5000);
+                    BalloonTooltip.Show(this.notificationIcon, $"Your keyboard and mouse is locked.{Environment.NewLine}Press \"{this.inputBlocker.UnblockingKey}\" to unlock.", 5000);
                 else
-                    NotificationHelper.Hide();
+                    BalloonTooltip.Hide();
             }
             catch { }
         }
@@ -100,7 +108,6 @@ namespace KeyboardLocker.UI
                 this.inputBlocker.StartBlocking();
         }
 
-
         private void onBlockingStateChanged(bool state)
         {
             this.updateLook();
@@ -108,7 +115,7 @@ namespace KeyboardLocker.UI
             this.showToolTip(state);
         }
 
-        private void onInputBlocked()
+        private void onKeyBlocked()
         {
             this.showToolTip(true);
         }

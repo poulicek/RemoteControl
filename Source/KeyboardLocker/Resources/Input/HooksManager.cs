@@ -65,39 +65,30 @@ namespace KeyboardLocker.Input
 
         #endregion
 
-        private static bool eventTriggered;
+        private static Keys lastKey;
 
         private static IntPtr mouseHookId = IntPtr.Zero;
         private static IntPtr keyboardHookId = IntPtr.Zero;
 
-        private static KeyCombination triggerKey;
+        private static KeyCombination[] specialKeys;
         private static LowLevelCallbackProc mouseCallback;
         private static LowLevelCallbackProc keyboardCallback;
 
-        public static event Action InputBlocked;
-        public static event Action KeyCombinationTriggered;
+        public static event Action KeyBlocked;
+        public static event Action<Keys> KeyPressed;
 
         public static bool BlockInput { get; private set; }
 
 
         /// <summary>
-        /// Re-sets the hooks for keyboard and mouse
-        /// </summary>
-        public static void SetHooks(KeyCombination trigger)
-        {
-            SetHooks(trigger, BlockInput);
-        }
-
-
-        /// <summary>
         /// Sets the hooks for keyboard and mouse (depending on if input blocking is requested)
         /// </summary>
-        public static void SetHooks(KeyCombination trigger, bool blockInput)
+        public static void SetHooks(bool blockInput, params KeyCombination[] specialKeys)
         {
             UnHook();
 
             HooksManager.BlockInput = blockInput;
-            HooksManager.triggerKey = trigger;
+            HooksManager.specialKeys = specialKeys;
             
             // callbacks have their instance variables to prevent their destrcution by garbage collector
             keyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardCallback = new LowLevelCallbackProc(keyboardHookCallback), Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);            
@@ -133,7 +124,7 @@ namespace KeyboardLocker.Input
             try
             {
                 if (wParam == (IntPtr)MouseMessages.WM_LBUTTONDOWN || wParam == (IntPtr)MouseMessages.WM_RBUTTONDOWN)
-                    InputBlocked?.Invoke();                
+                    KeyBlocked?.Invoke();                
             }
             catch { }
 
@@ -146,36 +137,36 @@ namespace KeyboardLocker.Input
         /// </summary>
         private static IntPtr keyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
+            var key = getKey(lParam);
+            var isDown = wParam == (IntPtr)WM_KEYDOWN;
+
             try
             {
-                var key = getKey(lParam);
-                var isDown = wParam == (IntPtr)WM_KEYDOWN;
-
-                // detection of the trigger key
-                if (isTriggerKey(key))
+                if (lastKey != key)
                 {
-                    if (!isDown)
-                        eventTriggered = false;
-                    else if (!eventTriggered)
-                    {
-                        KeyCombinationTriggered?.Invoke();
-                        eventTriggered = true;
-                    }
+                    // finding the special key
+                    if (checkSpecialKey(key, isDown))
+                        return new IntPtr(-1);
+
+                    // invoking key pressed event
+                    if (isDown)
+                        KeyPressed?.Invoke(key);
                 }
 
-                // propagate event if input is not blocked
-                if (!BlockInput)
-                    return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
-
-                // modifiers are always allowed
-                if (isKeyAllowed(key))
+                // propagate event if input is not blocked or is a modifier
+                if (!BlockInput || isKeyModifier(key))
                     return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
 
                 // inform about the blocked key
-                if (isDown)
-                    InputBlocked?.Invoke();
+                if (isDown && lastKey != key)
+                    KeyBlocked?.Invoke();
             }
             catch { }
+            finally
+            {
+                // setting the last key
+                lastKey = isDown ? key : Keys.None;
+            }
 
             // blocking the input;
             return new IntPtr(-1);
@@ -184,53 +175,61 @@ namespace KeyboardLocker.Input
         #region Helpers
 
         /// <summary>
+        /// Returns true of the key is pressed
+        /// </summary>
+        private static bool isKeyPressed(Keys key)
+        {
+            return (GetKeyState((int)key) & 0x80) == 0x80;
+        }
+
+
+        /// <summary>
         /// Converts the pointer into structure
         /// </summary>
         private static Keys getKey(IntPtr ptr)
         {
-            return (Keys)((KeyboardHookStruct)Marshal.PtrToStructure(ptr, typeof(KeyboardHookStruct))).VirtualKeyCode;
+            var key = (Keys)((KeyboardHookStruct)Marshal.PtrToStructure(ptr, typeof(KeyboardHookStruct))).VirtualKeyCode;
+
+            if (isKeyPressed(Keys.ControlKey))
+                key |= Keys.Control;
+
+            if (isKeyPressed(Keys.ShiftKey))
+                key |= Keys.Shift;
+
+            if (isKeyPressed(Keys.Menu))
+                key |= Keys.Alt;
+
+            return key;
         }
 
 
         /// <summary>
-        /// Returns true if the pressed key is the trigger
+        /// Checks if the key combination was triggered
         /// </summary>
-        private static bool isTriggerKey(Keys key)
+        private static bool checkSpecialKey(Keys key, bool isDown)
         {
-            if (triggerKey == null)
-                return false;
+            foreach (var k in specialKeys)
+                if (k.Key == key && k.SetPressed(isDown) == true)
+                    return true;
 
-            // checking the main key
-            if (triggerKey.MainKey != key)
-                return false;
-
-            // checking if all modifiers are pressed
-            foreach (var modifierKey in triggerKey.Modifiers)
-                if ((GetKeyState((int)modifierKey) & 0x80) != 0x80)
-                    return false;
-
-            return true;
+            return false;
         }
 
-        
+
         /// <summary>
         /// Returns true if the key is a modifier
         /// </summary>
-        private static bool isKeyAllowed(Keys key)
+        private static bool isKeyModifier(Keys key)
         {
-            if (triggerKey != null)
-                return false;
-
-            foreach (var modifierKey in triggerKey.Modifiers)
+            switch (key)
             {
-                if (modifierKey == key)
+                case Keys.LShiftKey:
+                case Keys.RShiftKey:
+                case Keys.RControlKey:
+                case Keys.LControlKey:
+                case Keys.LMenu:
+                case Keys.RMenu:
                     return true;
-
-                if (modifierKey == Keys.ControlKey)
-                    return key == Keys.LControlKey || key == Keys.RControlKey;
-
-                if (modifierKey == Keys.ShiftKey)
-                    return key == Keys.LShiftKey || key == Keys.RShiftKey;
             }
 
             return false;
