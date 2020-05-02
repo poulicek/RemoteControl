@@ -11,7 +11,8 @@ namespace KeyboardLocker.Input
 
         private const int WH_KEYBOARD_LL = 13;
         private const int WH_MOUSE_LL = 14;
-        private const int WM_KEYDOWN = 256;
+        private const int WM_KEYDOWN = 0x0100;
+        private const int WM_SYSKEYDOWN = 0x0104;
         public enum MouseMessages
         {
             WM_LBUTTONDOWN = 0x0201,
@@ -65,12 +66,12 @@ namespace KeyboardLocker.Input
 
         #endregion
 
-        private static Keys lastKey;
+        private static Keys lastKeyDown;
 
         private static IntPtr mouseHookId = IntPtr.Zero;
         private static IntPtr keyboardHookId = IntPtr.Zero;
 
-        private static KeyCombination[] specialKeys;
+        private static ActionKey[] actionKeys;
         private static LowLevelCallbackProc mouseCallback;
         private static LowLevelCallbackProc keyboardCallback;
 
@@ -83,12 +84,12 @@ namespace KeyboardLocker.Input
         /// <summary>
         /// Sets the hooks for keyboard and mouse (depending on if input blocking is requested)
         /// </summary>
-        public static void SetHooks(bool blockInput, params KeyCombination[] specialKeys)
+        public static void SetHooks(bool blockInput, params ActionKey[] actionKeys)
         {
             UnHook();
 
             HooksManager.BlockInput = blockInput;
-            HooksManager.specialKeys = specialKeys;
+            HooksManager.actionKeys = actionKeys;
             
             // callbacks have their instance variables to prevent their destrcution by garbage collector
             keyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardCallback = new LowLevelCallbackProc(keyboardHookCallback), Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);            
@@ -138,14 +139,15 @@ namespace KeyboardLocker.Input
         private static IntPtr keyboardHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             var key = getKey(lParam);
-            var isDown = wParam == (IntPtr)WM_KEYDOWN;
+            var isDown = (int)wParam == WM_KEYDOWN || (int)wParam == WM_SYSKEYDOWN;
 
             try
             {
-                if (lastKey != key)
+                // ingore repeating messages
+                if (lastKeyDown != key || !isDown)
                 {
                     // finding the special key
-                    if (checkSpecialKey(key, isDown))
+                    if (tryInvokeActionKey(key, isDown))
                         return new IntPtr(-1);
 
                     // invoking key pressed event
@@ -158,14 +160,13 @@ namespace KeyboardLocker.Input
                     return CallNextHookEx(keyboardHookId, nCode, wParam, lParam);
 
                 // inform about the blocked key
-                if (isDown && lastKey != key)
+                if (isDown && lastKeyDown != key)
                     KeyBlocked?.Invoke();
             }
             catch { }
             finally
             {
-                // setting the last key
-                lastKey = isDown ? key : Keys.None;
+                lastKeyDown = isDown ? key : Keys.None;
             }
 
             // blocking the input;
@@ -190,6 +191,9 @@ namespace KeyboardLocker.Input
         {
             var key = (Keys)((KeyboardHookStruct)Marshal.PtrToStructure(ptr, typeof(KeyboardHookStruct))).VirtualKeyCode;
 
+            if (isKeyModifier(key))
+                return key;
+
             if (isKeyPressed(Keys.ControlKey))
                 key |= Keys.Control;
 
@@ -206,9 +210,9 @@ namespace KeyboardLocker.Input
         /// <summary>
         /// Checks if the key combination was triggered
         /// </summary>
-        private static bool checkSpecialKey(Keys key, bool isDown)
+        private static bool tryInvokeActionKey(Keys key, bool isDown)
         {
-            foreach (var k in specialKeys)
+            foreach (var k in actionKeys)
                 if (k.Key == key && k.SetPressed(isDown) == true)
                     return true;
 
@@ -221,18 +225,7 @@ namespace KeyboardLocker.Input
         /// </summary>
         private static bool isKeyModifier(Keys key)
         {
-            switch (key)
-            {
-                case Keys.LShiftKey:
-                case Keys.RShiftKey:
-                case Keys.RControlKey:
-                case Keys.LControlKey:
-                case Keys.LMenu:
-                case Keys.RMenu:
-                    return true;
-            }
-
-            return false;
+            return key >= Keys.LShiftKey && key <= Keys.RMenu;
         }
 
         #endregion

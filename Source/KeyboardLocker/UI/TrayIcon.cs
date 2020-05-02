@@ -9,9 +9,11 @@ namespace KeyboardLocker.UI
 {
     public class TrayIcon : TrayIconBase
     {
-        private readonly Bitmap notificationIcon;
+        private readonly Bitmap iconLock;
+        private readonly Bitmap iconScreen;
         private readonly SoundPlayer soundBlock;
         private readonly SoundPlayer soundUnblock;
+        private readonly SoundPlayer soundLongPress;
         private readonly InputBlocker inputBlocker;
 
 
@@ -19,21 +21,20 @@ namespace KeyboardLocker.UI
         {
 #if DEBUG
             HooksManager.KeyPressed += this.onKeyPressed;
-#endif
+#else
             HooksManager.KeyBlocked += this.onKeyBlocked;
+#endif
 
-            this.inputBlocker = new InputBlocker(Keys.Pause, Keys.Pause, Keys.Pause | Keys.Control);
+            this.inputBlocker = new InputBlocker(Keys.Pause, Keys.Pause);
+            this.inputBlocker.ScreenOffRequested += this.onScreenOffRequested;
             this.inputBlocker.BlockingStateChanged += this.onBlockingStateChanged;
 
-            this.soundBlock = this.getSound(true);
-            this.soundUnblock = this.getSound(false);
+            this.soundBlock = this.getSound("Lock.wav");
+            this.soundUnblock = this.getSound("Unlock.wav");
+            this.soundLongPress = this.getSound("LongPress.wav");
 
-            this.notificationIcon = this.getResourceImage("Resources.IconLocked.png");
-        }
-
-        private void onKeyPressed(Keys key)
-        {
-            BalloonTooltip.Show(this.notificationIcon, key.ToString());
+            this.iconLock = this.getResourceImage("Resources.IconLocked.png");
+            this.iconScreen = this.getResourceImage("Resources.IconScreenOff.png");
         }
 
         #region UI
@@ -45,7 +46,7 @@ namespace KeyboardLocker.UI
             this.soundBlock.Dispose();
             this.soundUnblock.Dispose();
             this.inputBlocker.Dispose();
-            this.notificationIcon.Dispose();
+            this.iconLock.Dispose();
         }
 
 
@@ -71,7 +72,7 @@ namespace KeyboardLocker.UI
 
                 this.trayIcon.Visible = true;
                 if (blockingState)
-                    BalloonTooltip.Show(this.notificationIcon, $"Your keyboard and mouse is locked.{Environment.NewLine}Press \"{this.inputBlocker.UnblockingKey}\" to unlock.", 5000);
+                    BalloonTooltip.Show(this.iconLock, $"Your keyboard and mouse is locked.{Environment.NewLine}Press \"{this.inputBlocker.UnblockingKey}\" to unlock.", 5000);
                 else
                     BalloonTooltip.Hide();
             }
@@ -82,10 +83,11 @@ namespace KeyboardLocker.UI
         /// <summary>
         /// Returns the sound object
         /// </summary>
-        private SoundPlayer getSound(bool block)
+        private SoundPlayer getSound(string fileName)
         {
-            return new SoundPlayer(this.getResourceStream($"Resources.{(block ? "Lock" : "Unlock")}.wav"));
+            return new SoundPlayer(this.getResourceStream($"Resources.{fileName}"));
         }
+
         
         /// <summary>
         /// Plays the notification
@@ -111,13 +113,24 @@ namespace KeyboardLocker.UI
         private void onBlockingStateChanged(bool state)
         {
             this.updateLook();
-            this.playNotificationSound(state);
             this.showToolTip(state);
+            this.playNotificationSound(state);
         }
 
         private void onKeyBlocked()
         {
             this.showToolTip(true);
+        }
+
+        private void onScreenOffRequested()
+        {
+            BalloonTooltip.Show(this.iconScreen, "Turning the screen off...");
+            //this.soundLongPress.Play();
+        }
+
+        private void onKeyPressed(Keys key)
+        {
+            BalloonTooltip.Show(this.iconLock, key.ToString());
         }
 
         #endregion
