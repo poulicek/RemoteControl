@@ -28,6 +28,8 @@ namespace KeyboardLocker.UI
             HooksManager.KeyBlocked += this.onKeyBlocked;
 #endif
 
+            BalloonTooltip.InitActivation();
+
             this.inputBlocker = new InputBlocker(Keys.Pause, Keys.Pause);
             this.inputBlocker.ScreenTurnedOff += this.onScreenTurnedOff;
             this.inputBlocker.ScreenOffRequested += this.onScreenOffRequested;
@@ -143,7 +145,7 @@ namespace KeyboardLocker.UI
 
         private void onScreenTurnedOff()
         {
-            BalloonTooltip.Hide();
+            BalloonTooltip.Activate();
         }
 
         #endregion

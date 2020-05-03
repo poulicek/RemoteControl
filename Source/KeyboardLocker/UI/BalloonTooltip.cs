@@ -44,6 +44,22 @@ namespace KeyboardLocker.UI
                 this.AutoScaleMode = AutoScaleMode.Dpi;
             }
 
+            protected override void OnPaintBackground(PaintEventArgs e)
+            {
+                // hiding if no contents are available
+                if (string.IsNullOrEmpty(this.Message))
+                    this.Hide();
+                else
+                    base.OnPaintBackground(e);
+
+            }
+
+            protected override void OnPaint(PaintEventArgs e)
+            {
+                if (!string.IsNullOrEmpty(this.Message))
+                    this.drawContents(e.Graphics);
+            }
+
 
             /// <summary>
             /// Gets the desired location
@@ -67,11 +83,6 @@ namespace KeyboardLocker.UI
             }
 
             #region Look
-
-            protected override void OnPaint(PaintEventArgs e)
-            {
-                this.drawContents(e.Graphics);
-            }
 
 
             /// <summary>
@@ -156,6 +167,15 @@ namespace KeyboardLocker.UI
 
 
         /// <summary>
+        /// Initializes the tooltip activation by showing an empty balloon once
+        /// </summary>
+        public static void InitActivation()
+        {
+            tooltip.ShowUnfocused();
+        }
+
+
+        /// <summary>
         /// Resets the timer
         /// </summary>
         private static void resetTimer(int timeout = 0)
@@ -191,6 +211,15 @@ namespace KeyboardLocker.UI
         {
             resetTimer();
             tooltip.Hide();
+        }
+
+
+        /// <summary>
+        /// Activates the tooltip control
+        /// </summary>
+        public static void Activate()
+        {
+            tooltip.Activate();
         }
 
         private static void onTimerTick(object sender, EventArgs e)
