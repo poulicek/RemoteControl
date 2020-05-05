@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace KeyboardLocker.Input
 {
@@ -13,18 +14,35 @@ namespace KeyboardLocker.Input
         public ActionKey BlockingKey { get; private set; }
         public ActionKey UnblockingKey { get; private set; }
 
+
         public InputBlocker(ActionKey blockingKey, ActionKey unblockingKey)
         {
             this.BlockingKey = blockingKey;
-            this.BlockingKey.Pressed += this.StartBlocking;
-            this.BlockingKey.Released += this.TurnScreenOff;
+            this.BlockingKey.Pressed += this.onBlockingKeyPressed;
+            this.BlockingKey.Released += this.onBlockingKeyReleased;
             this.BlockingKey.LongPress += this.onBlockingKeyLongPress;
 
             this.UnblockingKey = unblockingKey;
-            this.UnblockingKey.Pressed += this.StopBlocking;
+            this.UnblockingKey.Pressed += this.onUnblockingKeyPressed;
 
             this.setBlockingState(false);
             
+        }
+
+        #region Action Keys Event Handlers
+
+        private bool onBlockingKeyPressed()
+        {
+            return this.StartBlocking();
+        }
+
+        private bool onBlockingKeyReleased()
+        {
+            if (this.BlockingKey?.WasLongPressed != true)
+                return false;
+
+            this.StartBlockingScreenOff();
+            return true;
         }
 
         private void onBlockingKeyLongPress()
@@ -32,24 +50,24 @@ namespace KeyboardLocker.Input
             this.ScreenOffRequested?.Invoke();
         }
 
-        private void setBlockingState(bool blockInput)
+        private bool onUnblockingKeyPressed()
         {
-            HooksManager.SetHooks(blockInput, this.BlockingKey, this.UnblockingKey);
+            return this.StopBlocking();
         }
 
-        public bool TurnScreenOff()
+        #endregion
+
+        #region Interface
+
+        public void StartBlockingScreenOff()
         {
-            if (this.BlockingKey?.WasLongPressed != true)
-                return false;
-
             this.StartBlocking();
-
 #if !DEBUG
-            SystemControls.TurnOffScreen();
+            this.turnScreenOff(500);
 #endif
             this.ScreenTurnedOff?.Invoke();
-            return true;
         }
+
 
         public bool StartBlocking()
         {
@@ -72,9 +90,49 @@ namespace KeyboardLocker.Input
             return true;
         }
 
+
         public void Dispose()
         {
             this.StopBlocking();
         }
+
+        #endregion
+
+        #region Helpers
+
+        /// <summary>
+        /// Sets the blocking state
+        /// </summary>
+        /// <param name="blockInput"></param>
+
+        private void setBlockingState(bool blockInput)
+        {
+            HooksManager.SetHooks(blockInput, this.BlockingKey, this.UnblockingKey);
+        }
+
+
+        /// <summary>
+        /// Turns off the screen
+        /// </summary>
+        private void turnScreenOff(int timeLimitMs)
+        {
+            try
+            {
+                var t = new Thread(() =>
+                {
+                    try
+                    {
+                        SystemControls.TurnOffScreen();
+                    }
+                    catch { }
+                });
+                t.Start();
+                Thread.Sleep(timeLimitMs);
+                t.Abort();
+            }
+            catch { }
+        }
+
+        #endregion
     }
 }
