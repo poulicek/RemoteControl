@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Media;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Common;
 using KeyboardLocker.Input;
@@ -10,7 +10,7 @@ namespace KeyboardLocker.UI
 {
     public class TrayIcon : TrayIconBase
     {
-
+        private bool shortcutSettingMode;
 
         private readonly Bitmap iconLock;
         private readonly Bitmap iconScreen;
@@ -22,11 +22,9 @@ namespace KeyboardLocker.UI
 
         public TrayIcon() : base("Keyboard Locker")
         {
-#if DEBUG
             HooksManager.KeyPressed += this.onKeyPressed;
-#else
+            HooksManager.KeyReleased += this.onKeyReleased;
             HooksManager.KeyBlocked += this.onKeyBlocked;
-#endif
 
             BalloonTooltip.InitActivation();
 
@@ -88,7 +86,17 @@ namespace KeyboardLocker.UI
             }
             catch { }
         }
-        
+
+        protected override List<MenuItem> getMenuItems()
+        {
+            var items = base.getMenuItems();
+            items.Insert(0, new MenuItem("Set shortcut...", this.onSetShortcutClick));
+            items.Insert(0, new MenuItem("-"));
+            items.Insert(0, new MenuItem("Turn off screen", this.onScreenTurnOffClick));
+            items.Insert(0, new MenuItem("Lock", this.onLockClick, (Shortcut)this.inputBlocker.BlockingKey.Key));
+
+            return items;
+        }
 
         /// <summary>
         /// Returns the sound object
@@ -135,19 +143,63 @@ namespace KeyboardLocker.UI
         private void onScreenOffRequested()
         {
             BalloonTooltip.Show(this.iconScreen, "Turning the screen off...");
-            //this.soundLongPress.Play();
         }
 
         private void onKeyPressed(Keys key)
         {
-            BalloonTooltip.Show(this.iconLock, key.ToString());
+            if (this.shortcutSettingMode)
+                BalloonTooltip.Show(this.iconLock, $"Press desired key combination{Environment.NewLine}{(ActionKey)key}");
+        }
+
+
+        private void onKeyReleased(Keys key)
+        {
+            if (!this.shortcutSettingMode)
+                return;
+
+            if (ActionKey.GetUnmodifiedKey(key) == Keys.None)
+                return;
+
+            try
+            {
+                BalloonTooltip.Hide();
+                this.shortcutSettingMode = false;
+                if (MessageBox.Show($"Do you wish to set this shortcut? {(ActionKey)key}", "Set shortcut", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.No)
+                    return;
+
+                this.inputBlocker.BlockingKey.Key = key;
+                this.inputBlocker.UnblockingKey.Key = key;
+                this.createContextMenu();
+            }
+            finally
+            {
+                this.inputBlocker.Enabled = true;
+            }
         }
 
         private void onScreenTurnedOff()
         {
+            BalloonTooltip.Show(this.iconScreen, "..zzZ");
             BalloonTooltip.Activate();
         }
 
-        #endregion
+        private void onScreenTurnOffClick(object sender, EventArgs e)
+        {
+            this.inputBlocker.StartBlockingScreenOff();
+        }
+
+        private void onLockClick(object sender, EventArgs e)
+        {
+            this.inputBlocker.StartBlocking();
+        }
+
+        private void onSetShortcutClick(object sender, EventArgs e)
+        {
+            this.inputBlocker.Enabled = false;
+            this.shortcutSettingMode = true;
+            BalloonTooltip.Show(this.iconLock, $"Press desired key combination...");
+        }
+
+#endregion
     }
 }

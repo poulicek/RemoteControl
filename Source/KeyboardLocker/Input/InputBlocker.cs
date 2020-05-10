@@ -9,6 +9,8 @@ namespace KeyboardLocker.Input
         public event Action ScreenTurnedOff;
         public event Action<bool> BlockingStateChanged;
 
+        public bool Enabled { get; set; }
+
         public bool IsBlocking { get { return HooksManager.BlockInput; } }
 
         public ActionKey BlockingKey { get; private set; }
@@ -17,6 +19,7 @@ namespace KeyboardLocker.Input
 
         public InputBlocker(ActionKey blockingKey, ActionKey unblockingKey)
         {
+            this.Enabled = true;
             this.BlockingKey = blockingKey;
             this.BlockingKey.Pressed += this.onBlockingKeyPressed;
             this.BlockingKey.Released += this.onBlockingKeyReleased;
@@ -25,8 +28,7 @@ namespace KeyboardLocker.Input
             this.UnblockingKey = unblockingKey;
             this.UnblockingKey.Pressed += this.onUnblockingKeyPressed;
 
-            this.setBlockingState(false);
-            
+            this.setBlockingState(false);   
         }
 
         #region Action Keys Event Handlers
@@ -47,7 +49,8 @@ namespace KeyboardLocker.Input
 
         private void onBlockingKeyLongPress()
         {
-            this.ScreenOffRequested?.Invoke();
+            if (this.Enabled)
+                this.ScreenOffRequested?.Invoke();
         }
 
         private bool onUnblockingKeyPressed()
@@ -61,6 +64,9 @@ namespace KeyboardLocker.Input
 
         public void StartBlockingScreenOff()
         {
+            if (!this.Enabled)
+                return;
+
             this.StartBlocking();
 #if !DEBUG
             this.turnScreenOff(500);
@@ -71,7 +77,7 @@ namespace KeyboardLocker.Input
 
         public bool StartBlocking()
         {
-            if (HooksManager.BlockInput)
+            if (!this.Enabled || HooksManager.BlockInput)
                 return false;
 
             this.setBlockingState(true);
@@ -82,7 +88,7 @@ namespace KeyboardLocker.Input
 
         public bool StopBlocking()
         {
-            if (!HooksManager.BlockInput)
+            if (!this.Enabled || !HooksManager.BlockInput)
                 return false;
 
             this.setBlockingState(false);
@@ -93,7 +99,7 @@ namespace KeyboardLocker.Input
 
         public void Dispose()
         {
-            this.StopBlocking();
+            this.setBlockingState(false);
         }
 
         #endregion

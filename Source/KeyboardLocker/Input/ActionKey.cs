@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace KeyboardLocker.Input
@@ -15,7 +17,7 @@ namespace KeyboardLocker.Input
         public event Func<bool> Released;
         public event Action LongPress;
 
-        public readonly Keys Key;
+        public Keys Key { get; set; }
 
         public bool IsPressed { get; private set; }
         public bool WasLongPressed { get; private set; }
@@ -41,7 +43,7 @@ namespace KeyboardLocker.Input
                 
                 return this.Pressed?.Invoke() == true;
             }
-            
+
             return this.Released?.Invoke() == true;
         }
 
@@ -54,7 +56,27 @@ namespace KeyboardLocker.Input
 
         public override string ToString()
         {
-            return this.Key.ToString();
+            var str = string.Empty;
+            if (this.Key.HasFlag(Keys.Control))
+                str += "Ctrl,";
+
+            if (this.Key.HasFlag(Keys.Alt))
+                str += "Alt,";
+
+            if (this.Key.HasFlag(Keys.Shift))
+                str += "Shift,";
+
+            var rootKey = GetUnmodifiedKey(this.Key);
+            if (rootKey != Keys.None)
+                str += rootKey;
+
+            return str.Trim(',').Replace(',', '+');
+        }
+
+
+        public static Keys GetUnmodifiedKey(Keys key)
+        {
+            return key & ~Keys.Control & ~Keys.Shift & ~Keys.Alt;
         }
     }
 }

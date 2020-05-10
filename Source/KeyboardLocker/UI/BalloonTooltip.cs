@@ -117,20 +117,39 @@ namespace KeyboardLocker.UI
                 {
                     using (var f = new Font("Segoe UI", 11, FontStyle.Bold, GraphicsUnit.Point))
                     using (var sf = new StringFormat() { LineAlignment = StringAlignment.Center })
+                    {
                         g.DrawString(this.Message, f, Brushes.White, rect, sf);
+                        this.ensureSize(g, this.Message, f, rect);
+                    }
                 }
                 else
                 {
                     using (var f = new Font("Segoe UI", 11, FontStyle.Bold, GraphicsUnit.Point))
                     using (var sf = new StringFormat() { LineAlignment = StringAlignment.Near })
+                    {
                         g.DrawString(this.Message, f, Brushes.White, new Rectangle(rect.X, rect.Y, rect.Width, 2 * rect.Height / 3), sf);
+                        this.ensureSize(g, this.Message, f, rect);
+                    }
 
                     using (var f = new Font("Segoe UI", 9, GraphicsUnit.Point))
                     using (var sf = new StringFormat() { LineAlignment = StringAlignment.Far })
+                    {
                         g.DrawString(this.Note, f, Brushes.White, new Rectangle(rect.X, rect.Y + 2 * rect.Height / 3, rect.Width, rect.Height / 3), sf);
+                        this.ensureSize(g, this.Note, f, rect);
+                    }
                 }
 
                 return rect;
+            }
+
+            private void ensureSize(Graphics g, string str, Font f, Rectangle rect)
+            {
+                var s = g.MeasureString(str, f);
+                if (s.Width > rect.Width)
+                {
+                    this.Width += ((int)Math.Ceiling(s.Width) - rect.Width);
+                    this.ShowUnfocused();
+                }
             }
 
 

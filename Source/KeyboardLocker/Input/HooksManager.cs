@@ -77,6 +77,7 @@ namespace KeyboardLocker.Input
 
         public static event Action KeyBlocked;
         public static event Action<Keys> KeyPressed;
+        public static event Action<Keys> KeyReleased;
 
         public static bool BlockInput { get; private set; }
 
@@ -90,11 +91,12 @@ namespace KeyboardLocker.Input
 
             HooksManager.BlockInput = blockInput;
             HooksManager.actionKeys = actionKeys;
-            
+            var hModule = Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]);
+
             // callbacks have their instance variables to prevent their destrcution by garbage collector
-            keyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardCallback = new LowLevelCallbackProc(keyboardHookCallback), Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);            
+            keyboardHookId = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardCallback = new LowLevelCallbackProc(keyboardHookCallback), hModule, 0);            
             if (blockInput)
-                mouseHookId = SetWindowsHookEx(WH_MOUSE_LL, mouseCallback = new LowLevelCallbackProc(mouseBlockingHookCallback), Marshal.GetHINSTANCE(Assembly.GetExecutingAssembly().GetModules()[0]), 0);
+                mouseHookId = SetWindowsHookEx(WH_MOUSE_LL, mouseCallback = new LowLevelCallbackProc(mouseBlockingHookCallback), hModule, 0);
         }
 
 
@@ -153,6 +155,8 @@ namespace KeyboardLocker.Input
                     // invoking key pressed event
                     if (isDown)
                         KeyPressed?.Invoke(key);
+                    else
+                        KeyReleased?.Invoke(key);
                 }
 
                 // propagate event if input is not blocked or is a modifier
@@ -190,20 +194,21 @@ namespace KeyboardLocker.Input
         private static Keys getKey(IntPtr ptr)
         {
             var key = (Keys)((KeyboardHookStruct)Marshal.PtrToStructure(ptr, typeof(KeyboardHookStruct))).VirtualKeyCode;
+            var res = key;
 
             if (isKeyModifier(key))
-                return key;
+                res = Keys.None;
 
-            if (isKeyPressed(Keys.ControlKey))
-                key |= Keys.Control;
+            if (isKeyPressed(Keys.ControlKey) || key == Keys.LControlKey || key == Keys.RControlKey)
+                res |= Keys.Control;
 
-            if (isKeyPressed(Keys.ShiftKey))
-                key |= Keys.Shift;
+            if (isKeyPressed(Keys.ShiftKey) || key == Keys.LShiftKey || key == Keys.RShiftKey)
+                res |= Keys.Shift;
 
-            if (isKeyPressed(Keys.Menu))
-                key |= Keys.Alt;
+            if (isKeyPressed(Keys.Menu) || key == Keys.LMenu || key == Keys.RMenu)
+                res |= Keys.Alt;
 
-            return key;
+            return res;
         }
 
 
