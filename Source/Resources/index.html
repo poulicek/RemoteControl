@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="full-screen" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Remote Control</title>
+    <style>
+        html { background: #2d2d2d; color: white; font-family: Calibri; overflow: hidden; }
+        body { padding: 0px; margin: 0px; position: relative; margin-top: calc((100vh - 80vw) / 2); box-sizing: border-box;}
+        #content { display: flex; margin: 0px auto; }
+        .section { width: 100%; text-align: center; }
+        .section:nth-child(odd) { padding-left: 10vw; }
+        .section:nth-child(even) { padding-right: 10vw; }
+        .button { display: block; text-align: center; border-radius: 50%; width: 24vw; line-height: 24vw; height: 24vw; border: 1px solid white; color: white; font-size: 15vw; opacity: 0.8; text-decoration: none; margin: 8vw auto; }
+        .button:hover { opacity: 1; }
+        .button:active { background: white; color: black; opacity: 1; }
+    </style>
+</head>
+
+<body>
+    <div id="content">
+        <div class="section">
+            <a class="button" href="command=key&value=1">+</a>
+            <a class="button" href="command=key&value=1">-</a>
+        </div>
+        <div class="section">
+            <a class="button" href="command=key&value=1">+</a>
+            <a class="button" href="command=key&value=1">-</a>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+    </script>
+</body>
+</html>
