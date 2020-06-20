@@ -13,6 +13,7 @@ namespace RemoteControl.Server
 
         private HttpListenerContext currentContext;
 
+
         public void Listen(int port)
         {
             ThreadPool.QueueUserWorkItem((o) => this.startListening(port));

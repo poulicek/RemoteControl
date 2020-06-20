@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.Windows.Forms;
 using TrayToolkit.UI;
 
@@ -6,7 +6,7 @@ namespace RemoteControl
 {
     public partial class TrayIcon : TrayIconBase
     {
-        private readonly CommandController commandController = new CommandController();
+        private readonly Controller controller = new Controller();
 
         public TrayIcon() : base("Remote Control")
         {
@@ -14,17 +14,19 @@ namespace RemoteControl
 
         protected override string getIconName(bool lightMode)
         {
-            return null;
+            return lightMode
+                ? "Resources.IconLight.png"
+                : "Resources.IconDark.png";
         }
 
         protected override void onTrayIconClick(object sender, MouseEventArgs e)
         {
-            throw new NotImplementedException();
+            Process.Start(this.controller.ServerUrl);
         }
 
         protected override void Dispose(bool disposing)
         {
-            this.commandController.Dispose();
+            this.controller.Dispose();
             base.Dispose(disposing);
         }
     }

@@ -5,27 +5,38 @@ using RemoteControl.Server;
 
 namespace RemoteControl
 {
-    class CommandController : IDisposable
+    public class Controller : IDisposable
     {
+        private const int Port = 5000;
         private readonly HttpServer server = new HttpServer();
 
-        public CommandController()
+
+        public string ServerUrl
+        {
+            get
+            {
+                return $"http://localhost:{Port}";
+            }
+        }
+
+
+        public Controller()
         {
             this.server.CommandReceived += this.onCommandReceived;
-            this.server.Listen(50000);
+            this.server.Listen(Controller.Port);
         }
+
 
         private void onCommandReceived(string command, string value)
         {
             switch (command)
             {
-
-
                 default:
                     this.server.WriteText(this.getTextResource("index.html"));
                     break;
             }
         }
+
 
         private string getTextResource(string fileName)
         {
@@ -39,6 +50,7 @@ namespace RemoteControl
             using (var r = new StreamReader(s))
                 return r.ReadToEnd();
         }
+
 
         public void Dispose()
         {
