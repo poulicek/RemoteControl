@@ -65,7 +65,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\TrayToolkit\Source\TrayToolkit.csproj">
+      <Project>{855e79ef-1e63-4a3e-953e-3b5dc52ebd4c}</Project>
+      <Name>TrayToolkit</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\index.html" />
   </ItemGroup>
