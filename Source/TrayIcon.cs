@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows.Forms;
+using RemoteControl.UI;
 using TrayToolkit.UI;
 
 namespace RemoteControl
@@ -21,7 +22,9 @@ namespace RemoteControl
 
         protected override void onTrayIconClick(object sender, MouseEventArgs e)
         {
-            Process.Start(this.controller.ServerUrl);
+            using (var dlg = new MainForm(this.controller))
+                dlg.ShowDialog();
+            //Process.Start(this.controller.ServerUrl);
         }
 
         protected override void Dispose(bool disposing)

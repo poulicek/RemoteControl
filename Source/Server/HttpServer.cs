@@ -1,17 +1,15 @@
 ﻿using System;
-using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace RemoteControl.Server
 {
     public class HttpServer : IDisposable
     {
-        private readonly HttpListener listener = new HttpListener();
+        private TcpListener listener;
 
-        public event Action<string, string> CommandReceived;
-
-        private HttpListenerContext currentContext;
+        public event Action<HttpContext> RequestReceived;
 
 
         public void Listen(int port)
@@ -22,42 +20,27 @@ namespace RemoteControl.Server
 
         private void startListening(int port)
         {
-            this.listener.Prefixes.Add("http://*:" + port + "/");
+            this.listener = new TcpListener(IPAddress.Any, port);
             this.listener.Start();
 
-            while (this.listener.IsListening)
+            while (true)
             {
-                try
-                {
-                    this.handleRequest(this.listener.GetContext());
-                }
-                catch { }
+                var tcpClient = this.listener.AcceptTcpClient();
+                ThreadPool.QueueUserWorkItem(this.handleTcpClient, tcpClient);
             }
         }
 
 
-        private void handleRequest(HttpListenerContext context)
+        private void handleTcpClient(object o)
         {
-            this.currentContext = context;
-            this.CommandReceived?.Invoke(context.Request.QueryString["command"], context.Request.QueryString["value"]);
+            using (var context = new HttpContext(o as TcpClient))
+                this.RequestReceived?.Invoke(context);
         }
 
-
-        public void WriteText(string text, HttpStatusCode httpStatus = HttpStatusCode.OK)
-        {
-            if (this.currentContext == null)
-                return;
-
-            this.currentContext.Response.ContentType = "text/html";
-            using (var w = new StreamWriter(this.currentContext.Response.OutputStream))
-                w.Write(text);
-            this.currentContext.Response.OutputStream.Close();
-        }
 
         public void Dispose()
         {
-            this.listener.Stop();
-            this.listener.Close();
+            this.listener?.Stop();
         }
     }
 }
