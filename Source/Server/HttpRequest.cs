@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Web;
 
 namespace RemoteControl.Server
@@ -24,6 +25,9 @@ namespace RemoteControl.Server
         }
 
 
+        /// <summary>
+        /// Reads the stream
+        /// </summary>
         private void readStream(Stream stream)
         {
             // initial line
@@ -50,6 +54,9 @@ namespace RemoteControl.Server
         }
 
 
+        /// <summary>
+        /// Reads a line from the stream
+        /// </summary>
         private string readline(Stream stream)
         {
             var data = string.Empty;
@@ -67,6 +74,7 @@ namespace RemoteControl.Server
                     continue;
 
                 data += Convert.ToChar(nextChar);
+                Thread.Sleep(1);
             }
 
             return data;

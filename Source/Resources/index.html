@@ -38,8 +38,9 @@
                 if (this.readyState == 4)
                     document.body.className = this.status == 200 ? null : "requestError";
             };
-            xhttp.open("GET", query, false);
+            xhttp.open("GET", query, true);
             xhttp.send();
+            return xhttp;
         }
 
 
@@ -47,17 +48,36 @@
             var els = document.getElementsByTagName('a');
             for (var i = 0; i < els.length; i++) {
                 var el = els[i];
-                if (el.rel == 'async') {
+                if (el.rel == 'press') {
+                    el.onmouseout = function () {
+                        this.isPressed = false;
+                        return false;
+                    };
                     el.onclick = function () {
                         this.isPressed = false;
                         return false;
                     };
                     el.onmousedown = function () {
+                        this.xhttp = null;
                         this.isPressed = true;
-                        while (this.isPressed)
-                            sendRequest(this.href);
+                        keepSending(this);
                     };
                 }
+                else if (el.rel == 'click') {
+                    el.onclick = function () {
+                        sendRequest(this.href);
+                        return false;
+                    };
+                }
+            }
+        }
+
+
+        function keepSending(el) {
+            if (el.isPressed) {
+                if (!el.xhttp || el.xhttp.readyState == 4)
+                    el.xhttp = sendRequest(el.href);
+                setTimeout(function () { keepSending(el); }, 31);
             }
         }
 
@@ -75,7 +95,7 @@
                         <td></td>
                         <td></td>
                         <td>
-                            <a rel="async" href="?command=display&value=screenOff">&#59564</a>
+                            <a rel="click" href="?command=display&value=screenOff">&#59564;</a>
                         </td>
                     </tr>
                 </table>
@@ -85,15 +105,15 @@
             <td>
                 <table>
                     <tr>
-                        <td class="icon alignRight">&#57421</td>
+                        <td class="icon alignRight">&#57421;</td>
                         <td class="large">
-                            <a rel="async" class="button" href="?command=key&value=175">&#57669</a>
-                            <a rel="async" class="button" href="?command=display&value=brightnessUp">&#57669</a>
+                            <a rel="press" class="button" href="?command=key&value=175">&#57669;</a>
+                            <a rel="press" class="button" href="?command=display&value=brightnessUp">&#57669;</a>
                             <br />
-                            <a rel="async" class="button" href="?command=key&value=174">&#57691</a>
-                            <a rel="async" class="button" href="?command=display&value=brightnessDown">&#57691</a>
+                            <a rel="press" class="button" href="?command=key&value=174">&#57691;</a>
+                            <a rel="press" class="button" href="?command=display&value=brightnessDown">&#57691;</a>
                         </td>
-                        <td class="icon alignLeft">&#58416</td>
+                        <td class="icon alignLeft">&#58416;</td>
                     </tr>
                 </table>
             </td>
@@ -103,13 +123,13 @@
                 <table>
                     <tr>
                         <td>
-                            <a rel="async" href="?command=key&value=37">&#57702</a>
+                            <a rel="click" href="?command=key&value=37">&#57702;</a>
                         </td>
                         <td>
-                            <a rel="async" class="large" href="?command=key&value=179">&#57399&#57396‬</a>
+                            <a rel="click" class="large" href="?command=key&value=179">&#57399;&#57396;‬</a>
                         </td>
                         <td>
-                            <a rel="async" href="?command=key&value=39">&#57690</a>
+                            <a rel="click" href="?command=key&value=39">&#57690;</a>
                         </td>
                     </tr>
                 </table>

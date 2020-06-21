@@ -21,6 +21,10 @@ namespace RemoteControl.Server
             this.Headers.Add("Content-Type", "text/html");
         }
 
+
+        /// <summary>
+        /// Writes the response to the stream
+        /// </summary>
         public void Write()
         {
             if (this.Bytes == null)

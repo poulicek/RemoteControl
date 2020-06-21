@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using RemoteControl.UI;
 using TrayToolkit.UI;
 

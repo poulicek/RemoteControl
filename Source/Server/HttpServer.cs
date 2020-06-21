@@ -7,6 +7,7 @@ namespace RemoteControl.Server
 {
     public class HttpServer : IDisposable
     {
+        private bool enabled;
         private TcpListener listener;
 
         public event Action<HttpContext> RequestReceived;
@@ -20,26 +21,27 @@ namespace RemoteControl.Server
 
         private void startListening(int port)
         {
+            this.enabled = true;
             this.listener = new TcpListener(IPAddress.Any, port);
             this.listener.Start();
 
-            while (true)
-            {
-                var tcpClient = this.listener.AcceptTcpClient();
-                ThreadPool.QueueUserWorkItem(this.handleTcpClient, tcpClient);
-            }
+            while (this.enabled)
+                this.listener.BeginAcceptTcpClient(this.onTcpClientAccepted, this.listener);
         }
 
-
-        private void handleTcpClient(object o)
+        private void onTcpClientAccepted(IAsyncResult ar)
         {
-            using (var context = new HttpContext(o as TcpClient))
+            var listener = (TcpListener)ar.AsyncState;
+            var tcpClient = listener.EndAcceptTcpClient(ar);
+
+            using (var context = new HttpContext(tcpClient))
                 this.RequestReceived?.Invoke(context);
         }
 
 
         public void Dispose()
         {
+            this.enabled = false;
             this.listener?.Stop();
         }
     }
