@@ -26,15 +26,16 @@ namespace RemoteControl.Server
             this.listener.Start();
 
             while (this.enabled)
-                this.listener.BeginAcceptTcpClient(this.onTcpClientAccepted, this.listener);
+            {
+                var tcpClient = this.listener.AcceptTcpClient();
+                ThreadPool.QueueUserWorkItem(this.handleTcpClient, tcpClient);
+            }
         }
 
-        private void onTcpClientAccepted(IAsyncResult ar)
-        {
-            var listener = (TcpListener)ar.AsyncState;
-            var tcpClient = listener.EndAcceptTcpClient(ar);
 
-            using (var context = new HttpContext(tcpClient))
+        private void handleTcpClient(object o)
+        {
+            using (var context = new HttpContext(o as TcpClient))
                 this.RequestReceived?.Invoke(context);
         }
 

@@ -38,7 +38,7 @@
                 if (this.readyState == 4)
                     document.body.className = this.status == 200 ? null : "requestError";
             };
-            xhttp.open("GET", query, true);
+            xhttp.open("GET", query + "&" + Math.random(), true);
             xhttp.send();
             return xhttp;
         }

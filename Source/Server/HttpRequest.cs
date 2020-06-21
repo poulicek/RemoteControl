@@ -74,7 +74,6 @@ namespace RemoteControl.Server
                     continue;
 
                 data += Convert.ToChar(nextChar);
-                Thread.Sleep(1);
             }
 
             return data;
