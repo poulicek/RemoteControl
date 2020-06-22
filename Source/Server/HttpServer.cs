@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -36,12 +37,15 @@ namespace RemoteControl.Server
 
         private void handleTcpClient(object o)
         {
+            Stream stream = null;
             try
             {
-                using (var context = new HttpContext(o as TcpClient))
+                stream = (o as TcpClient).GetStream();
+                using (var context = new HttpContext(stream))
                     this.RequestReceived?.Invoke(context);
             }
             catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
+            finally { stream?.Close(); }
         }
 
 

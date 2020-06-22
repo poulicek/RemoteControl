@@ -54,21 +54,24 @@
                 var el = els[i];
                 if (el.rel == 'press') {
                     el.ontouchend = el.onmouseout = function () {
-                        this.isPressed = false;
+                        this.pressedEvent = null;
                     };
                     el.onclick = function () {
-                        this.isPressed = false;
+                        this.pressedEvent = null;
                         return false;
                     };
-                    el.ontouchstart = el.onmousedown = function () {
+                    el.ontouchstart = el.onmousedown = function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
                         this.xhttp = null;
-                        this.isPressed = true;
-                        keepSending(this);
+                        this.pressedEvent = e;
+                        keepSending(this, e, true);
                     };
                 }
                 else if (el.rel == 'click') {
-                    el.ontouchstart = function () { };
-                    el.onmouseup = function () {
+                    el.ontouchend = el.onmouseup = function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
                         sendRequest(this.href);
                     };
                     el.onclick = function () {
@@ -79,11 +82,11 @@
         }
 
 
-        function keepSending(el) {
-            if (el.isPressed) {
+        function keepSending(el, e, applyDelay) {
+            if (el.pressedEvent == e) {
                 if (!el.xhttp || el.xhttp.readyState == 4)
                     el.xhttp = sendRequest(el.href);
-                setTimeout(function () { keepSending(el); }, 31);
+                setTimeout(function () { keepSending(el, e); }, applyDelay ? 500 : 31);
             }
         }
 
@@ -129,13 +132,13 @@
                 <table>
                     <tr>
                         <td>
-                            <a rel="click" href="?command=key&value=37">&#57702;</a>
+                            <a rel="press" href="?command=key&value=37">&#57702;</a>
                         </td>
                         <td>
                             <a rel="click" class="large" href="?command=key&value=179">&#57399;&#57396;‬</a>
                         </td>
                         <td>
-                            <a rel="click" href="?command=key&value=39">&#57690;</a>
+                            <a rel="press" href="?command=key&value=39">&#57690;</a>
                         </td>
                     </tr>
                 </table>

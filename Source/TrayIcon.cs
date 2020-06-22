@@ -6,6 +6,7 @@ namespace RemoteControl
 {
     public partial class TrayIcon : TrayIconBase
     {
+        private MainForm dialog;
         private readonly Controller controller = new Controller();
 
         public TrayIcon() : base("Remote Control")
@@ -21,8 +22,12 @@ namespace RemoteControl
 
         protected override void onTrayIconClick(object sender, MouseEventArgs e)
         {
-            using (var dlg = new MainForm(this.controller))
-                dlg.ShowDialog();
+            if (this.dialog == null || this.dialog.IsDisposed)
+                this.dialog = new MainForm(this.controller);
+            
+            this.dialog.Show();
+            this.dialog.WindowState = FormWindowState.Normal;
+            this.dialog.Activate();
         }
 
         protected override void Dispose(bool disposing)

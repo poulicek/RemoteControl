@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using QRCoder;
+using TrayToolkit.Helpers;
 
 namespace RemoteControl.UI
 {
@@ -12,6 +13,7 @@ namespace RemoteControl.UI
         public MainForm()
         {
             InitializeComponent();
+            this.DoubleBuffered = true;
         }
 
         public MainForm(Controller controller) : this()
@@ -19,6 +21,7 @@ namespace RemoteControl.UI
             this.webBrowser.ProgressChanged += this.onProgressChanged;
             this.webBrowser.Url = new Uri(controller.ServerUrl);
             this.qrImage = this.getQRCode(controller.ServerUrl);
+            this.Location = this.GetCornerLocation();
         }
 
         private void onProgressChanged(object sender, WebBrowserProgressChangedEventArgs e)
@@ -32,12 +35,12 @@ namespace RemoteControl.UI
             using (var qrGenerator = new QRCodeGenerator())
             using (var qrCodeData = qrGenerator.CreateQrCode(str, QRCodeGenerator.ECCLevel.Q))
             using (var qrCode = new QRCode(qrCodeData))
-                return qrCode.GetGraphic(48, Color.White, Color.Black, true);
+                return qrCode.GetGraphic(48, Color.White, this.qrBox.BackColor, true);
         }
 
         private void qrBox_Paint(object sender, PaintEventArgs e)
         {
-            this.btnClose.Visible = true;
+            //this.btnClose.Visible = true;
 
             if (this.qrImage == null)
                 return;

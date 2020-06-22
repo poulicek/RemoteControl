@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Text;
-using System.Threading;
 using System.Web;
 
 namespace RemoteControl.Server
@@ -31,7 +30,8 @@ namespace RemoteControl.Server
         private void readStream(Stream stream)
         {
             // initial line
-            var tokens = readline(stream)?.Split(' ');
+            var reader = new StreamReader(stream);
+            var tokens = reader.ReadLine()?.Split(' ');
             if (tokens?.Length != 3)
                 throw new Exception("Invalid http request header");
 
@@ -41,7 +41,7 @@ namespace RemoteControl.Server
 
             // reading headers
             string line;
-            while (!string.IsNullOrEmpty(line = this.readline(stream)))
+            while (!string.IsNullOrEmpty(line = reader.ReadLine()))
             {
                 var header = line.Split(':');
                 if (header.Length > 1)
@@ -51,32 +51,6 @@ namespace RemoteControl.Server
             // reading content
             if (this.ContentLength > 0)
                 this.Content = Encoding.ASCII.GetString(new BinaryReader(stream).ReadBytes(this.ContentLength));
-        }
-
-
-        /// <summary>
-        /// Reads a line from the stream
-        /// </summary>
-        private string readline(Stream stream)
-        {
-            var data = string.Empty;
-
-            while (true)
-            {
-                var nextChar = stream.ReadByte();
-                if (nextChar == '\n')
-                    break;
-
-                if (nextChar == '\r')
-                    continue;
-
-                if (nextChar == -1)
-                    continue;
-
-                data += Convert.ToChar(nextChar);
-            }
-
-            return data;
         }
     }
 }

@@ -11,9 +11,9 @@ namespace RemoteControl.Server
         public HttpRequest Request { get; }
         public HttpResponse Response { get; }
 
-        public HttpContext(TcpClient tcpClient)
+        public HttpContext(Stream stream)
         {
-            this.stream = tcpClient.GetStream();
+            this.stream = stream;
             this.Request = new HttpRequest(stream);
             this.Response = new HttpResponse(stream);
         }
