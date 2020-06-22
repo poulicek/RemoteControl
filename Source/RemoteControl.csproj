@@ -95,7 +95,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\index.html" />
+    <EmbeddedResource Include="App\index.html" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\IconDark.png" />
@@ -107,12 +107,12 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\MaterialIcons-Regular.ttf" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\IconActiveLight.png" />
     <EmbeddedResource Include="Resources\IconInactiveLight.png" />
     <Content Include="Resources\TrayIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="App\MaterialIcons-Regular.woff" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,55 +1,72 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 
 namespace RemoteControl.Server
 {
     public class HttpResponse
     {
         private readonly Stream stream;
+        private readonly StreamWriter writer;
+        private bool headerWritten;
 
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
-        public byte[] Bytes { get; set; }
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
-        public string Content { set { this.Bytes = Encoding.UTF8.GetBytes(value); } }
 
 
         public HttpResponse(Stream stream)
         {
             this.stream = stream;
-            this.Headers.Add("Content-Type", "text/html");
+            this.writer = new StreamWriter(stream);
             this.Headers.Add("Cache-Control", "no-cache");
         }
 
 
         /// <summary>
-        /// Writes the response to the stream
+        /// Writes a HTTP header
         /// </summary>
-        public void Write()
+        private void writeHeader(string mime)
         {
-            if (this.Bytes == null)
-                this.Bytes = new byte[0];
+            this.writer.WriteLine($"HTTP/1.0 {(int)this.StatusCode} {this.StatusCode}");
 
-            // default to text/html content type
-            this.Headers["Content-Length"] = this.Bytes.Length.ToString();
-
-            this.write( string.Format("HTTP/1.0 {0} {1}\r\n", (int)this.StatusCode, this.StatusCode.ToString()));
+            this.Headers["Content-Type"] = mime;
             foreach (var h in this.Headers)
-                this.write($"{h.Key}: {h.Value}\r\n");
-            this.write("\r\n");
-            this.write(this.Bytes);
+                this.writer.WriteLine($"{h.Key}: {h.Value}");
+            this.writer.WriteLine();
+            this.headerWritten = true;
         }
 
 
-        private void write(string text)
+        /// <summary>
+        /// Writes a string
+        /// </summary>
+        public void Write(string text)
         {
-            this.write(Encoding.UTF8.GetBytes(text));
+            if (!this.headerWritten)
+                this.writeHeader("text/html");
+            this.writer.Write(text);
         }
 
-        private void write(byte[] bytes)
+
+        /// <summary>
+        /// Writes a byte array
+        /// </summary>
+        public void Write(byte[] bytes)
         {
-            this.stream.Write(bytes, 0, bytes.Length);
+            if (!this.headerWritten)
+                this.writeHeader("application/octet-stream");
+            this.writer.BaseStream.Write(bytes, 0, bytes.Length);
+        }
+
+
+        /// <summary>
+        /// Writes a stream
+        /// </summary>
+        public void Write(Stream s)
+        {
+            if (!this.headerWritten)
+                this.writeHeader("application/octet-stream");
+            s.CopyTo(this.stream);
         }
     }
 }

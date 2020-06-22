@@ -60,7 +60,8 @@ namespace RemoteControl
                     break;
 
                 default:
-                    context.Response.Content = this.getStringResource("index.html");
+                    var file = context.Request.Url.Trim('/').Replace('/', '.');
+                    context.Response.Write(this.getResource(string.IsNullOrEmpty(file) ? "index.html" : file));
                     break;
             }
         }
@@ -91,17 +92,13 @@ namespace RemoteControl
         }
 
 
-        private string getStringResource(string fileName)
+        private Stream getResource(string fileName)
         {
-            var assembly = Assembly.GetExecutingAssembly();
-
             var localFile = Path.Combine("../../Resources", fileName);
             if (File.Exists(localFile))
-                return File.ReadAllText(localFile);
+                return new FileStream(localFile, FileMode.Open);
 
-            using (var s = assembly.GetManifestResourceStream("RemoteControl.Resources." + fileName))
-            using (var r = new StreamReader(s))
-                return r.ReadToEnd();
+            return Assembly.GetExecutingAssembly().GetManifestResourceStream("RemoteControl.App." + fileName);
         }
 
 

@@ -21,7 +21,6 @@ namespace RemoteControl.Server
 
         public void Dispose()
         {
-            this.Response.Write();
             this.stream.Flush();
             this.stream.Dispose();
         }
