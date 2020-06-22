@@ -48,38 +48,45 @@
         }
 
 
-        function initLinks() {
+        function bindLinkEvents() {
             var els = document.getElementsByTagName('a');
             for (var i = 0; i < els.length; i++) {
                 var el = els[i];
-                if (el.rel == 'press') {
-                    el.ontouchend = el.onmouseout = function () {
-                        this.pressedEvent = null;
-                    };
-                    el.onclick = function () {
-                        this.pressedEvent = null;
-                        return false;
-                    };
-                    el.ontouchstart = el.onmousedown = function (e) {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        this.xhttp = null;
-                        this.pressedEvent = e;
-                        keepSending(this, e, true);
-                    };
-                }
-                else if (el.rel == 'click') {
-                    el.ontouchend = el.onmouseup = function (e) {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        sendRequest(this.href);
-                    };
-                    el.onclick = function () {
-                        return false;
-                    };
+
+                switch (el.rel) {
+                    case 'press':
+                        bindPressEvents(el);
+                        break;
+
+                    case 'click':
+                        bindClickEvents(el);
+                        break;
                 }
             }
         }
+
+        function bindPressEvents(el) {
+            el.onclick = el.ontouchend = el.onmouseout = function () {
+                this.pressedEvent = null;
+                return false;
+            };
+            el.ontouchstart = el.onmousedown = function (e) {
+                this.xhttp = null;
+                this.pressedEvent = e;
+                keepSending(this, e, true);
+                return false;
+            };
+        };
+
+        function bindClickEvents(el) {
+            el.onclick = el.ontouchstart = el.onmousedown = function () {
+                return false;
+            };
+            el.ontouchend = el.onmouseup = function () {
+                sendRequest(this.href);
+                return false;
+            };
+        };
 
 
         function keepSending(el, e, applyDelay) {
@@ -90,7 +97,7 @@
             }
         }
 
-        window.onload = initLinks;
+        window.onload = bindLinkEvents;
 
     </script>
 </head>

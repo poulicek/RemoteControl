@@ -110,6 +110,8 @@
     <EmbeddedResource Include="Resources\MaterialIcons-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Resources\IconActiveLight.png" />
+    <EmbeddedResource Include="Resources\IconInactiveLight.png" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
