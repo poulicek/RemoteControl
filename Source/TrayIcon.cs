@@ -23,7 +23,6 @@ namespace RemoteControl
         {
             using (var dlg = new MainForm(this.controller))
                 dlg.ShowDialog();
-            //Process.Start(this.controller.ServerUrl);
         }
 
         protected override void Dispose(bool disposing)

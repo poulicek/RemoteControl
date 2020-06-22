@@ -19,6 +19,7 @@ namespace RemoteControl.Server
         {
             this.stream = stream;
             this.Headers.Add("Content-Type", "text/html");
+            this.Headers.Add("Cache-Control", "no-cache");
         }
 
 

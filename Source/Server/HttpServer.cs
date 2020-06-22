@@ -10,6 +10,7 @@ namespace RemoteControl.Server
         private bool enabled;
         private TcpListener listener;
 
+        public event Action<Exception> ErrorOccured;
         public event Action<HttpContext> RequestReceived;
 
 
@@ -35,8 +36,12 @@ namespace RemoteControl.Server
 
         private void handleTcpClient(object o)
         {
-            using (var context = new HttpContext(o as TcpClient))
-                this.RequestReceived?.Invoke(context);
+            try
+            {
+                using (var context = new HttpContext(o as TcpClient))
+                    this.RequestReceived?.Invoke(context);
+            }
+            catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
         }
 
 

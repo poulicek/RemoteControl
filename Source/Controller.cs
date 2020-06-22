@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 using TrayToolkit.IO.Display;
+using TrayToolkit.UI;
 
 namespace RemoteControl
 {
@@ -32,11 +33,17 @@ namespace RemoteControl
 
         public Controller()
         {
+            this.server.ErrorOccured += onHttpErrorOccured;
             this.server.RequestReceived += this.onRequestReceived;
             this.server.Listen(Controller.Port);
         }
 
-
+        private void onHttpErrorOccured(Exception ex)
+        {
+#if DEBUG
+            BalloonTooltip.Show(ex.Message, null, ex.StackTrace);
+#endif
+        }
 
         private void onRequestReceived(HttpContext context)
         {
@@ -78,7 +85,7 @@ namespace RemoteControl
                     break;
 
                 case "screenOff":
-                    //this.display.TurnOff();
+                    this.display.TurnOff();
                     break;
             }
         }
