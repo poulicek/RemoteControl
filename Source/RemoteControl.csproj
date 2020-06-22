@@ -63,7 +63,7 @@
     <Compile Include="Server\HttpResponse.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="Server\HttpServer.cs" />
-    <Compile Include="TrayIcon.cs">
+    <Compile Include="UI\TrayIcon.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Program.cs" />
