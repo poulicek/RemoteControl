@@ -17,6 +17,9 @@ namespace RemoteControl.Server
         public HttpResponse(Stream stream)
         {
             this.stream = stream;
+#if DEBUG
+            this.Headers["Cache-Control"] = "no-cache";
+#endif
         }
 
 
@@ -27,21 +30,22 @@ namespace RemoteControl.Server
         {
             this.Headers["Content-Type"] = mime;
             this.Headers["Content-Length"] = length.ToString();
-#if DEBUG
-            this.Headers["Cache-Control"] = "no-cache";
-#endif
 
-            this.writeLine($"HTTP/1.1 {(int)this.StatusCode} {this.StatusCode}");
+            var sb = new StringBuilder();
+            sb.AppendLine($"HTTP/1.1 {(int)this.StatusCode} {this.StatusCode}");
+
             foreach (var h in this.Headers)
-                this.writeLine($"{h.Key}: {h.Value}");
-            this.writeLine();
+                sb.AppendLine($"{h.Key}: {h.Value}");
+            sb.AppendLine();
+
+            this.writeString(sb.ToString());
             this.headerWritten = true;
         }
 
 
-        private void writeLine(string str = null)
+        private void writeString(string str)
         {
-            var bytes = Encoding.UTF8.GetBytes(str + "\r\n");
+            var bytes = Encoding.UTF8.GetBytes(str);
             this.stream.Write(bytes, 0, bytes.Length);
         }
 
