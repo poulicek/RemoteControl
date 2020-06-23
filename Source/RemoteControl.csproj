@@ -58,6 +58,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="App\style.css" />
     <Compile Include="Server\HttpContext.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponse.cs" />
@@ -109,6 +110,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\IconActiveLight.png" />
     <EmbeddedResource Include="Resources\IconInactiveLight.png" />
+    <EmbeddedResource Include="App\script.js" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>

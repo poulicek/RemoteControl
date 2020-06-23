@@ -61,7 +61,8 @@ namespace RemoteControl
 
                 default:
                     var file = context.Request.Url.Trim('/').Replace('/', '.');
-                    context.Response.Write(this.getResource(string.IsNullOrEmpty(file) ? "index.html" : file));
+                    var resource = string.IsNullOrEmpty(file) ? "index.html" : file;
+                    context.Response.Write(this.getResource(resource), System.Web.MimeMapping.GetMimeMapping(resource));
                     break;
             }
         }
@@ -94,9 +95,9 @@ namespace RemoteControl
 
         private Stream getResource(string fileName)
         {
-            var localFile = Path.Combine("../../Resources", fileName);
+            var localFile = Path.Combine("../../App", fileName);
             if (File.Exists(localFile))
-                return new FileStream(localFile, FileMode.Open);
+                return new FileStream(localFile, FileMode.Open, FileAccess.Read);
 
             return Assembly.GetExecutingAssembly().GetManifestResourceStream("RemoteControl.App." + fileName);
         }

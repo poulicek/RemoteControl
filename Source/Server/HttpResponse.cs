@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace RemoteControl.Server
 {
     public class HttpResponse
     {
         private readonly Stream stream;
-        private readonly StreamWriter writer;
         private bool headerWritten;
 
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
@@ -17,56 +17,48 @@ namespace RemoteControl.Server
         public HttpResponse(Stream stream)
         {
             this.stream = stream;
-            this.writer = new StreamWriter(stream);
-            this.Headers.Add("Cache-Control", "no-cache");
         }
 
 
         /// <summary>
-        /// Writes a HTTP header
+        /// Writes the response to the stream
         /// </summary>
-        private void writeHeader(string mime)
+        private void writeHeader(string mime, int length)
         {
-            this.writer.WriteLine($"HTTP/1.0 {(int)this.StatusCode} {this.StatusCode}");
-
             this.Headers["Content-Type"] = mime;
+            this.Headers["Content-Length"] = length.ToString();
+#if DEBUG
+            this.Headers["Cache-Control"] = "no-cache";
+#endif
+
+            this.writeLine($"HTTP/1.1 {(int)this.StatusCode} {this.StatusCode}");
             foreach (var h in this.Headers)
-                this.writer.WriteLine($"{h.Key}: {h.Value}");
-            this.writer.WriteLine();
+                this.writeLine($"{h.Key}: {h.Value}");
+            this.writeLine();
             this.headerWritten = true;
         }
 
 
-        /// <summary>
-        /// Writes a string
-        /// </summary>
-        public void Write(string text)
+        private void writeLine(string str = null)
         {
-            if (!this.headerWritten)
-                this.writeHeader("text/html");
-            this.writer.Write(text);
+            var bytes = Encoding.UTF8.GetBytes(str + "\r\n");
+            this.stream.Write(bytes, 0, bytes.Length);
         }
 
 
-        /// <summary>
-        /// Writes a byte array
-        /// </summary>
-        public void Write(byte[] bytes)
+        public void WriteEmpty()
         {
             if (!this.headerWritten)
-                this.writeHeader("application/octet-stream");
-            this.writer.BaseStream.Write(bytes, 0, bytes.Length);
+                this.writeHeader(null, 0);
         }
 
 
-        /// <summary>
-        /// Writes a stream
-        /// </summary>
-        public void Write(Stream s)
+        public void Write(Stream s, string mime)
         {
             if (!this.headerWritten)
-                this.writeHeader("application/octet-stream");
-            s.CopyTo(this.stream);
+                this.writeHeader(mime, (int)(s?.Length ?? 0));
+
+            s?.CopyTo(this.stream);
         }
     }
 }

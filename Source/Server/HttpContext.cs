@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net.Sockets;
 
 namespace RemoteControl.Server
 {
@@ -10,6 +9,7 @@ namespace RemoteControl.Server
 
         public HttpRequest Request { get; }
         public HttpResponse Response { get; }
+
 
         public HttpContext(Stream stream)
         {
@@ -21,8 +21,7 @@ namespace RemoteControl.Server
 
         public void Dispose()
         {
-            this.stream.Flush();
-            this.stream.Dispose();
+            this.Response.WriteEmpty();
         }
     }
 }

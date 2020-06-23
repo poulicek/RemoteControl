@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace RemoteControl.Server
 {
@@ -17,11 +16,11 @@ namespace RemoteControl.Server
 
         public void Listen(int port)
         {
-            ThreadPool.QueueUserWorkItem((o) => this.startListening(port));
+            this.startListening(port);
         }
 
 
-        private void startListening(int port)
+        private async void startListening(int port)
         {
             this.enabled = true;
             this.listener = new TcpListener(IPAddress.Any, port);
@@ -29,23 +28,35 @@ namespace RemoteControl.Server
 
             while (this.enabled)
             {
-                var tcpClient = this.listener.AcceptTcpClient();
-                ThreadPool.QueueUserWorkItem(this.handleTcpClient, tcpClient);
+                var tcpClient = await this.listener.AcceptTcpClientAsync();
+                this.handleTcpClientAsync(tcpClient);
             }
         }
 
 
-        private void handleTcpClient(object o)
+        /// <summary>
+        /// Handles the new client connection
+        /// </summary>
+        private void handleTcpClientAsync(TcpClient tcpClient)
         {
-            Stream stream = null;
+            Task.Factory.StartNew(this.readWriteData, tcpClient, TaskCreationOptions.LongRunning);
+        }
+
+
+        /// <summary>
+        /// Reads and writes data to the network stream
+        /// </summary>
+        private void readWriteData(object o)
+        {
             try
             {
-                stream = (o as TcpClient).GetStream();
-                using (var context = new HttpContext(stream))
-                    this.RequestReceived?.Invoke(context);
+                // The stream gets reused indefinitely so the connection is kept alive
+                using (var s = (o as TcpClient).GetStream())
+                    while (this.enabled)
+                        using (var context = new HttpContext(s))
+                            this.RequestReceived?.Invoke(context);
             }
             catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
-            finally { stream?.Close(); }
         }
 
 
