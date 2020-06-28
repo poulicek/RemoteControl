@@ -8,7 +8,7 @@ namespace RemoteControl.UI
         private MainForm dialog;
         private readonly Controller controller = new Controller();
 
-        public TrayIcon() : base("Remote Control")
+        public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
         {
         }
 
@@ -21,6 +21,9 @@ namespace RemoteControl.UI
 
         protected override void onTrayIconClick(object sender, MouseEventArgs e)
         {
+            if (e.Button != MouseButtons.Left)
+                return;
+
             if (this.dialog == null || this.dialog.IsDisposed)
                 this.dialog = new MainForm(this.controller);
             

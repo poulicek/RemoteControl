@@ -10,7 +10,7 @@ namespace RemoteControl
 {
     public class Controller : IDisposable
     {
-        private readonly HttpServer server = new HttpServer(5000, true);
+        private readonly HttpServer server = new HttpServer(5000, false);
         private readonly DisplayContoller display = new DisplayContoller();
 
 
@@ -28,6 +28,7 @@ namespace RemoteControl
         {
             ThreadingHelper.HandleException(ex);
         }
+
 
         private void onRequestReceived(HttpContext context)
         {
