@@ -1,14 +1,23 @@
 ﻿function sendRequest(query) {
     document.body.className = "requestInProgress";
 
+    query = this.redirectToHash(query);
+
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         if (this.readyState == 4)
             document.body.className = this.status == 200 ? null : "requestError";
-    };
+    };    
     xhttp.open("GET", query + "&" + Math.random(), true);
     xhttp.send();
     return xhttp;
+}
+
+
+function redirectToHash(query) {
+    return window.location.hash.length > 1
+        ? query = window.location.hash.substring(1) + '?' + query.split('?')[1]
+        : query;
 }
 
 

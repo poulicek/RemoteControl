@@ -14,12 +14,15 @@ namespace RemoteControl.Server
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
 
 
-        public HttpResponse(Stream stream)
+        public HttpResponse(Stream stream, string allowOrigin)
         {
             this.stream = stream;
+            this.Headers["Access-Control-Allow-Origin"] = allowOrigin;
 #if DEBUG
             this.Headers["Cache-Control"] = "no-cache";
 #endif
+
+
         }
 
 

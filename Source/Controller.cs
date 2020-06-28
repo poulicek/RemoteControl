@@ -10,7 +10,7 @@ namespace RemoteControl
 {
     public class Controller : IDisposable
     {
-        private readonly HttpServer server = new HttpServer(5000, false);
+        private readonly HttpServer server = new HttpServer(5000, false) { AllowOrigin = "*" };
         private readonly DisplayContoller display = new DisplayContoller();
 
 

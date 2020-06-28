@@ -5,17 +5,14 @@ namespace RemoteControl.Server
 {
     public class HttpContext : IDisposable
     {
-        private readonly Stream stream;
-
         public HttpRequest Request { get; }
         public HttpResponse Response { get; }
 
 
-        public HttpContext(Stream stream)
+        public HttpContext(Stream stream, string allowOrigin = null)
         {
-            this.stream = stream;
             this.Request = new HttpRequest(stream);
-            this.Response = new HttpResponse(stream);
+            this.Response = new HttpResponse(stream, allowOrigin);
         }
 
 

@@ -59,7 +59,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="App\style.css" />
     <Compile Include="Server\HttpContext.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponse.cs" />
@@ -97,9 +96,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="App\index.html" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\IconDark.png" />
     <EmbeddedResource Include="Resources\IconLight.png" />
   </ItemGroup>
@@ -111,11 +107,24 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\IconActiveLight.png" />
     <EmbeddedResource Include="Resources\IconInactiveLight.png" />
-    <EmbeddedResource Include="App\script.js" />
+    <EmbeddedResource Include="..\Docs\favicon.ico">
+      <Link>App\favicon.ico</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Docs\index.html">
+      <Link>App\index.html</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Docs\script.js">
+      <Link>App\script.js</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\Docs\style.css">
+      <Link>App\style.css</Link>
+    </EmbeddedResource>
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="App\MaterialIcons-Regular.woff" />
+    <EmbeddedResource Include="..\Docs\MaterialIcons-Regular.woff">
+      <Link>App\MaterialIcons-Regular.woff</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

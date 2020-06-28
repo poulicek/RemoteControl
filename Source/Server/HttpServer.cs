@@ -15,6 +15,7 @@ namespace RemoteControl.Server
         private bool enabled;
         private TcpListener listener;
 
+        public string AllowOrigin { get; set; }
         public event Action<Exception> ErrorOccured;
         public event Action<HttpContext> RequestReceived;
 
@@ -98,7 +99,7 @@ namespace RemoteControl.Server
                 using (var stream = this.getStream(o as TcpClient))
                 {
                     while (this.enabled)
-                        using (var context = new HttpContext(stream))
+                        using (var context = new HttpContext(stream, this.AllowOrigin))
                             this.processContext(context);
                 }
             }
