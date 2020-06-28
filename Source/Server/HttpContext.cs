@@ -21,7 +21,7 @@ namespace RemoteControl.Server
 
         public void Dispose()
         {
-            this.Response.WriteEmpty();
+            this.Response.Write();
         }
     }
 }

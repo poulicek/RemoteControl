@@ -1,6 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace RemoteControl.Server
@@ -13,13 +18,52 @@ namespace RemoteControl.Server
         public event Action<Exception> ErrorOccured;
         public event Action<HttpContext> RequestReceived;
 
+        public int Port { get; }
 
-        public void Listen(int port)
+        public X509Certificate Certificate { get; }
+
+        public string Url { get { return $"{(this.Certificate == null ? "http" :  "https")}://{this.HostName}:{this.Port}"; } }
+
+        public string HostName
         {
-            this.startListening(port);
+            get
+            {
+                foreach (var ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+                    if (ip.AddressFamily == AddressFamily.InterNetwork)
+                        return ip.ToString();
+
+                return "localhost";
+            }
         }
 
 
+        public HttpServer(int port, bool useHttps)
+            : this(port, null)
+        {
+            if (useHttps)
+                this.Certificate = this.makeCert();
+        }
+
+
+        public HttpServer(int port, X509Certificate cert)
+        {
+            this.Port = port;
+            this.Certificate = cert;
+        }
+
+
+        /// <summary>
+        /// Starts listening to incoming connections
+        /// </summary>
+        public void Listen()
+        {
+            this.startListening(this.Port);
+        }
+
+
+        /// <summary>
+        /// Starts the asynchornous listening
+        /// </summary>
         private async void startListening(int port)
         {
             this.enabled = true;
@@ -51,12 +95,60 @@ namespace RemoteControl.Server
             try
             {
                 // The stream gets reused indefinitely so the connection is kept alive
-                using (var s = (o as TcpClient).GetStream())
+                using (var stream = this.getStream(o as TcpClient))
+                {
                     while (this.enabled)
-                        using (var context = new HttpContext(s))
-                            this.RequestReceived?.Invoke(context);
+                        using (var context = new HttpContext(stream))
+                            this.processContext(context);
+                }
             }
+            catch (AuthenticationException) { }
+            catch (IOException) { }
             catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
+        }
+
+
+
+        /// <summary>
+        /// Processes the context
+        /// </summary>
+        private void processContext(HttpContext context)
+        {
+            try
+            {
+                this.RequestReceived?.Invoke(context);
+            }
+            catch (Exception ex)
+            {
+                context.Response.StatusCode = HttpStatusCode.InternalServerError;
+                context.Response.Write(ex.ToString());
+            }
+        }
+
+
+        /// <summary>
+        /// Gets a stream from the TCP client
+        /// </summary>
+        private Stream getStream(TcpClient tcpClient)
+        {
+            var tcpStream = tcpClient.GetStream();
+            if (this.Certificate == null)
+                return tcpStream;
+
+            var sslStream = new SslStream(tcpStream, false);
+            sslStream.AuthenticateAsServer(this.Certificate, false, SslProtocols.Tls12, false);
+            return sslStream;
+        }
+
+
+        /// <summary>
+        /// Creates a self-signed certificate
+        /// </summary>
+        private X509Certificate2 makeCert()
+        {
+            var req = new CertificateRequest("cn=" + this.HostName, ECDsa.Create(ECCurve.NamedCurves.nistP384), HashAlgorithmName.SHA256);
+            var cert = req.CreateSelfSigned(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(5));
+            return new X509Certificate2(cert.Export(X509ContentType.Pfx));
         }
 
 

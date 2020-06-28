@@ -38,22 +38,25 @@ namespace RemoteControl.Server
                 sb.AppendLine($"{h.Key}: {h.Value}");
             sb.AppendLine();
 
-            this.writeString(sb.ToString());
             this.headerWritten = true;
+            this.Write(sb.ToString());            
         }
 
 
-        private void writeString(string str)
-        {
-            var bytes = Encoding.UTF8.GetBytes(str);
-            this.stream.Write(bytes, 0, bytes.Length);
-        }
-
-
-        public void WriteEmpty()
+        public void Write()
         {
             if (!this.headerWritten)
                 this.writeHeader(null, 0);
+        }
+
+
+        public void Write(string str)
+        {
+            var bytes = Encoding.UTF8.GetBytes(str ?? string.Empty);
+            if (!this.headerWritten)
+                this.writeHeader("text/html", bytes.Length);
+
+            this.stream.Write(bytes, 0, bytes.Length);
         }
 
 
@@ -61,7 +64,6 @@ namespace RemoteControl.Server
         {
             if (!this.headerWritten)
                 this.writeHeader(mime, (int)(s?.Length ?? 0));
-
             s?.CopyTo(this.stream);
         }
     }

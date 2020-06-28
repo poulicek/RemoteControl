@@ -1,48 +1,32 @@
 ﻿using System;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
 using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 using TrayToolkit.IO.Display;
-using TrayToolkit.UI;
 
 namespace RemoteControl
 {
     public class Controller : IDisposable
     {
-        private const int Port = 5000;
-        private readonly HttpServer server = new HttpServer();
+        private readonly HttpServer server = new HttpServer(5000, true);
         private readonly DisplayContoller display = new DisplayContoller();
 
 
-        public string ServerUrl
-        {
-            get
-            {
-                foreach (var ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                        return $"http://{ip}:{Port}";
-                
-                throw new Exception("The computer is not connected to the network");
-            }
-        }
+        public string ServerUrl { get { return this.server.Url; } }
 
 
         public Controller()
         {
-            this.server.ErrorOccured += onHttpErrorOccured;
+            this.server.ErrorOccured += this.onHttpErrorOccured;
             this.server.RequestReceived += this.onRequestReceived;
-            this.server.Listen(Controller.Port);
+            this.server.Listen();
         }
 
         private void onHttpErrorOccured(Exception ex)
         {
-#if DEBUG
-            BalloonTooltip.Show(ex.Message, null, ex.StackTrace);
-#endif
+            ThreadingHelper.HandleException(ex);
         }
 
         private void onRequestReceived(HttpContext context)
@@ -60,20 +44,25 @@ namespace RemoteControl
                     break;
 
                 default:
-                    var file = context.Request.Url.Trim('/').Replace('/', '.');
-                    var resource = string.IsNullOrEmpty(file) ? "index.html" : file;
-                    context.Response.Write(this.getResource(resource), System.Web.MimeMapping.GetMimeMapping(resource));
+                    this.writeResourceFile(context);
                     break;
             }
         }
 
 
+        /// <summary>
+        /// Processes a key command
+        /// </summary>
         private void processKeyCommand(string value)
         {
             if (int.TryParse(value, out var keyCode))
                 ((Keys)keyCode).Press();
         }
 
+
+        /// <summary>
+        /// Processes a display command
+        /// </summary>
         private void processDisplayCommand(string value)
         {
             switch (value)
@@ -93,6 +82,23 @@ namespace RemoteControl
         }
 
 
+        /// <summary>
+        /// Writes a file from the resources
+        /// </summary>
+        private void writeResourceFile(HttpContext context)
+        {
+            var path = context.Request.Url.Trim('/').Replace('/', '.');
+            var file = string.IsNullOrEmpty(path) ? "index.html" : path;
+            var resource = this.getResource(file);
+            if (resource == null)
+                context.Response.StatusCode = System.Net.HttpStatusCode.NotFound;
+            context.Response.Write(resource, System.Web.MimeMapping.GetMimeMapping(file));
+        }
+
+
+        /// <summary>
+        /// Returns a stream representinga file in resources
+        /// </summary>
         private Stream getResource(string fileName)
         {
             var localFile = Path.Combine("../../App", fileName);

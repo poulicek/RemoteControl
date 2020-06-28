@@ -31,16 +31,16 @@ namespace RemoteControl.Server
         {
             // initial line
             var reader = new StreamReader(stream);
-            var tokens = reader.ReadLine()?.Split(' ');
+            var line = reader.ReadLine();
+            var tokens = line?.Split(' ');
             if (tokens?.Length != 3)
-                throw new Exception("Invalid http request header");
+                throw new IOException("Invalid http request header");
 
             this.Method = tokens[0].ToUpper();
             this.Url = tokens[1];
             this.Query = HttpUtility.ParseQueryString(this.Url.Contains("?") ? this.Url.Split('?')[1] : string.Empty);
 
             // reading headers
-            string line;
             while (!string.IsNullOrEmpty(line = reader.ReadLine()))
             {
                 var header = line.Split(':');
