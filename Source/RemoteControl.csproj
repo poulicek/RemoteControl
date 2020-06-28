@@ -107,24 +107,14 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\IconActiveLight.png" />
     <EmbeddedResource Include="Resources\IconInactiveLight.png" />
-    <EmbeddedResource Include="..\Docs\favicon.ico">
-      <Link>App\favicon.ico</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Docs\index.html">
-      <Link>App\index.html</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Docs\script.js">
-      <Link>App\script.js</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\Docs\style.css">
-      <Link>App\style.css</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="App\favicon.ico" />
+    <EmbeddedResource Include="App\index.html" />
+    <EmbeddedResource Include="App\script.js" />
+    <EmbeddedResource Include="App\style.css" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Docs\MaterialIcons-Regular.woff">
-      <Link>App\MaterialIcons-Regular.woff</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="App\MaterialIcons-Regular.woff" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
