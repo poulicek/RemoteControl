@@ -7,9 +7,12 @@ namespace RemoteControl.Server
 {
     public class HttpResponse
     {
+        public enum CacheControl { Default, Cache, NoCache }
+
         private readonly Stream stream;
         private bool headerWritten;
 
+        public CacheControl? Cache { get; set; }
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
 
@@ -19,10 +22,8 @@ namespace RemoteControl.Server
             this.stream = stream;
             this.Headers["Access-Control-Allow-Origin"] = allowOrigin;
 #if DEBUG
-            this.Headers["Cache-Control"] = "no-cache";
+            this.Cache = CacheControl.Cache;
 #endif
-
-
         }
 
 
@@ -33,6 +34,9 @@ namespace RemoteControl.Server
         {
             this.Headers["Content-Type"] = mime;
             this.Headers["Content-Length"] = length.ToString();
+
+            if (this.Cache > CacheControl.Default && !this.Headers.ContainsKey("Cache-Control"))
+                this.Headers["Cache-Control"] = this.Cache == CacheControl.NoCache ? "no-cache" : "public, max-age=157680000";
 
             var sb = new StringBuilder();
             sb.AppendLine($"HTTP/1.1 {(int)this.StatusCode} {this.StatusCode}");
@@ -67,6 +71,7 @@ namespace RemoteControl.Server
         {
             if (!this.headerWritten)
                 this.writeHeader(mime, (int)(s?.Length ?? 0));
+
             s?.CopyTo(this.stream);
         }
     }

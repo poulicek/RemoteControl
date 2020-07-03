@@ -26,8 +26,11 @@ namespace RemoteControl.UI
 
         private void onProgressChanged(object sender, WebBrowserProgressChangedEventArgs e)
         {
-            if (e.CurrentProgress == e.MaximumProgress)
+            if (e.CurrentProgress == e.MaximumProgress && !this.webBrowser.Visible)
+            {
+                this.webBrowser.Refresh(WebBrowserRefreshOption.Completely);
                 this.webBrowser.Visible = true;
+            }
         }
 
         private Bitmap getQRCode(string str)

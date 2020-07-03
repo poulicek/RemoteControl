@@ -1,26 +1,4 @@
-﻿function sendRequest(query) {
-    document.body.className = "requestInProgress";
-
-    query = this.redirectToHash(query);
-
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function () {
-        if (this.readyState == 4)
-            document.body.className = this.status == 200 ? null : "requestError";
-    };    
-    xhttp.open("GET", query + "&" + Math.random(), true);
-    xhttp.send();
-    return xhttp;
-}
-
-
-function redirectToHash(query) {
-    return window.location.hash.length > 1
-        ? query = window.location.hash.substring(1) + '?' + query.split('?')[1]
-        : query;
-}
-
-
+﻿// binds the events on links
 function bindLinkEvents() {
     var els = document.getElementsByTagName('a');
     for (var i = 0; i < els.length; i++) {
@@ -38,12 +16,15 @@ function bindLinkEvents() {
     }
 };
 
+// binds the press events
 function bindPressEvents(el) {
     el.onclick = el.ontouchend = el.onmouseout = function () {
+        setClass(this, 'active', false);
         this.pressedEvent = null;
         return false;
     };
     el.ontouchstart = el.onmousedown = function (e) {
+        setClass(this, 'active', true);
         this.xhttp = null;
         this.pressedEvent = e;
         keepSending(this, e, true);
@@ -51,23 +32,35 @@ function bindPressEvents(el) {
     };
 };
 
+// binds the click events
 function bindClickEvents(el) {
-    el.onclick = el.ontouchstart = el.onmousedown = function () {
+    el.onclick = el.onmouseout = function () {
+        setClass(this, 'active', false);
+        return false;
+    };
+    el.ontouchstart = el.onmousedown = function () {
+        setClass(this, 'active', true);
         return false;
     };
     el.ontouchend = el.onmouseup = function () {
         sendRequest(this.href);
+        setClass(this, 'active', false);
         return false;
     };
 };
 
-
+// keeps sending the request
 function keepSending(el, e, applyDelay) {
     if (el.pressedEvent == e) {
         if (!el.xhttp || el.xhttp.readyState == 4)
             el.xhttp = sendRequest(el.href);
-        setTimeout(function () { keepSending(el, e); }, applyDelay ? 500 : 31);
+        setTimeout(keepSending, applyDelay ? 500 : 31, el, e);
     }
 };
 
-window.onload = bindLinkEvents;
+// sets the class to the given element
+function setClass(el, className, set) {
+    el.className = el.className.replace(className, null);
+    if (set)
+        el.className += ' ' + className;
+};
