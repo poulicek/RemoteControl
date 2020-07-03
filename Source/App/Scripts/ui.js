@@ -16,6 +16,7 @@ function bindLinkEvents() {
     }
 };
 
+
 // binds the press events
 function bindPressEvents(el) {
     el.onclick = el.ontouchend = el.onmouseout = function () {
@@ -31,6 +32,7 @@ function bindPressEvents(el) {
         return false;
     };
 };
+
 
 // binds the click events
 function bindClickEvents(el) {
@@ -49,6 +51,7 @@ function bindClickEvents(el) {
     };
 };
 
+
 // keeps sending the request
 function keepSending(el, e, applyDelay) {
     if (el.pressedEvent == e) {
@@ -57,6 +60,7 @@ function keepSending(el, e, applyDelay) {
         setTimeout(keepSending, applyDelay ? 500 : 31, el, e);
     }
 };
+
 
 // sets the class to the given element
 function setClass(el, className, set) {

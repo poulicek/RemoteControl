@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 using TrayToolkit.IO.Display;
+using static RemoteControl.Server.HttpResponse;
 
 namespace RemoteControl
 {
@@ -24,29 +25,42 @@ namespace RemoteControl
             this.server.Listen();
         }
 
+
+        /// <summary>
+        /// Handles the request error
+        /// </summary>
         private void onHttpErrorOccured(Exception ex)
         {
             ThreadingHelper.HandleException(ex);
         }
 
 
+        /// <summary>
+        /// Handles the request reception
+        /// </summary>
         private void onRequestReceived(HttpContext context)
         {
-            var command = context.Request.Query["command"];
-            var value = context.Request.Query["value"];
-            switch (command)
+            if (context.Request.Query.Count == 0)
+                this.writeResourceFile(context);
+            else
             {
-                case "key":
-                    this.processKeyCommand(value);
-                    break;
+                var command = context.Request.Query["command"];
+                var value = context.Request.Query["value"];
 
-                case "display":
-                    this.processDisplayCommand(value);
-                    break;
+                switch (command)
+                {
+                    case "key":
+                        this.processKeyCommand(value);
+                        break;
 
-                default:
-                    this.writeResourceFile(context);
-                    break;
+                    case "display":
+                        this.processDisplayCommand(value);
+                        break;
+
+                    default:
+                        context.Response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                        break;
+                }
             }
         }
 
@@ -91,9 +105,16 @@ namespace RemoteControl
             var path = context.Request.Url.Trim('/').Replace('/', '.');
             var file = string.IsNullOrEmpty(path) ? "index.html" : path;
             var resource = this.getResource(file);
+
             if (resource == null)
                 context.Response.StatusCode = System.Net.HttpStatusCode.NotFound;
-            context.Response.Write(resource, System.Web.MimeMapping.GetMimeMapping(file));
+            else
+            {
+#if !DEBUG
+                context.Response.Cache = CacheControl.NoCache;
+#endif
+                context.Response.Write(resource, System.Web.MimeMapping.GetMimeMapping(file));
+            }
         }
 
 

@@ -12,7 +12,7 @@ namespace RemoteControl.Server
         private readonly Stream stream;
         private bool headerWritten;
 
-        public CacheControl? Cache { get; set; }
+        public CacheControl Cache { get; set; }
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
 
@@ -21,9 +21,6 @@ namespace RemoteControl.Server
         {
             this.stream = stream;
             this.Headers["Access-Control-Allow-Origin"] = allowOrigin;
-#if DEBUG
-            this.Cache = CacheControl.Cache;
-#endif
         }
 
 

@@ -1,7 +1,6 @@
 ﻿// sends an ajax request
 function sendRequest(query) {
-    query = this.redirectToHash(query);
-
+    
     var xhttp = new XMLHttpRequest();
     document.xhttp = xhttp;
 
@@ -26,12 +25,6 @@ function handleResponse(xhttp) {
     }
 };
 
-// redirects the query to address provided in hash
-function redirectToHash(query) {
-    return window.location.hash.length > 1
-        ? query = window.location.hash.substring(1) + '?' + query.split('?')[1]
-        : query;
-};
 
 // clears the status
 function setStatus(status, xhttp) {
