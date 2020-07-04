@@ -54,11 +54,11 @@ namespace RemoteControl.Server
         }
 
 
-        public void Write(string str)
+        public void Write(string str, string mime = "text/html")
         {
             var bytes = Encoding.UTF8.GetBytes(str ?? string.Empty);
             if (!this.headerWritten)
-                this.writeHeader("text/html", bytes.Length);
+                this.writeHeader(mime, bytes.Length);
 
             this.stream.Write(bytes, 0, bytes.Length);
         }

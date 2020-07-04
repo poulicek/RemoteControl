@@ -1,10 +1,10 @@
 ﻿// sends an ajax request
-function sendRequest(query) {
+function sendRequest(query, callback) {
     
     var xhttp = new XMLHttpRequest();
     document.xhttp = xhttp;
 
-    xhttp.onreadystatechange = handleResponse;    
+    xhttp.onreadystatechange = function () { handleResponse(this, callback) };
     xhttp.open("GET", query + "&" + Math.random(), true);
     xhttp.timeout = 500;
     xhttp.send();
@@ -14,10 +14,13 @@ function sendRequest(query) {
 
 
 // handles the ajax response
-function handleResponse(xhttp) {
+function handleResponse(xhttp, callback) {
     if (xhttp.readyState == 4) {
-        if (xhttp.status == 200)
+        if (xhttp.status == 200) {
             setStatus(null, this);
+            if (callback)
+                callback(xhttp.responseText);
+        }
         else {
             setStatus("request-error", this);
             setTimeout(setStatus, 1000, null, this);

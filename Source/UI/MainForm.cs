@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using QRCoder;
+using RemoteControl.Controllers;
 using TrayToolkit.Helpers;
 
 namespace RemoteControl.UI
@@ -16,7 +17,7 @@ namespace RemoteControl.UI
             this.DoubleBuffered = true;
         }
 
-        public MainForm(Controller controller) : this()
+        public MainForm(MainController controller) : this()
         {
             this.webBrowser.ProgressChanged += this.onProgressChanged;
             this.webBrowser.Url = new Uri(controller.ServerUrl);
@@ -27,10 +28,7 @@ namespace RemoteControl.UI
         private void onProgressChanged(object sender, WebBrowserProgressChangedEventArgs e)
         {
             if (e.CurrentProgress == e.MaximumProgress && !this.webBrowser.Visible)
-            {
-                this.webBrowser.Refresh(WebBrowserRefreshOption.Completely);
                 this.webBrowser.Visible = true;
-            }
         }
 
         private Bitmap getQRCode(string str)

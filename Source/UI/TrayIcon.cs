@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using RemoteControl.Controllers;
 using TrayToolkit.UI;
 
 namespace RemoteControl.UI
@@ -6,7 +7,7 @@ namespace RemoteControl.UI
     public partial class TrayIcon : TrayIconBase
     {
         private MainForm dialog;
-        private readonly Controller controller = new Controller();
+        private readonly MainController controller = new MainController();
 
         public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
         {

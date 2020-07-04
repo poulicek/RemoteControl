@@ -19,7 +19,7 @@ function bindLinkEvents() {
 
 // binds the press events
 function bindPressEvents(el) {
-    el.onclick = el.ontouchend = el.onmouseout = function () {
+    el.onclick = el.ontouchend = el.onmouseout = el.ontouchcancel = function () {
         setClass(this, 'active', false);
         this.pressedEvent = null;
         return false;
@@ -36,7 +36,7 @@ function bindPressEvents(el) {
 
 // binds the click events
 function bindClickEvents(el) {
-    el.onclick = el.onmouseout = function () {
+    el.onclick = el.onmouseout = el.ontouchcancel = function () {
         setClass(this, 'active', false);
         return false;
     };
