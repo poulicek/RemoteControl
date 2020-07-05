@@ -31,6 +31,13 @@ function bindPressEvents(el) {
         keepSending(this, e, true);
         return false;
     };
+    el.ontouchmove = function (e) {
+        if (!isElementTouched(el, e)) {
+            setClass(this, 'active', false);
+            this.pressedEvent = null;
+            return false;
+        }
+    };
 };
 
 
@@ -38,19 +45,39 @@ function bindPressEvents(el) {
 function bindClickEvents(el) {
     el.onclick = el.onmouseout = el.ontouchcancel = function () {
         setClass(this, 'active', false);
+        this.pressedEvent = null;
         return false;
     };
-    el.ontouchstart = el.onmousedown = function () {
+    el.ontouchstart = el.onmousedown = function (e) {
         setClass(this, 'active', true);
+        this.pressedEvent = e;
         return false;
     };
     el.ontouchend = el.onmouseup = function () {
-        sendRequest(this.href);
+        if (this.pressedEvent != null)
+            sendRequest(this.href);
         setClass(this, 'active', false);
+        this.pressedEvent = null;
         return false;
+    };
+    el.ontouchmove = function (e) {
+        if (!isElementTouched(el, e)) {
+            setClass(this, 'active', false);
+            this.pressedEvent = null;
+            return false;
+        }
     };
 };
 
+
+// returns true or false if the element is touched
+function isElementTouched(el, e) {
+    if (!e.touches || e.touches.length == 0)
+        return null;
+
+    var touch = e.touches[0];
+    return el == document.elementFromPoint(touch.pageX, touch.pageY);
+}
 
 // keeps sending the request
 function keepSending(el, e, applyDelay) {

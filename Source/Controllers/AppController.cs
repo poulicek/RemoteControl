@@ -13,7 +13,7 @@ namespace RemoteControl.Controllers
 
         public void ProcessRequest(HttpContext context)
         {
-            switch (context.Request.Query["value"])
+            switch (context.Request.Query["v"])
             {
                 case "getversion":
                     context.Response.Write(this.appVersion);

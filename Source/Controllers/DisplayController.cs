@@ -9,7 +9,7 @@ namespace RemoteControl.Controllers
 
         public void ProcessRequest(HttpContext context)
         {
-            switch (context.Request.Query["value"])
+            switch (context.Request.Query["v"])
             {
                 case "brightnessUp":
                     this.display.SetBrightness(this.display.CurrentValue + 10);

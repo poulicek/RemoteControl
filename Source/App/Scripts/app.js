@@ -10,9 +10,9 @@ function init() {
 
 // checks the app version
 function checkVersion() {
-    sendRequest("?command=app&value=getversion", function (v) {
+    sendRequest("?c=app&v=getversion", function (v) {
         if (v != document.getElementById('app-version').content)
-            window.location.reload(true);
+            document.location.href = "?v=" + v;
     });
 };
 

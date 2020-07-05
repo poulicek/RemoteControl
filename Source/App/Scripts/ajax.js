@@ -5,7 +5,7 @@ function sendRequest(query, callback) {
     document.xhttp = xhttp;
 
     xhttp.onreadystatechange = function () { handleResponse(this, callback) };
-    xhttp.open("GET", query + "&" + Math.random(), true);
+    xhttp.open("GET", query, true);
     xhttp.timeout = 500;
     xhttp.send();
 
@@ -17,13 +17,13 @@ function sendRequest(query, callback) {
 function handleResponse(xhttp, callback) {
     if (xhttp.readyState == 4) {
         if (xhttp.status == 200) {
-            setStatus(null, this);
+            setStatus('', this);
             if (callback)
                 callback(xhttp.responseText);
         }
         else {
-            setStatus("request-error", this);
-            setTimeout(setStatus, 1000, null, this);
+            setStatus("request-error", xhttp);
+            setTimeout(setStatus, 1000, '', xhttp);
         }
     }
 };

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -7,12 +8,10 @@ namespace RemoteControl.Server
 {
     public class HttpResponse
     {
-        public enum CacheControl { Default, Cache, NoCache }
-
         private readonly Stream stream;
         private bool headerWritten;
 
-        public CacheControl Cache { get; set; }
+        public TimeSpan? CacheAge { get; set; }
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
 
@@ -32,8 +31,8 @@ namespace RemoteControl.Server
             this.Headers["Content-Type"] = mime;
             this.Headers["Content-Length"] = length.ToString();
 
-            if (this.Cache > CacheControl.Default && !this.Headers.ContainsKey("Cache-Control"))
-                this.Headers["Cache-Control"] = this.Cache == CacheControl.NoCache ? "no-cache" : "public, max-age=157680000";
+            if (this.CacheAge.HasValue && !this.Headers.ContainsKey("Cache-Control"))
+                this.Headers["Cache-Control"] = this.CacheAge == TimeSpan.Zero ? "no-cache, no-store, must-revalidate" : "public, max-age=" + (long)this.CacheAge.Value.TotalSeconds;
 
             var sb = new StringBuilder();
             sb.AppendLine($"HTTP/1.1 {(int)this.StatusCode} {this.StatusCode}");

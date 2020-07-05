@@ -73,8 +73,12 @@ namespace RemoteControl.Server
 
             while (this.enabled)
             {
-                var tcpClient = await this.listener.AcceptTcpClientAsync();
-                this.handleTcpClientAsync(tcpClient);
+                try
+                {
+                    var tcpClient = await this.listener.AcceptTcpClientAsync();
+                    this.handleTcpClientAsync(tcpClient);
+                }
+                catch (ObjectDisposedException) { }
             }
         }
 

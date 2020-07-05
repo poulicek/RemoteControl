@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 using static RemoteControl.Server.HttpResponse;
@@ -8,6 +9,8 @@ namespace RemoteControl.Controllers
     public class FilesController : IController
     {
         private readonly string appVersion;
+        private readonly TimeSpan cacheAge = TimeSpan.FromDays(5 * 365);
+
 
         public FilesController(string appVersion)
         {
@@ -20,19 +23,20 @@ namespace RemoteControl.Controllers
         /// </summary>
         public void ProcessRequest(HttpContext context)
         {
-            var path = context.Request.Url.Trim('/');
+            var path = context.Request.Url.Split('?')[0].Trim('/');
             var file = string.IsNullOrEmpty(path) ? "index.html" : path;
-            var stream = this.getResource(file);
-
-            if (stream == null)
-                context.Response.StatusCode = System.Net.HttpStatusCode.NotFound;
-            else
+            using (var stream = this.getResource(file))
             {
-                context.Response.Cache = CacheControl.NoCache;
-                if (Path.GetExtension(file) == ".html")
-                    context.Response.Write(this.convertToHtml(stream));
+                if (stream == null)
+                    context.Response.StatusCode = System.Net.HttpStatusCode.NotFound;
                 else
-                    context.Response.Write(stream, System.Web.MimeMapping.GetMimeMapping(file));
+                {
+                    context.Response.CacheAge = this.cacheAge;
+                    if (Path.GetExtension(file) == ".html")
+                        context.Response.Write(this.readFormattedHtml(stream));
+                    else
+                        context.Response.Write(stream, System.Web.MimeMapping.GetMimeMapping(file));
+                }
             }
         }
 
@@ -40,15 +44,12 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Returns the html file with evaluated variables
         /// </summary>
-        private string convertToHtml(Stream s)
+        private string readFormattedHtml(Stream s)
         {
             using (var r = new StreamReader(s))
-            {
-                var html = r.ReadToEnd();
-                html = html.Replace("{Version}", this.appVersion);
-                html = html.Replace("{Title}", "Remote Control");
-                return html;
-            }
+                return r.ReadToEnd()
+                    .Replace("{Version}", this.appVersion)
+                    .Replace("{Title}", Environment.MachineName);
         }
 
 

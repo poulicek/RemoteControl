@@ -12,7 +12,7 @@ namespace RemoteControl.Controllers
 
         public string ServerUrl { get { return this.server.Url; } }
 
-        public string AppVersion { get; } = ResourceHelper.GetLastWriteTime().Ticks.ToString("x");
+        public string AppVersion { get; } = ResourceHelper.GetLastWriteTime().GetHashCode().ToString("x");
 
 
         public MainController()
@@ -42,12 +42,14 @@ namespace RemoteControl.Controllers
         /// </summary>
         public void ProcessRequest(HttpContext context)
         {
-            var command = context.Request.Query.Count == 0 ? "file" : context.Request.Query["command"];
-
-            if (this.controllers.TryGetValue(command, out var ctrl))
-                ctrl.ProcessRequest(context);
-            else
+            var command = context.Request.Query["c"] ?? "file";
+            if (!this.controllers.TryGetValue(command, out var ctrl))
                 context.Response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+            else
+            {
+                context.Response.CacheAge = TimeSpan.Zero;
+                ctrl.ProcessRequest(context);
+            }   
         }
 
 
@@ -55,8 +57,8 @@ namespace RemoteControl.Controllers
         {
             this.server.Dispose();
 
-            foreach (IDisposable ctrl in this.controllers.Values)
-                ctrl.Dispose();
+            foreach (var ctrl in this.controllers.Values)
+                (ctrl as IDisposable)?.Dispose();
         }
     }
 }
