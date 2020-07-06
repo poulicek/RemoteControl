@@ -10,7 +10,7 @@ namespace RemoteControl.Controllers
         private readonly HttpServer server = new HttpServer(5000, false) { AllowOrigin = "*" };
         private readonly Dictionary<string, IController> controllers = new Dictionary<string, IController>();
 
-        public string ServerUrl { get { return this.server.Url; } }
+        public string ServerUrl { get { return this.server.GetUrl(); } }
 
         public string AppVersion { get; } = ResourceHelper.GetLastWriteTime().GetHashCode().ToString("x");
 
@@ -21,7 +21,7 @@ namespace RemoteControl.Controllers
             this.server.RequestReceived += this.ProcessRequest;
             this.server.Listen();
 
-            this.controllers.Add("file", new FilesController(this.AppVersion));
+            this.controllers.Add("file", new FilesController(this.AppVersion, this.server.GetUrl(Environment.MachineName)));
             this.controllers.Add("app", new AppController(this.AppVersion));
             this.controllers.Add("key", new KeysController());
             this.controllers.Add("display", new DisplayController());

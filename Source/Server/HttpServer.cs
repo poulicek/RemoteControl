@@ -23,7 +23,6 @@ namespace RemoteControl.Server
 
         public X509Certificate Certificate { get; }
 
-        public string Url { get { return $"{(this.Certificate == null ? "http" :  "https")}://{this.HostName}:{this.Port}"; } }
 
         public string HostName
         {
@@ -50,6 +49,15 @@ namespace RemoteControl.Server
         {
             this.Port = port;
             this.Certificate = cert;
+        }
+
+
+        /// <summary>
+        /// Returns the current server url
+        /// </summary>
+        public string GetUrl(string hostName = null)
+        {
+            return $"{(this.Certificate == null ? "http" : "https")}://{hostName ?? this.HostName}:{this.Port}";
         }
 
 

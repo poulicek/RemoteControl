@@ -1,4 +1,5 @@
-﻿using RemoteControl.Server;
+﻿using System;
+using RemoteControl.Server;
 
 namespace RemoteControl.Controllers
 {
@@ -16,7 +17,7 @@ namespace RemoteControl.Controllers
             switch (context.Request.Query["v"])
             {
                 case "getversion":
-                    context.Response.Write(this.appVersion);
+                    context.Response.Write($"{this.appVersion},{Environment.MachineName}");
                     break;
             }
         }

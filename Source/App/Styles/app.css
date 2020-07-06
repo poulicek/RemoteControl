@@ -1,6 +1,6 @@
 ﻿@font-face { font-family: 'Material Icons'; src: url('../Res/MaterialIcons-Regular.woff') format('woff'); }
 
-* { font-size: 8vmin; text-align: center; }
+* { font: 8vmin Arial, Tahoma; text-align: center; }
 html { -webkit-font-smoothing: antialiased;  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
 body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; user-select: none; position: fixed; }
 table { width: 100%; height: 100%; }
@@ -14,8 +14,11 @@ a.active { background: rgba(255, 255, 255, .3); }
 #grid td a { border-radius: 15px; min-width: 22vmin; line-height: 18vh; display: inline-block; margin: 5px; }
 #grid td a.large { font-size: 2em; }
 
-.status { position: absolute; text-align: center; width: 100%; top: 2%; visibility: hidden;}
-.request-error #status-error { visibility: visible; color: #AD4141; }
+.status { position: absolute; width: 100%; top: 2%; visibility: hidden; font-size: 60%; line-height: 10vmin;  }
+.status#status-normal { visibility: visible; }
+.status-error #status-error { visibility: visible; color: #AD4141; }
+.status-error #status-normal { visibility: hidden; }
+
 
 .align-left { text-align: left; }
 .align-right { text-align: right; }

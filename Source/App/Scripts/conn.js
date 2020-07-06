@@ -14,23 +14,21 @@ function sendRequest(query, callback) {
 
 
 // handles the ajax response
-function handleResponse(xhttp, callback) {
+function handleResponse(xhttp, onSuccess, onError) {
     if (xhttp.readyState == 4) {
         if (xhttp.status == 200) {
-            setStatus('', this);
-            if (callback)
-                callback(xhttp.responseText);
+            setConnStatus('', this);
+
+            if (onSuccess)
+                onSuccess(xhttp.responseText);
         }
         else {
-            setStatus("request-error", xhttp);
-            setTimeout(setStatus, 1000, '', xhttp);
+            if (onError)
+                onError(xhttp.responseText);
+            else {
+                setConnStatus("status-error", xhttp);
+                setTimeout(setStatus, 1000, '', xhttp);
+            }
         }
     }
-};
-
-
-// clears the status
-function setStatus(status, xhttp) {
-    if (!xhttp || xhttp == document.xhttp)
-        document.body.className = status;
 };

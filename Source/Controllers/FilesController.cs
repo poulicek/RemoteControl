@@ -9,12 +9,14 @@ namespace RemoteControl.Controllers
     public class FilesController : IController
     {
         private readonly string appVersion;
+        private readonly string hostUrl;
         private readonly TimeSpan cacheAge = TimeSpan.FromDays(5 * 365);
 
 
-        public FilesController(string appVersion)
+        public FilesController(string appVersion, string hostUrl)
         {
             this.appVersion = appVersion;
+            this.hostUrl = hostUrl;
         }
 
 
@@ -49,6 +51,7 @@ namespace RemoteControl.Controllers
             using (var r = new StreamReader(s))
                 return r.ReadToEnd()
                     .Replace("{Version}", this.appVersion)
+                    .Replace("{HostUrl}", this.hostUrl)
                     .Replace("{Title}", Environment.MachineName);
         }
 

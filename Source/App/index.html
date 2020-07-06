@@ -5,6 +5,7 @@
 
     <meta charset="utf-8">
     <meta id="app-version" name="app-version" content="{Version}" />
+    <meta id="app-url" name="app-url" content="{HostUrl}" />
     <meta name="full-screen" content="yes">
 
     <meta name="mobile-web-app-capable" content="yes">
@@ -19,12 +20,13 @@
 
     <script src="Scripts/ui.js?v={Version}" type="text/javascript"></script>
     <script src="Scripts/app.js?v={Version}" type="text/javascript"></script>
-    <script src="Scripts/ajax.js?v={Version}" type="text/javascript"></script>
+    <script src="Scripts/conn.js?v={Version}" type="text/javascript"></script>
 
     <title>{Title}</title>
 </head>
 
 <body>
+    <div id="status-normal" class="status">Connecting...</div>
     <div id="status-error" class="icon status">&#57818;</div>
     <table id="grid">
         <tr>
