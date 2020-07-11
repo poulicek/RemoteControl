@@ -4,6 +4,11 @@ function bindLinkEvents() {
     for (var i = 0; i < els.length; i++) {
         var el = els[i];
         switch (el.rel) {
+
+            case 'down':
+                bindDownEvents(el);
+                break;
+
             case 'press':
                 bindPressEvents(el);
                 break;
@@ -16,36 +21,69 @@ function bindLinkEvents() {
 };
 
 
+// binds the down events
+function bindDownEvents(el) {
+    el.ontouchstart = el.onmousedown = sendKeyDown;
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = sendKeyUp;
+    el.ontouchmove = function(e) {
+        if (!isTouched(e))
+            return sendKeyUp(e);
+    };
+};
+
+
 // binds the press events
 function bindPressEvents(el) {
-    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
-    el.ontouchmove = cancelPressIfNotTouched;
-    el.ontouchstart = el.onmousedown = performPress;
+    el.ontouchstart = el.onmousedown = sendKeyPress;
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = sendKeyUp;
+    el.ontouchmove = function(e) {
+        if (!isTouched(e))
+            return sendKeyUp(e);
+    };
 };
 
 
 // binds the click events
 function bindClickEvents(el) {
+    el.ontouchend = el.onmouseup = sendClick;
     el.ontouchstart = el.onmousedown = initPress;
     el.ontouchcancel = el.onclick = el.onmouseout = cancelPress
-    el.ontouchmove = cancelPressIfNotTouched;
-    el.ontouchend = el.onmouseup = performClick;
+    el.ontouchmove = function(e) {
+        if (!isTouched(e))
+            return cancelPress(e);
+    };
 };
 
 
 // performs the click event
-function performClick(e) {
-    if (e.target.pressedEvent == e)
-        sendRequest(e.target.href);
+function sendClick(e) {
+    if (e.target.pressedEvent)
+        sendRequest(e.target.href + '&s=1');
+    return cancelPress(e);
+};
+
+
+// ends the press
+function sendKeyUp(e) {
+    if (e.target.pressedEvent)
+        sendRequest(e.target.href + '&s=0');
     return cancelPress(e);
 };
 
 
 // performs the button pressing
-function performPress(e) {
+function sendKeyPress(e) {
     e.target.xhttp = null;
     initPress(e);
     keepPressing(e, true);
+    return false;
+};
+
+
+// starts the button press
+function sendKeyDown(e) {
+    initPress(e);
+    sendRequest(e.target.href + '&s=1');
     return false;
 };
 
@@ -55,7 +93,7 @@ function keepPressing(e, applyDelay) {
     var el = e.target;
     if (el.pressedEvent == e) {
         if (!el.xhttp || el.xhttp.readyState == 4)
-            el.xhttp = sendRequest(el.href);
+            el.xhttp = sendRequest(el.href + '&s=1');
         setTimeout(keepPressing, applyDelay ? 500 : 31, e);
     }
 };
@@ -77,15 +115,8 @@ function cancelPress(e) {
 };
 
 
-// cancels the press if button is not tourched
-function cancelPressIfNotTouched(e) {
-    if (!isElementTouched(e))
-        return cancelPress(e);
-};
-
-
 // returns true or false if the element is touched
-function isElementTouched(e) {
+function isTouched(e) {
     if (!e.touches || e.touches.length == 0)
         return null;
 
@@ -96,21 +127,21 @@ function isElementTouched(e) {
 
 // sets the class to the given element
 function setClass(el, className, set) {
-    el.className = el.className.replace(className, null);
     if (set)
-        el.className += ' ' + className;
+        el.classList.add(className);
+    else
+        el.classList.remove(className);
 };
 
 
 // connection status
-function setConnStatus(className, xhttp) {
-    if (!xhttp || xhttp == document.xhttp)
-        document.body.className = className ? className : '';
+function setConnStatus(className) {
+    document.body.className = className ? className : '';
 };
 
 
 // sets the status
 function setStatus(statusText) {
-    document.getElementById('status-normal').innerText = statusText;
-    setConnStatus();    
+    document.getElementById('status-normal').innerText = statusText ? statusText : '';
+    setConnStatus();
 };

@@ -8,9 +8,13 @@ namespace RemoteControl.Controllers
     {
         public void ProcessRequest(HttpContext context)
         {
-            var value = context.Request.Query["v"];
-            if (!string.IsNullOrEmpty(value) && int.TryParse(value, out var keyCode))
-                ((Keys)keyCode).Press();
+            if (!int.TryParse(context.Request.Query["v"], out var keyCode))
+                return;
+
+            if (!int.TryParse(context.Request.Query["s"], out var keyState) || keyState == 1)
+                ((Keys)keyCode).Down();
+            else
+                ((Keys)keyCode).Up();
         }
     }
 }

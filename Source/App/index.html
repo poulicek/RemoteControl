@@ -18,9 +18,9 @@
 
     <link rel="stylesheet" href="Styles/app.css?v={Version}" />
 
-    <script src="Scripts/ui.js?v={Version}" type="text/javascript"></script>
-    <script src="Scripts/app.js?v={Version}" type="text/javascript"></script>
-    <script src="Scripts/conn.js?v={Version}" type="text/javascript"></script>
+    <script src="Scripts/ui.js?_={Version}" type="text/javascript"></script>
+    <script src="Scripts/app.js?_={Version}" type="text/javascript"></script>
+    <script src="Scripts/conn.js?_={Version}" type="text/javascript"></script>
 
     <title>{Title}</title>
 </head>
@@ -28,45 +28,8 @@
 <body>
     <div id="status-normal" class="status">Connecting...</div>
     <div id="status-error" class="icon status">&#57818;</div>
-    <table id="grid">
-        <tr>
-            <td class="align-right">
-                <a rel="click" href="?c=display&v=screenOff">&#59564;</a>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <table>
-                    <tr>
-                        <td width="20%" class="icon align-right">&#57421;</td>
-                        <td style="direction: rtl">
-                            <a rel="press" class="button" href="?c=key&v=175">&#57669;</a><a rel="press" class="button" href="?c=key&v=174">&#57691;</a>
-                        </td>
-                        <td style="direction: rtl">
-                            <a rel="press" class="button" href="?c=display&v=brightnessUp">&#57669;</a><a rel="press" class="button" href="?c=display&v=brightnessDown">&#57691;</a>
-                        </td>
-                        <td width="20%" align="left" class="icon align-left">&#58416;</td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <table>
-                    <tr>
-                        <td>
-                            <a rel="press" href="?c=key&v=37">&#57702;</a>
-                        </td>
-                        <td>
-                            <a rel="click" class="large" href="?c=key&v=179">&#57399;&#57396;‬</a>
-                        </td>
-                        <td>
-                            <a rel="press" href="?c=key&v=39">&#57690;</a>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
+
+    <div id="view">
+    </div>
 </body>
 </html>

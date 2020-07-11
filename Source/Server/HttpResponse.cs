@@ -63,7 +63,7 @@ namespace RemoteControl.Server
         }
 
 
-        public void Write(Stream s, string mime)
+        public void Write(Stream s, string mime = "text/html")
         {
             if (!this.headerWritten)
                 this.writeHeader(mime, (int)(s?.Length ?? 0));

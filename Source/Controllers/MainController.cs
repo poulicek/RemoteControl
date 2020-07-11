@@ -23,8 +23,9 @@ namespace RemoteControl.Controllers
 
             this.controllers.Add("file", new FilesController(this.AppVersion, this.server.GetUrl(Environment.MachineName)));
             this.controllers.Add("app", new AppController(this.AppVersion));
+            this.controllers.Add("view", new ViewController());
             this.controllers.Add("key", new KeysController());
-            this.controllers.Add("display", new DisplayController());
+            this.controllers.Add("media", new MediaController());
         }
 
 

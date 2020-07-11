@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Windows.Forms;
 using RemoteControl.Server;
+using TrayToolkit.Helpers;
 
 namespace RemoteControl.Controllers
 {
-    public class DisplayController : IController, IDisposable
+    public class MediaController : IController, IDisposable
     {
-        private readonly TrayToolkit.IO.Display.DisplayController display = new TrayToolkit.IO.Display.DisplayController();
+        private readonly TrayToolkit.OS.Display.DisplayController display = new TrayToolkit.OS.Display.DisplayController();
 
         public void ProcessRequest(HttpContext context)
         {
@@ -21,6 +23,11 @@ namespace RemoteControl.Controllers
 
                 case "screenOff":
                     this.display.TurnOff();
+                    break;
+
+                default:
+                    if (int.TryParse(context.Request.Query["v"], out var keyCode))
+                        ((Keys)keyCode).Down();
                     break;
             }
         }

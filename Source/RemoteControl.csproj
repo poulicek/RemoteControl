@@ -59,9 +59,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ViewController.cs" />
     <Compile Include="Controllers\FilesController.cs" />
     <Compile Include="Controllers\IController.cs" />
-    <Compile Include="Controllers\DisplayController.cs" />
+    <Compile Include="Controllers\MediaController.cs" />
     <Compile Include="Controllers\AppController.cs" />
     <Compile Include="Controllers\KeysController.cs" />
     <Compile Include="Server\HttpContext.cs" />
@@ -118,6 +119,8 @@
     <EmbeddedResource Include="App\Styles\app.css" />
     <EmbeddedResource Include="App\Scripts\conn.js" />
     <EmbeddedResource Include="App\Scripts\app.js" />
+    <EmbeddedResource Include="App\Views\media.html" />
+    <EmbeddedResource Include="App\Views\gamepad.html" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>

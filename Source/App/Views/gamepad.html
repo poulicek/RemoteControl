@@ -1,0 +1,77 @@
+﻿<style>
+    td a.button {min-width: 22vmin; line-height: 22vmin; margin: 0px; border-radius: 50%;}
+    .keysection {margin: 0px auto; max-width: 66vmin; max-height: 66vmin; }
+    .show-wide { visibility: hidden; position: absolute; }
+    .button.action {font-family: inherit; background: none; color: white; border-color: white;}
+    .button-long {width: 60%; font-family: inherit; border: 1px solid white; margin: 0px auto;}
+
+    @media screen and (min-width: 480px) and (orientation: landscape) {
+    .show-wide { position: initial; visibility: visible; }
+}
+
+</style>
+
+<table class="grid">
+    <tr><td></tr></td>
+    <tr>
+        <td>
+            <table class="keysection">
+                <tr>
+                    <td></td>
+                    <td>
+                        <a rel="down" class="button" href="?c=key&v=38">&#58134;</a>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a rel="down" class="button" href="?c=key&v=37">&#58132;</a>
+                    </td>
+                    <td></td>
+                    <td>
+                        <a rel="down" class="button" href="?c=key&v=39">&#58133;</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a rel="down" class="button" href="?c=key&v=40">&#58131;</a>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
+        <td class="show-wide">
+            <table class="keysection">
+                <tr>
+                    <td></td>
+                    <td>
+                        <a rel="down" class="button action" href="?c=key&v=89">Y</a>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <a rel="down" class="button action" href="?c=key&v=88">X</a>
+                    </td>
+                    <td></td>
+                    <td>
+                        <a rel="down" class="button action" href="?c=key&v=66">B</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a rel="down" class="button action" href="?c=key&v=65">A</a>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <a rel="down" class="button-long" href="?c=key&v=32">Space</a>
+        </td>
+    </tr>
+</table>

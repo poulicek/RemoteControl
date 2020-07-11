@@ -20,7 +20,7 @@ namespace RemoteControl.UI
         public MainForm(MainController controller) : this()
         {
             this.webBrowser.ProgressChanged += this.onProgressChanged;
-            this.webBrowser.Url = new Uri(controller.ServerUrl);
+            this.webBrowser.Url = new Uri(controller.ServerUrl + "?v=" + controller.AppVersion);
             this.qrImage = this.getQRCode(controller.ServerUrl);
             this.Location = this.GetCornerLocation();
         }

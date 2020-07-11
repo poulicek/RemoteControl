@@ -65,7 +65,7 @@ namespace RemoteControl.Controllers
             if (File.Exists(localFile))
                 return new FileStream(localFile, FileMode.Open, FileAccess.Read);
 
-            return ResourceHelper.GetResourceStream("RemoteControl.App." + fileName.Replace('/', '.'));
+            return ResourceHelper.GetResourceStream("App." + fileName.Replace('/', '.'));
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using RemoteControl.Server;
+using TrayToolkit.Helpers;
 
 namespace RemoteControl.Controllers
 {
