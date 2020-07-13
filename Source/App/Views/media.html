@@ -1,40 +1,40 @@
-﻿<table class="grid">
-    <tr>
-        <td style="text-align: right">
-            <a rel="click" href="?c=media&v=screenOff">&#59564;</a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <table>
-                <tr>
-                    <td width="20%" class="icon" style="text-align: right">&#57421;</td>
-                    <td style="direction: rtl">
-                        <a rel="press" class="button" href="?c=media&v=175">&#57669;</a><a rel="press" class="button" href="?c=media&v=174">&#57691;</a>
-                    </td>
-                    <td style="direction: rtl">
-                        <a rel="press" class="button" href="?c=media&v=brightnessUp">&#57669;</a><a rel="press" class="button" href="?c=media&v=brightnessDown">&#57691;</a>
-                    </td>
-                    <td width="20%" align="left" class="icon" style="text-align: left">&#58416;</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <table>
-                <tr>
-                    <td>
-                        <a rel="press" href="?c=media&v=37">&#57702;</a>
-                    </td>
-                    <td>
-                        <a rel="click" class="large" href="?c=media&v=179">&#57399;&#57396;‬</a>
-                    </td>
-                    <td>
-                        <a rel="press" href="?c=media&v=39">&#57690;</a>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>
+﻿<style>
+    .grid { grid-template-rows: 25% 1.5fr 1fr; }
+    .grid > .button { justify-self: right; }
+    .grid div:last-child { display: grid; grid-template-columns: auto auto auto; }
+
+    .center { display: grid; height: 100%; grid-template-columns: 15% auto 5% auto 15%; align-items: center; grid-gap: 5px; }
+    .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; }
+    .center div .button { width: 100%; }
+    .center span:first-child { justify-self: right; }
+    .center span:last-child { justify-self: left; }    
+
+    @media screen and (min-width: 320px) and (orientation: landscape) {
+        .grid .center div { flex-wrap: nowrap; }
+    }
+
+</style>
+
+<div class="grid">
+    <a rel="click" class="button icon" href="?c=media&v=screenOff">&#59564;</a>
+
+    <div class="center icon">
+        <span>&#57421;</span>
+
+        <div>
+            <a rel="press" class="icon button plastic" href="?c=media&v=175">&#57669;</a><a rel="press" class="icon button plastic" href="?c=media&v=174">&#57691;</a>
+        </div>
+        <div></div>
+        <div>
+            <a rel="press" class="icon button plastic" href="?c=media&v=brightnessUp">&#57669;</a><a rel="press" class="icon button plastic" href="?c=media&v=brightnessDown">&#57691;</a>
+        </div>
+
+        <span>&#58416;</span>
+    </div>
+
+    <div>
+        <a rel="press" class="button icon" href="?c=media&v=37">&#57702;</a>
+        <a rel="click" class="button icon large" href="?c=media&v=179">&#57399;&#57396;‬</a>
+        <a rel="press" class="button icon" href="?c=media&v=39">&#57690;</a>
+    </div>
+</div>

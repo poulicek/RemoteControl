@@ -7,7 +7,7 @@ window.onhashchange = onHashChange;
 
 // initalizes the application
 function onLoad() {
-    preventDoubleTap();      
+    preventDoubleTap();
     connect(APP_URL);
 };
 

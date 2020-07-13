@@ -1,31 +1,24 @@
 ﻿@font-face { font-family: 'Material Icons'; src: url('../Res/MaterialIcons-Regular.woff') format('woff'); }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 
-* { font-family: Arial, Tahoma; font-size: 8vmin; text-align: center; touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
-body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; touch-action: none; }
+* { touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; font-family: Arial, Tahoma; font-size: 8vmin; text-align: center;}
 table { width: 100%; height: 100%; border-spacing: 0px; }
+#view { height: 100%; animation-duration: .5s; animation-timing-function: ease-in; }
 
-a, .icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
-a { font-size: 1.2em; color: white; text-decoration: none; }
-a.button { background-color: #6D93AE; color: #1b2d34; border: 1px solid black;}
-a.active { background-color: rgba(255, 255, 255, .3); }
+.icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
+.grid { width: 100%; height: 100%; display: grid; align-items: center; box-sizing: border-box; padding: 5%;}
 
-#view {height: 100%; animation-duration: .5s;}
+.button { font-size: 1.2em; color: white; text-decoration: none; border-radius: 10px; display: grid; align-items: center; margin: 5px; box-sizing: border-box; min-width: .6in; min-height: .6in; }
+.button.large { font-size: 2em; }
+.button.outline { color: white; border: 1px solid white; background-color: rgba(0, 0, 0, .2); }
+.button.active { background-color: rgba(255, 255, 255, .3); }
+.button.plastic { background-color: #6D93AE; color: #1b2d34; border: 1px solid black; border-radius: 15px; }
 
-.status { position: absolute; width: 100%; top: 2%; visibility: hidden; font-size: 60%; line-height: 10vmin; z-index: 999; }
+.status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: 60%; z-index: 999; }
 .status#status-normal { visibility: visible; }
 .status-error #status-error { visibility: visible; color: #AD4141; }
 .status-error #status-normal { visibility: hidden; }
-
-.grid td { border: 0px solid white; }
-.grid td > a { border-radius: 15px; min-width: 22vmin; line-height: 18vh; display: inline-block; margin: 5px; }
-.grid td > a.large { font-size: 2em; }
-
-/* The animation code */
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
-}
-
-@media screen and (min-width: 320px) and (orientation: landscape) {
-    .grid td > a { min-width: 20vmin; line-height: 28vh; }
-}
