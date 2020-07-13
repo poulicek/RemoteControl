@@ -1,77 +1,43 @@
 ﻿<style>
-    td a.button {min-width: 22vmin; line-height: 22vmin; margin: 0px; border-radius: 50%;}
-    .keysection {margin: 0px auto; max-width: 66vmin; max-height: 66vmin; }
-    .show-wide { visibility: hidden; position: absolute; }
-    .button.action {font-family: inherit; background: none; color: white; border-color: white;}
-    .button-long {width: 60%; font-family: inherit; border: 1px solid white; margin: 0px auto;}
 
-    @media screen and (min-width: 480px) and (orientation: landscape) {
-    .show-wide { position: initial; visibility: visible; }
+a { background-color: rgba(0, 0, 0, .2); }
+
+.main { display: grid; grid-template-columns: 100% 0%; grid-template-rows: auto auto .5in auto; width: 100%; height: 100%; }
+.main a.button-long { display: grid; width: 60%; height: 80%; margin: auto; align-items: center; font-family: inherit; border: 1px solid white; font-size: 60%; }
+
+.cross { display: grid; grid-template-columns: auto auto; width: 60vmin; height: 60vmin; margin: auto; transform: rotate(45deg); grid-gap: 8px; }
+.cross:nth-child(2) { visibility: hidden; }
+.cross a { display: flex; justify-content: center; align-items: center; border: 1px solid white; }
+.cross a.icon span { font-family: inherit; }
+.cross a span { transform: rotate(-45deg); }
+.cross a:nth-child(1) { border-radius: 100% 5px 5px 5px; }
+.cross a:nth-child(2) { border-radius: 5px 100% 5px 5px; }
+.cross a:nth-child(3) { border-radius: 5px 5px 5px 100%; }
+.cross a:nth-child(4) { border-radius: 5px 5px 100% 5px; }
+
+
+
+@media screen and (min-width: 480px) and (orientation: landscape) {
+    .main { grid-template-columns: 50% 50%; grid-template-rows: .5in auto .5in;}
+    .main a.button-long { width: 30%; position: relative; top: -5vh; }
+    .cross:nth-child(2) { visibility: visible; }
 }
 
 </style>
 
-<table class="grid">
-    <tr><td></tr></td>
-    <tr>
-        <td>
-            <table class="keysection">
-                <tr>
-                    <td></td>
-                    <td>
-                        <a rel="down" class="button" href="?c=key&v=38">&#58134;</a>
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>
-                        <a rel="down" class="button" href="?c=key&v=37">&#58132;</a>
-                    </td>
-                    <td></td>
-                    <td>
-                        <a rel="down" class="button" href="?c=key&v=39">&#58133;</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <a rel="down" class="button" href="?c=key&v=40">&#58131;</a>
-                    </td>
-                    <td></td>
-                </tr>
-            </table>
-        </td>
-        <td class="show-wide">
-            <table class="keysection">
-                <tr>
-                    <td></td>
-                    <td>
-                        <a rel="down" class="button action" href="?c=key&v=89">Y</a>
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>
-                        <a rel="down" class="button action" href="?c=key&v=88">X</a>
-                    </td>
-                    <td></td>
-                    <td>
-                        <a rel="down" class="button action" href="?c=key&v=66">B</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>
-                        <a rel="down" class="button action" href="?c=key&v=65">A</a>
-                    </td>
-                    <td></td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <a rel="down" class="button-long" href="?c=key&v=32">Space</a>
-        </td>
-    </tr>
-</table>
+
+<div class="main">
+    <div class="cross" style="grid-column: 1; grid-row: 2;">
+        <a rel="down" class="icon" href="?c=key&v=38"><span>&#58134;</span></a>
+        <a rel="down" class="icon" href="?c=key&v=39"><span>&#58133;</span></a>
+        <a rel="down" class="icon" href="?c=key&v=37"><span>&#58132;</span></a>
+        <a rel="down" class="icon" href="?c=key&v=40"><span>&#58131;</span></a>
+    </div>
+    <div class="cross"  style="grid-column: 2; grid-row: 2;">
+        <a rel="down" href="?c=key&v=89"><span>Y</span></a>
+        <a rel="down" href="?c=key&v=66"><span>B</span></a>
+        <a rel="down" href="?c=key&v=88"><span>X</span></a>
+        <a rel="down" href="?c=key&v=65"><span>A</span></a>
+    </div>
+    <a rel="down" class="button-long" href="?c=key&v=32" style="grid-column-start: 1; grid-column-end: 3; grid-row: 3;">SPACE</a>
+</div>

@@ -57,7 +57,7 @@ namespace RemoteControl.Controllers
 
 
         /// <summary>
-        /// Returns a stream representinga file in resources
+        /// Returns a stream representing a file in resources
         /// </summary>
         private Stream getResource(string fileName)
         {

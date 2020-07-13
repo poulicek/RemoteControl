@@ -1,14 +1,13 @@
 ﻿@font-face { font-family: 'Material Icons'; src: url('../Res/MaterialIcons-Regular.woff') format('woff'); }
 
-* { font: 8vmin Arial, Tahoma; text-align: center; }
-html { -webkit-font-smoothing: antialiased;  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
-body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; user-select: none; position: fixed; }
+* { font-family: Arial, Tahoma; font-size: 8vmin; text-align: center; touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; touch-action: none; }
 table { width: 100%; height: 100%; border-spacing: 0px; }
 
 a, .icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
 a { font-size: 1.2em; color: white; text-decoration: none; }
-a.button { background: #6D93AE; color: #1b2d34; border: 1px solid black;}
-a.active { background: rgba(255, 255, 255, .3); }
+a.button { background-color: #6D93AE; color: #1b2d34; border: 1px solid black;}
+a.active { background-color: rgba(255, 255, 255, .3); }
 
 #view {height: 100%; animation-duration: .5s;}
 
@@ -18,8 +17,8 @@ a.active { background: rgba(255, 255, 255, .3); }
 .status-error #status-normal { visibility: hidden; }
 
 .grid td { border: 0px solid white; }
-.grid td a { border-radius: 15px; min-width: 22vmin; line-height: 18vh; display: inline-block; margin: 5px; }
-.grid td a.large { font-size: 2em; }
+.grid td > a { border-radius: 15px; min-width: 22vmin; line-height: 18vh; display: inline-block; margin: 5px; }
+.grid td > a.large { font-size: 2em; }
 
 /* The animation code */
 @keyframes fadeIn {
@@ -28,5 +27,5 @@ a.active { background: rgba(255, 255, 255, .3); }
 }
 
 @media screen and (min-width: 320px) and (orientation: landscape) {
-    .grid td a { min-width: 20vmin; line-height: 28vh; }
+    .grid td > a { min-width: 20vmin; line-height: 28vh; }
 }

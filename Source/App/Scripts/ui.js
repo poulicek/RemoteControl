@@ -57,23 +57,23 @@ function bindClickEvents(el) {
 
 // performs the click event
 function sendClick(e) {
-    if (e.target.pressedEvent)
-        sendRequest(e.target.href + '&s=1');
+    if (e.currentTarget.pressedEvent)
+        sendRequest(e.currentTarget.href + '&s=1');
     return cancelPress(e);
 };
 
 
 // ends the press
 function sendKeyUp(e) {
-    if (e.target.pressedEvent)
-        sendRequest(e.target.href + '&s=0');
+    if (e.currentTarget.pressedEvent)
+        sendRequest(e.currentTarget.href + '&s=0');
     return cancelPress(e);
 };
 
 
 // performs the button pressing
 function sendKeyPress(e) {
-    e.target.xhttp = null;
+    e.currentTarget.xhttp = null;
     initPress(e);
     keepPressing(e, true);
     return false;
@@ -83,14 +83,14 @@ function sendKeyPress(e) {
 // starts the button press
 function sendKeyDown(e) {
     initPress(e);
-    sendRequest(e.target.href + '&s=1');
+    sendRequest(e.currentTarget.href + '&s=1');
     return false;
 };
 
 
 // keeps sending the request
 function keepPressing(e, applyDelay) {
-    var el = e.target;
+    var el = e.currentTarget;
     if (el.pressedEvent == e) {
         if (!el.xhttp || el.xhttp.readyState == 4)
             el.xhttp = sendRequest(el.href + '&s=1');
@@ -101,16 +101,16 @@ function keepPressing(e, applyDelay) {
 
 // initializes the button press
 function initPress(e) {
-    setClass(e.target, 'active', true);
-    e.target.pressedEvent = e;
+    setClass(e.currentTarget, 'active', true);
+    e.currentTarget.pressedEvent = e;
     return false;
 };
 
 
 // cancels the button press
 function cancelPress(e) {
-    setClass(e.target, 'active', false);
-    e.target.pressedEvent = null;
+    setClass(e.currentTarget, 'active', false);
+    e.currentTarget.pressedEvent = null;
     return false;
 };
 
@@ -121,7 +121,8 @@ function isTouched(e) {
         return null;
 
     var touch = e.touches[0];
-    return e.target == document.elementFromPoint(touch.pageX, touch.pageY);
+    var el = document.elementFromPoint(touch.pageX, touch.pageY);
+    return e.currentTarget == el || e.currentTarget.contains(el);
 };
 
 
@@ -144,4 +145,12 @@ function setConnStatus(className) {
 function setStatus(statusText) {
     document.getElementById('status-normal').innerText = statusText ? statusText : '';
     setConnStatus();
+};
+
+
+// prevents the double-tap zoom on Safari
+function preventDoubleTap() {
+    var els = document.getElementsByTagName('*');
+    for (var i = 0; i < els.length; i++)
+        els[i].ontouchstart = function (e) { e.preventDefault(); };
 };
