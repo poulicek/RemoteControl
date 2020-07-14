@@ -35,10 +35,10 @@ function bindDownEvents(el) {
 // binds the press events
 function bindPressEvents(el) {
     el.ontouchstart = el.onmousedown = sendKeyPress;
-    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = sendKeyUp;
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
     el.ontouchmove = function(e) {
         if (!isTouched(e))
-            return sendKeyUp(e);
+            return cancelPress(e);
     };
 };
 
@@ -75,7 +75,7 @@ function sendKeyUp(e) {
 function sendKeyPress(e) {
     e.currentTarget.xhttp = null;
     initPress(e);
-    keepPressing(e, true);
+    keepPressing(e.currentTarget, true);
     return false;
 };
 
@@ -89,12 +89,11 @@ function sendKeyDown(e) {
 
 
 // keeps sending the request
-function keepPressing(e, applyDelay) {
-    var el = e.currentTarget;
-    if (el.pressedEvent == e) {
+function keepPressing(el, applyDelay) {
+    if (el.pressedEvent) {
         if (!el.xhttp || el.xhttp.readyState == 4)
             el.xhttp = sendRequest(el.href + '&s=1');
-        setTimeout(keepPressing, applyDelay ? 500 : 31, e);
+        setTimeout(keepPressing, applyDelay ? 500 : 31, el);
     }
 };
 
