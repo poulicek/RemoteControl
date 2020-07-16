@@ -31,7 +31,7 @@ function connect(url) {
     setStatus('Connecting...');
 
     console.log('Connecting to url: ' + url);
-    sendRequest('?c=app&v=getversion', onConnectSuccess, onConnectError, 1000);
+    sendRequest('?c=app&v=getversion', function (data) { onConnectSuccess(data, url); }, function (data) { onConnectError(data, url); });
 };
 
 
@@ -52,13 +52,14 @@ function onConnectSuccess(data) {
 
 
 // handles the negative response
-function onConnectError(error) {
+function onConnectError(error, url) {
     console.log('Connection error: ' + error);
 
-    if (!document.getElementById('query-base').href)
-        setConnStatus('status-error');
-    else
+    if (url.length)
         connect('');
+    else
+        setConnStatus('status-error');
+        
 };
 
 

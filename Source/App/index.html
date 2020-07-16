@@ -2,19 +2,18 @@
 <html lang="en">
 <head>
     <base id="query-base" href="" />
-
+    
     <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=11" />
+
     <meta id="app-version" name="app-version" content="{Version}" />
     <meta id="app-url" name="app-url" content="{HostUrl}" />
-    <meta name="full-screen" content="yes">
 
+    <meta name="full-screen" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
     <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
-    <meta http-equiv="X-UA-Compatible" content="IE=11" />
 
     <link rel="stylesheet" href="Styles/app.css?v={Version}" />
 
@@ -28,8 +27,8 @@
 <body>
     <div id="status-normal" class="status">Connecting...</div>
     <div id="status-error" class="icon status">&#57818;</div>
-
     <div id="view">
+        <a class="button reload icon" href="javascript:onLoad();">&#58837;</a>
     </div>
 </body>
 </html>

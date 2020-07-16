@@ -55,7 +55,12 @@ namespace RemoteControl.Server
 
         public void Write(string str, string mime = "text/html")
         {
-            var bytes = Encoding.UTF8.GetBytes(str ?? string.Empty);
+            this.Write(Encoding.UTF8.GetBytes(str ?? string.Empty), mime);
+        }
+
+
+        public void Write(byte[] bytes, string mime = "text/html")
+        {
             if (!this.headerWritten)
                 this.writeHeader(mime, bytes.Length);
 

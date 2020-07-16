@@ -6,7 +6,7 @@
 
 * { touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
 body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; font-family: Arial, Tahoma; font-size: .3in;}
-#view { height: 100%; animation-duration: .5s; animation-timing-function: ease-in; }
+#view { height: 100%; animation-duration: .5s; animation-timing-function: ease-in; display: grid; }
 
 .icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
 .grid { display: grid; box-sizing: border-box; width: 100%; height: 100%; align-items: center; padding: 5%; }
@@ -17,8 +17,10 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .button.outline { color: white; border: 1px solid white; background-color: rgba(0, 0, 0, .2); }
 .button.active { background-color: rgba(255, 255, 255, .3); }
 .button.plastic { background-color: #6D93AE; color: #1b2d34; border: 1px solid black; border-radius: 15px; }
+.button.reload { visibility: hidden; align-self: center; justify-content: center; font-size: 4em; color: inherit; }
 
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; }
 .status-error #status-error { visibility: visible; color: #AD4141; }
 .status-error #status-normal { visibility: hidden; }
+.status-error .reload { visibility: visible; }

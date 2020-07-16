@@ -121,6 +121,7 @@
     <EmbeddedResource Include="App\Scripts\app.js" />
     <EmbeddedResource Include="App\Views\media.html" />
     <EmbeddedResource Include="App\Views\gamepad.html" />
+    <EmbeddedResource Include="App\Views\link.html" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>

@@ -22,7 +22,7 @@ namespace RemoteControl.Controllers
             this.server.Listen();
 
             this.controllers.Add("file", new FilesController(this.AppVersion, this.server.GetUrl(Environment.MachineName)));
-            this.controllers.Add("app", new AppController(this.AppVersion));
+            this.controllers.Add("app", new AppController(this.AppVersion, this.ServerUrl));
             this.controllers.Add("view", new ViewController());
             this.controllers.Add("key", new KeysController());
             this.controllers.Add("media", new MediaController());
