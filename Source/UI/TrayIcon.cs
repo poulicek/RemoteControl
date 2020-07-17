@@ -16,7 +16,7 @@ namespace RemoteControl.UI
         protected override string getIconName(bool lightMode)
         {
             return lightMode
-                ? "Resources.IconInactiveLight.png"
+                ? "Resources.IconLight.png"
                 : "Resources.IconDark.png";
         }
 

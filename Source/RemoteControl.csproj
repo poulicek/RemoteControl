@@ -103,7 +103,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\IconDark.png" />
-    <EmbeddedResource Include="Resources\IconLight.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="QRCoder">
@@ -111,8 +110,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\IconActiveLight.png" />
-    <EmbeddedResource Include="Resources\IconInactiveLight.png" />
     <EmbeddedResource Include="App\favicon.ico" />
     <EmbeddedResource Include="App\index.html" />
     <EmbeddedResource Include="App\Scripts\ui.js" />
@@ -122,6 +119,19 @@
     <EmbeddedResource Include="App\Views\media.html" />
     <EmbeddedResource Include="App\Views\gamepad.html" />
     <EmbeddedResource Include="App\Views\link.html" />
+    <EmbeddedResource Include="Resources\IconLight.png" />
+    <EmbeddedResource Include="App\touch-icon-iphone.png" />
+    <EmbeddedResource Include="App\launch-iphone.png" />
+    <EmbeddedResource Include="App\splashscreens\ipadpro1_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\ipadpro2_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\ipadpro3_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\ipad_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\iphone5_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\iphone6_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\iphoneplus_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\iphonexr_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\iphonexsmax_splash.png" />
+    <EmbeddedResource Include="App\splashscreens\iphonex_splash.png" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>
