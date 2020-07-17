@@ -121,17 +121,6 @@
     <EmbeddedResource Include="App\Views\link.html" />
     <EmbeddedResource Include="Resources\IconLight.png" />
     <EmbeddedResource Include="App\touch-icon-iphone.png" />
-    <EmbeddedResource Include="App\launch-iphone.png" />
-    <EmbeddedResource Include="App\splashscreens\ipadpro1_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\ipadpro2_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\ipadpro3_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\ipad_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\iphone5_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\iphone6_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\iphoneplus_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\iphonexr_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\iphonexsmax_splash.png" />
-    <EmbeddedResource Include="App\splashscreens\iphonex_splash.png" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>
