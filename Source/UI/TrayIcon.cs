@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 using RemoteControl.Controllers;
 using TrayToolkit.UI;
 
@@ -11,6 +12,13 @@ namespace RemoteControl.UI
 
         public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
         {
+            this.controller.ConnectionError += this.onConnectionError;
+            this.controller.StartServer();
+        }
+
+        private void onConnectionError(Exception ex)
+        {
+            BalloonTooltip.Show("Network connection not available", null, ex.Message);
         }
 
         protected override string getIconName(bool lightMode)

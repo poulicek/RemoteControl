@@ -1,9 +1,13 @@
 ﻿// binds the events on links
-function bindLinkEvents() {
+function bindEvents() {
     var els = document.getElementsByTagName('a');
     for (var i = 0; i < els.length; i++) {
         var el = els[i];
         switch (el.rel) {
+
+            case 'link':
+                bindLinkEvents(el);
+                break;
 
             case 'down':
                 bindDownEvents(el);
@@ -18,6 +22,12 @@ function bindLinkEvents() {
                 break;
         }
     }
+};
+
+// binds the link events
+function bindLinkEvents(el) {
+    el.ontouchstart = el.onmousedown = function(e) { initPress(e); };
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = function(e) { cancelPress(e); };
 };
 
 

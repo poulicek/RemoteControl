@@ -1,15 +1,17 @@
 ﻿<style>
-    table { height: 100%; width: 100%; max-width: 400px; margin: auto; text-align: center; table-layout: fixed; margin-top: 15%; }
     h1 { font-size: 100%; text-align: center; }
-    #qr { background-image: url('?c=app&v=qr'); background-position: center; background-size: contain; background-repeat: no-repeat; }
     ol { color: white; margin: auto; padding: 0px; font-size: 50%; list-style-position: inside; display: inline-block; text-align: left; line-height: 140%; }
     p { margin: 0px; color: white; font-size: 50%; }
+    table { height: 100%; width: 100%; margin: auto; text-align: center; }
+    table tr:first-child td { height: 25%; vertical-align: bottom; }
+    table tr:last-child td { height: 40px; } 
+    #qr { background-image: url('?c=app&v=qr'); background-position: center; background-size: contain; background-repeat: no-repeat; }
 </style>
 
 <div class="grid">
     <table>
         <tr>
-            <td height="100px">
+            <td>
                 <ol>
                     <li>Scan the code with your phone or tablet</li>
                     <li>Add the page to your home screen</li>
@@ -21,7 +23,7 @@
             <td id="qr">&nbsp;</td>
         </tr>
         <tr>
-            <td height="40px" valign="top"><p></p></td>
+            <td><p></p></td>
         </tr>
     </table>
 </div>

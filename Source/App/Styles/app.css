@@ -12,12 +12,12 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .grid { display: grid; box-sizing: border-box; width: 100%; height: 100%; align-items: center; padding: 5%; }
 
 .button { display: grid; min-width: .6in; min-height: .6in; padding: 5px; border-radius: 10px; margin: 5px; align-items: center; }
-.button { color: white; text-decoration: none; justify-content: center; justify-self: center; }
+.button { color: white; text-decoration: none; justify-content: center; }
 .button.large { font-size: 2em; }
 .button.outline { color: white; border: 1px solid white; background-color: rgba(0, 0, 0, .2); }
 .button.plastic { background-color: #6D93AE; color: #1b2d34; border: 1px solid black; border-radius: 15px; }
-.button.reload { visibility: hidden; align-self: center; justify-content: center; font-size: 4em; color: inherit; }
 .button.active { background-color: rgba(255, 255, 255, .3); }
+.button.reload { visibility: hidden; align-self: center; justify-self: center; }
 
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; }

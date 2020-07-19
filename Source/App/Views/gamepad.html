@@ -1,7 +1,7 @@
 ﻿<style>
     .grid { grid-template-rows: 6fr .5in 1fr; }
 
-    .cross { display: grid; grid-template-columns: auto auto; width: 80vmin; height: 80vmin; margin: auto; transform: rotate(45deg); }
+    .cross { display: grid; grid-template-columns: auto auto; width: 70vmin; height: 70vmin; margin: auto; transform: rotate(45deg); }
     .cross:last-of-type { visibility: hidden; position: absolute; }
 
     .cross .button span { transform: rotate(-45deg); }
@@ -14,7 +14,7 @@
 
     @media screen and (min-width: 480px) and (orientation: landscape) {
         .grid { grid-template-columns: 1fr 1fr; grid-template-rows: .5in auto .5in; padding: 0px; }
-        .button.long { width: 30%; position: relative; top: -40%; grid-row: 3; grid-column-start: 1; grid-column-end: 3; min-height: .5in; }
+        .button.long { width: 60vmin; position: relative; top: -40%; grid-row: 3; grid-column-start: 1; grid-column-end: 3; min-height: .3in; }
         .cross { width: 60vmin; height: 60vmin; grid-row: 2; }
         .cross:last-of-type { visibility: visible; position: initial; }
     }
