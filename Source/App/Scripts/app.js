@@ -86,7 +86,7 @@ function onLoadViewSuccess(html) {
 
     viewEl.innerHTML = html;
     viewEl.style.animationName = 'fadeIn';
-    bindLinkEvents();
+    bindEvents();
 };
 
 

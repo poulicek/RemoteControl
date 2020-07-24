@@ -9,8 +9,6 @@ namespace RemoteControl.UI
 {
     public partial class MainForm : Form
     {
-        private readonly Bitmap qrImage;
-
         public MainForm()
         {
             InitializeComponent();
