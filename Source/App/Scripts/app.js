@@ -5,9 +5,17 @@ window.onload = onLoad;
 window.onhashchange = onHashChange;
 
 
-// initalizes the application
+// handles the load event
 function onLoad() {
+    bindEvents();
     preventDoubleTap();
+    init();
+};
+
+
+// initializes the application
+function init() {
+    console.log('Initializing...');
     connect(APP_URL);
 };
 

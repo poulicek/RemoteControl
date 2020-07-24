@@ -11,11 +11,12 @@ using System.Threading.Tasks;
 namespace RemoteControl.Server
 {
     public class HttpServer : IDisposable
-    {
-        private bool enabled;
+    {        
         private TcpListener listener;
 
+        public bool IsListening { get; private set; }
         public string AllowOrigin { get; set; }
+
         public event Action<Exception> ErrorOccured;
         public event Action<HttpContext> RequestReceived;
 
@@ -66,20 +67,20 @@ namespace RemoteControl.Server
         /// </summary>
         public void Listen()
         {
-            this.startListening(this.Port);
+            this.listener = new TcpListener(IPAddress.Any, this.Port);
+            this.listener.Start();
+            this.IsListening = true;
+
+            this.keepListening();
         }
 
 
         /// <summary>
-        /// Starts the asynchornous listening
+        /// Starts the asynchronous listening
         /// </summary>
-        private async void startListening(int port)
-        {
-            this.enabled = true;
-            this.listener = new TcpListener(IPAddress.Any, port);
-            this.listener.Start();
-
-            while (this.enabled)
+        private async void keepListening()
+        {            
+            while (this.IsListening)
             {
                 try
                 {
@@ -87,6 +88,7 @@ namespace RemoteControl.Server
                     this.handleTcpClientAsync(tcpClient);
                 }
                 catch (ObjectDisposedException) { }
+                catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
             }
         }
 
@@ -110,7 +112,7 @@ namespace RemoteControl.Server
                 // The stream gets reused indefinitely so the connection is kept alive
                 using (var stream = this.getStream(o as TcpClient))
                 {
-                    while (this.enabled)
+                    while (this.IsListening)
                         using (var context = new HttpContext(stream, this.AllowOrigin))
                             this.processContext(context);
                 }
@@ -167,7 +169,7 @@ namespace RemoteControl.Server
 
         public void Dispose()
         {
-            this.enabled = false;
+            this.IsListening = false;
             this.listener?.Stop();
         }
     }
