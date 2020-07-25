@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
-using static RemoteControl.Server.HttpResponse;
 
 namespace RemoteControl.Controllers
 {
@@ -27,7 +27,7 @@ namespace RemoteControl.Controllers
         {
             var path = context.Request.Url.Split('?')[0].Trim('/');
             var file = string.IsNullOrEmpty(path) ? "index.html" : path;
-            using (var stream = this.getResource(file))
+            using (var stream = GetResource(file))
             {
                 if (stream == null)
                     context.Response.StatusCode = System.Net.HttpStatusCode.NotFound;
@@ -48,18 +48,35 @@ namespace RemoteControl.Controllers
         /// </summary>
         private string readFormattedHtml(Stream s)
         {
+            return FillTemplate(s, new Dictionary<string, string>()
+            {
+                { "{Version}", this.appVersion },
+                { "{HostUrl}", this.hostUrl },
+                { "{Title}", Environment.MachineName },
+            });
+        }
+
+
+        /// <summary>
+        /// Fills the template with variables
+        /// </summary>
+        internal static string FillTemplate(Stream s, Dictionary<string, string> variables)
+        {
             using (var r = new StreamReader(s))
-                return r.ReadToEnd()
-                    .Replace("{Version}", this.appVersion)
-                    .Replace("{HostUrl}", this.hostUrl)
-                    .Replace("{Title}", Environment.MachineName);
+            {
+                var str = r.ReadToEnd();
+                foreach (var v in variables)
+                    str = str.Replace(v.Key, v.Value);
+
+                return str;
+            }
         }
 
 
         /// <summary>
         /// Returns a stream representing a file in resources
         /// </summary>
-        private Stream getResource(string fileName)
+        internal static Stream GetResource(string fileName)
         {
             var localFile = Path.Combine("../../App", fileName);
             if (File.Exists(localFile))

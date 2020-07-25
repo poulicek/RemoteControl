@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using RemoteControl.Server;
-using TrayToolkit.Helpers;
+using static TrayToolkit.Helpers.ResourceHelper;
 
 namespace RemoteControl.Controllers
 {
@@ -13,10 +14,10 @@ namespace RemoteControl.Controllers
             context.Response.CacheAge = TimeSpan.Zero;
 
             var view = context.Request.Query["v"];
-            using (var res = this.getResource(view))
+            using (var s = this.getResource(view))
             {
-                if (res != null)
-                    context.Response.Write(res);
+                if (s != null)
+                    this.writeView(context, s, view);
                 else
                 {
                     context.Response.StatusCode = HttpStatusCode.NotFound;
@@ -25,16 +26,35 @@ namespace RemoteControl.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Writes the view
+        /// </summary>
+        private void writeView(HttpContext context, Stream s, string view)
+        {
+            switch (view)
+            {
+                case "combined":
+                    context.Response.Write(FilesController.FillTemplate(s, new Dictionary<string, string>()
+                    {
+                        { "{View-Media}", this.getResource("media").ReadString() },
+                        { "{View-Gamepad}", this.getResource("gamepad").ReadString() },
+                    }));
+                    break;
+
+                default:
+                    context.Response.Write(s);
+                    break;
+            }            
+        }
+
+
         /// <summary>
         /// Returns a stream representing a file in resources
         /// </summary>
         private Stream getResource(string view)
         {
-            var localFile = Path.Combine("../../App/Views", view + ".html");
-            if (File.Exists(localFile))
-                return new FileStream(localFile, FileMode.Open, FileAccess.Read);
-
-            return ResourceHelper.GetResourceStream($"App.Views.{view}.html");
+            return FilesController.GetResource($"Views/{view}.html");
         }
     }
 }

@@ -117,6 +117,7 @@
     <EmbeddedResource Include="App\Views\link.html" />
     <EmbeddedResource Include="Resources\IconLight.png" />
     <EmbeddedResource Include="App\touch-icon-iphone.png" />
+    <EmbeddedResource Include="App\Views\combined.html" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>
