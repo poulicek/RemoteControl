@@ -1,5 +1,6 @@
 ﻿var APP_URL = document.getElementById('app-url').content;
 var APP_VERSION = document.getElementById('app-version').content;
+var DEFAULT_VIEW = 'combined';
 
 window.onload = onLoad;
 window.onhashchange = onHashChange;
@@ -22,7 +23,7 @@ function init() {
 
 // handles the change of the hash in the url
 function onHashChange() {
-    var view = window.location.hash.length > 1 ? window.location.hash.substring(1) : 'media';
+    var view = window.location.hash.length > 1 ? window.location.hash.substring(1) : DEFAULT_VIEW;
     loadView(view);
 };
 

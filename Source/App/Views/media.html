@@ -1,30 +1,30 @@
 ﻿<style>
-    .grid { grid-template-rows: 20% 1.5fr 1fr; }
-    .grid > .button { justify-self: right; }
+    #view-media.grid { grid-template-rows: 20% 1.5fr 1fr; }
+    #view-media.grid > .button { justify-self: right; }
 
-    .wide-only { visibility: hidden; position: absolute; }
-    .large { letter-spacing: -.1in; }
+    #view-media .wide-only { visibility: hidden; position: absolute; }
+    #view-media .large { letter-spacing: -.1in; }
 
-    #media-buttons .button { min-height: .4in; }
-    #media-buttons > div:first-child { display: grid; grid-template-columns: auto auto auto auto auto; }
-    #media-buttons > div:last-child { display: grid; grid-template-columns: .5fr 1fr 1fr .5fr; }
-    #media-buttons > div:last-child > .button:first-child { grid-column: 2;}
+    #view-media #media-buttons > div:first-child { display: grid; grid-template-columns: auto auto auto auto auto; }
+    #view-media #media-buttons > div:last-child { display: grid; grid-template-columns: .5fr 1fr 1fr .5fr; }
+    #view-media #media-buttons > div:last-child > .button:first-child { grid-column: 2; }
 
-    .center { display: grid; height: 100%; grid-template-columns: 15% auto 5% auto 15%; align-items: center; grid-gap: 5px; }
-    .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; }
-    .center div .button { width: 100%; }
-    .center span:first-child { justify-self: right; }
-    .center span:last-child { justify-self: left; }    
+    #view-media .center { display: grid; height: 100%; grid-template-columns: 15% auto 5% auto 15%; align-items: center; grid-gap: 5px; }
+    #view-media .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; }
+    #view-media .center div .button { width: 100%; }
+    #view-media .center span:first-child { justify-self: right; }
+    #view-media .center span:last-child { justify-self: left; }    
 
-    @media screen and (min-width: 320px) and (orientation: landscape) {
-        .grid .center div { flex-wrap: nowrap; }
-        .wide-only { visibility: visible; position: initial; }
-        #media-buttons > div:last-child { display: none; }
+    @media screen and (min-width: 320px) and (orientation: landscape)
+    {
+        #view-media .center div { flex-wrap: nowrap; }
+        #view-media .wide-only { visibility: visible; position: initial; }
+        #view-media #media-buttons > div:last-child { display: none; }
     }
 
 </style>
 
-<div class="grid">
+<div id="view-media" class="grid">
     <a rel="click" class="button icon" href="?c=media&v=screenOff">&#59564;</a>
 
     <div class="center icon">
@@ -50,8 +50,8 @@
             <a rel="press" class="button icon wide-only" href="?c=media&v=39">&#57690;</a>
         </div>
         <div>
-            <a rel="press" class="button icon" href="?c=media&v=37">&#57702;</a>
-            <a rel="press" class="button icon" href="?c=media&v=39">&#57690;</a>
+            <a rel="press" class="button icon small" href="?c=media&v=37">&#57702;</a>
+            <a rel="press" class="button icon small" href="?c=media&v=39">&#57690;</a>
         </div>
     </div>
 </div>

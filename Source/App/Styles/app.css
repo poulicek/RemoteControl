@@ -1,11 +1,12 @@
 ﻿@font-face { font-family: 'Material Icons'; src: url('../Res/MaterialIcons-Regular.woff') format('woff'); }
+@font-face { font-family: 'Roboto'; src: url('../Res/Roboto-Bold.woff') format('woff'); }
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
 * { touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
-body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; font-family: Arial, Tahoma; font-size: .3in;}
+body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; font-family: Roboto, Arial, Tahoma; font-size: .3in; }
 #view { height: 100%; animation-duration: .5s; animation-timing-function: ease-in; display: grid; }
 
 .icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
@@ -14,6 +15,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .button { display: grid; min-width: .6in; min-height: .6in; padding: 5px; border-radius: 10px; margin: 5px; align-items: center; }
 .button { color: white; text-decoration: none; justify-content: center; }
 .button.large { font-size: 2em; }
+.button.small { min-height: .4in; }
 .button.outline { color: white; border: 1px solid white; background-color: rgba(0, 0, 0, .2); }
 .button.plastic { background-color: #6D93AE; color: #1b2d34; border: 1px solid black; border-radius: 15px; }
 .button.active { background-color: rgba(255, 255, 255, .3); }

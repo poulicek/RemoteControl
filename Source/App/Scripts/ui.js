@@ -20,6 +20,10 @@ function bindEvents() {
             case 'click':
                 bindClickEvents(el);
                 break;
+
+            case 'grip':
+                bindGripEvents(el);
+                break;
         }
     }
 };
@@ -27,14 +31,14 @@ function bindEvents() {
 // binds the link events
 function bindLinkEvents(el) {
     el.ontouchstart = el.onmousedown = function(e) { initPress(e); };
-    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = function(e) { cancelPress(e); };
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseup = el.onmouseout = function(e) { cancelPress(e); };
 };
 
 
 // binds the down events
 function bindDownEvents(el) {
     el.ontouchstart = el.onmousedown = sendKeyDown;
-    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = sendKeyUp;
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseup = el.onmouseout = sendKeyUp;
     el.ontouchmove = function(e) {
         if (!isTouched(e))
             return sendKeyUp(e);
@@ -45,7 +49,7 @@ function bindDownEvents(el) {
 // binds the press events
 function bindPressEvents(el) {
     el.ontouchstart = el.onmousedown = sendKeyPress;
-    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseup = el.onmouseout = cancelPress;
     el.ontouchmove = function(e) {
         if (!isTouched(e))
             return cancelPress(e);
@@ -64,6 +68,15 @@ function bindClickEvents(el) {
     };
 };
 
+// binds the grip events
+function bindGripEvents(el) {
+    el.ontouchstart = el.onmousedown = initPress;
+    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseup = el.onmouseout = cancelPress
+    el.ontouchmove = function (e) {
+        if (!isTouched(e))
+            return cancelPress(e);
+    };
+};
 
 // performs the click event
 function sendClick(e) {
