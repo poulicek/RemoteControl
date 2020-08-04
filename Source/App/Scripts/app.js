@@ -8,8 +8,8 @@ window.onhashchange = onHashChange;
 
 // handles the load event
 function onLoad() {
-    bindEvents();
     preventDoubleTap();
+    bindEvents();
     init();
 };
 
@@ -64,11 +64,10 @@ function onConnectSuccess(data) {
 function onConnectError(error, url) {
     console.log('Connection error: ' + error);
 
-    if (url.length)
+    if (url && url.length)
         connect('');
     else
         setConnStatus('status-error');
-        
 };
 
 

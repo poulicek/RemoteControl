@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using RemoteControl.Controllers;
+using TrayToolkit.Helpers;
 using TrayToolkit.UI;
 
 namespace RemoteControl.UI
@@ -8,6 +10,7 @@ namespace RemoteControl.UI
     public partial class TrayIcon : TrayIconBase
     {
         private MainForm dialog;
+        private readonly Bitmap tooltipIcon = ResourceHelper.GetResourceImage("Resources.IconDark.png");
         private readonly MainController controller = new MainController();
 
         public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
@@ -18,7 +21,7 @@ namespace RemoteControl.UI
 
         private void onConnectionError(Exception ex)
         {
-            BalloonTooltip.Show("Network connection not available", null, ex.Message);
+            BalloonTooltip.Show("Network connection not available", this.tooltipIcon, ex.Message);
         }
 
         protected override string getIconName(bool lightMode)
@@ -43,6 +46,7 @@ namespace RemoteControl.UI
 
         protected override void Dispose(bool disposing)
         {
+            this.tooltipIcon.Dispose();
             this.controller.Dispose();
             base.Dispose(disposing);
         }
