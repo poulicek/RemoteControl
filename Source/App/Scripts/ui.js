@@ -30,8 +30,9 @@ function bindEvents() {
 
 // binds the link events
 function bindLinkEvents(el) {
-    el.ontouchstart = el.onmousedown = function(e) { initPress(e); };
-    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseup = el.onmouseout = function(e) { cancelPress(e); };
+    el.ontouchstart = el.onmousedown = initPress;
+    el.ontouchcancel = el.onmouseup = el.onmouseout = cancelPress;
+    el.ontouchend = function (e) { document.location.href = e.currentTarget.href; cancelPress(e); };
 };
 
 

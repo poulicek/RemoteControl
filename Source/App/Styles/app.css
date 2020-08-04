@@ -6,7 +6,6 @@
 }
 
 * { touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
-a { touch-action: auto; }
 body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; font-family: Roboto, Arial, Tahoma; font-size: .3in; }
 #view { height: 100%; animation-duration: .5s; animation-timing-function: ease-in; display: grid; }
 

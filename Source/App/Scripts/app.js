@@ -10,13 +10,14 @@ window.onhashchange = onHashChange;
 function onLoad() {
     preventDoubleTap();
     bindEvents();
-    init();
+    onConnectError(); //init();
 };
 
 
 // initializes the application
 function init() {
     console.log('Initializing...');
+    setStatus();
     connect(APP_URL);
 };
 
