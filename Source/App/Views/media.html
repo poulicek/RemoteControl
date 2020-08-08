@@ -2,9 +2,8 @@
     #view-media.grid { grid-template-rows: 20% 1.5fr 1fr; }
     #view-media.grid > .button { justify-self: right; }
 
+    #view-media .button.large { min-height: .6in; }
     #view-media .wide-only { visibility: hidden; position: absolute; }
-    #view-media .large { letter-spacing: -.1in; }
-
     #view-media #media-buttons > div:first-child { display: grid; grid-template-columns: auto auto auto auto auto; }
     #view-media #media-buttons > div:last-child { display: grid; grid-template-columns: .5fr 1fr 1fr .5fr; }
     #view-media #media-buttons > div:last-child > .button:first-child { grid-column: 2; }
@@ -43,11 +42,11 @@
 
     <div id="media-buttons">
         <div>
-            <a rel="press" class="button icon wide-only" href="?c=media&v=37">&#57702;</a>
-            <a rel="click" class="button icon" href="?c=media&v=177">&#57413;</a>
-            <a rel="click" class="button icon large" href="?c=media&v=179">&#57399;&#57396;‬</a>
-            <a rel="click" class="button icon" href="?c=media&v=176">&#57412;</a>
-            <a rel="press" class="button icon wide-only" href="?c=media&v=39">&#57690;</a>
+            <a rel="press" style="grid-column: 1" class="button icon wide-only" href="?c=media&v=37">&#57702;</a>
+            <a rel="click" style="grid-column: 2" class="button icon" href="?c=media&v=177">&#57413;</a>
+            <a rel="click" style="grid-column: 3" class="button icon large" href="?c=media&v=179">&#57399;&#57396;‬</a>
+            <a rel="click" style="grid-column: 4" class="button icon" href="?c=media&v=176">&#57412;</a>
+            <a rel="press" style="grid-column: 5" class="button icon wide-only" href="?c=media&v=39">&#57690;</a>
         </div>
         <div>
             <a rel="press" class="button icon small" href="?c=media&v=37">&#57702;</a>

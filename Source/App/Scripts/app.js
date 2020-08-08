@@ -10,7 +10,7 @@ window.onhashchange = onHashChange;
 function onLoad() {
     preventDoubleTap();
     bindEvents();
-    init();
+    onConnectError();//init();
 };
 
 
