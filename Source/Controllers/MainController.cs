@@ -32,6 +32,7 @@ namespace RemoteControl.Controllers
             this.controllers.Add("view", new ViewController());
             this.controllers.Add("key", new KeysController());
             this.controllers.Add("media", new MediaController());
+            this.controllers.Add("grip", new GripController());
         }
 
 
@@ -46,6 +47,8 @@ namespace RemoteControl.Controllers
             try
             {
                 this.server.Listen();
+                this.LastException = null;
+                this.ConnectedChanged?.Invoke(this.IsConnected);
             }
             catch (Exception ex) { this.onServerListeningError(ex, 5000); }
         }
