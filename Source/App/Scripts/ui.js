@@ -72,22 +72,8 @@ function bindClickEvents(el) {
 // binds the grip events
 function bindGripEvents(el) {
     el.ontouchstart = el.onmousedown = initPress;
-    el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseup = el.onmouseout = sendKeyUp;
-    el.ontouchmove = function (e) {
-        if (!e.touches || e.touches.length == 0)
-            return null;
-
-        var touch = e.touches[0];
-        var rect = e.currentTarget.getBoundingClientRect();
-        var s = Math.sqrt(Math.pow(rect.width / 2, 2) / 2);
-        var ctrX = rect.left + rect.width / 2;
-        var ctrY = rect.top + rect.height / 2;
-
-        var x = (touch.pageX - ctrX) / s;
-        var y = (ctrY - touch.pageY) / s;
-
-        sendRequest(e.currentTarget.href + '&s=1&v=' + x.toFixed(2) + ',' + y.toFixed(2));
-    };
+    el.ontouchend = el.onclick = el.onmouseup = el.onmouseout = sendKeyUp;
+    el.ontouchmove = sendTouchCoords;
 };
 
 // performs the click event
@@ -119,6 +105,29 @@ function sendKeyPress(e) {
 function sendKeyDown(e) {
     initPress(e);
     sendRequest(e.currentTarget.href + '&s=1');
+    return false;
+};
+
+
+// sends the touch coordinates
+function sendTouchCoords(e) {
+    if (!e.touches || e.touches.length == 0)
+        return false;
+
+    var touch = e.touches[0];
+    var rect = e.currentTarget.getBoundingClientRect();
+
+    var ctrX = rect.left + rect.width / 2;
+    var ctrY = rect.top + rect.height / 2;
+
+    var s = Math.sqrt(Math.pow(rect.width / 2, 2) / 2);
+    var x = (touch.pageX - ctrX) / s;
+    var y = (ctrY - touch.pageY) / s;
+
+    if (Math.abs(x) < 0.2 && Math.abs(y) < 0.2)
+        sendRequest(e.currentTarget.href + '&s=0');
+    else
+        sendRequest(e.currentTarget.href + '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2));
     return false;
 };
 

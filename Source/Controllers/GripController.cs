@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Forms.Design.Behavior;
-using System.Windows.Input;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
-using TrayToolkit.UI;
 
 namespace RemoteControl.Controllers
 {
@@ -17,10 +14,11 @@ namespace RemoteControl.Controllers
 
         public void ProcessRequest(HttpContext context)
         {
-            if (!int.TryParse(context.Request.Query["s"], out var keyState) || keyState == 1)
-                this.pressKeys(this.parsePressedKeys(context.Request.Query["k"].Split(','), context.Request.Query["v"].Split(',')));
-            else
+            if (int.TryParse(context.Request.Query["s"], out var keyState) && keyState == 0)
                 this.pressKeys();
+            else
+                this.pressKeys(this.parsePressedKeys(context.Request.Query["v"].Split(','), context.Request.Query["o"].Split(',')));
+                
         }
 
 
@@ -29,10 +27,9 @@ namespace RemoteControl.Controllers
         /// </summary>
         private Keys[] parsePressedKeys(string[] keyCodes, string[] coords)
         {
-            if (keyCodes.Length != 4 || coords.Length != 2)
-                return null;
-
-            if (!double.TryParse(coords[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) || !double.TryParse(coords[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
+            if (keyCodes.Length != 4 || coords.Length != 2 ||
+                !double.TryParse(coords[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) ||
+                !double.TryParse(coords[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
                 return null;
 
             return this.getPressedKeys(this.parseKeys(keyCodes), x, y);
@@ -44,26 +41,29 @@ namespace RemoteControl.Controllers
         /// </summary>
         private Keys[] getPressedKeys(Keys[] keys, double x, double y)
         {
-            var slope = Math.Abs(y / x);
-            var isDiagonal = Math.Abs(Math.Abs(slope) - 1) < 0.5;
+            var slope = x == 0 ? double.PositiveInfinity : Math.Abs(y / x);
+            var isDiagonal = slope > 0.5 && slope < 2;
 
-            if (x > 0 && y > 0)
+            if (x == 0 && y == 0)
+                return null;
+
+            if (x >= 0 && y >= 0)
                 return isDiagonal
                     ? new Keys[] { keys[0], keys[1] }
                     : new Keys[] { slope > 1 ? keys[0] : keys[1] };
 
-            if (x > 0 && y < 0)
+            if (x >= 0 && y <= 0)
                 return isDiagonal
                     ? new Keys[] { keys[1], keys[2] }
                     : new Keys[] { slope > 1 ? keys[2] : keys[1] };
 
-            if (x < 0 && y < 0)
+            if (x <= 0 && y <= 0)
                 return isDiagonal
                     ? new Keys[] { keys[2], keys[3] }
-                    : new Keys[] { slope > 1 ? keys[2] : keys[2] };
+                    : new Keys[] { slope > 1 ? keys[2] : keys[3] };
 
 
-            if (x < 0 && y > 0)
+            if (x <= 0 && y >= 0)
                 return isDiagonal
                     ? new Keys[] { keys[3], keys[0] }
                     : new Keys[] { slope > 1 ? keys[0] : keys[3] };
@@ -112,7 +112,7 @@ namespace RemoteControl.Controllers
                     this.pressedKeys.Add(key);
                 }
 
-                BalloonTooltip.Show(string.Join(" + ", this.pressedKeys.Select(k => k.ToString()).ToArray()));
+                //BalloonTooltip.Show(string.Join(" + ", this.pressedKeys.Select(k => k.ToString()).ToArray()));
             }
         }
     }
