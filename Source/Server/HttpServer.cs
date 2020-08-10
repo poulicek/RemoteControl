@@ -137,6 +137,8 @@ namespace RemoteControl.Server
             {
                 context.Response.StatusCode = HttpStatusCode.InternalServerError;
                 context.Response.Write(ex.ToString());
+
+                this.ErrorOccured?.Invoke(ex);
             }
         }
 

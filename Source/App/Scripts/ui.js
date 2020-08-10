@@ -33,7 +33,7 @@ function bindEvents() {
 function bindLinkEvents(el) {
     el.ontouchstart = el.onmousedown = initPress;
     el.ontouchcancel = el.onmouseup = el.onmouseout = cancelPress;
-    el.ontouchend = function (e) { document.location.href = e.currentTarget.href; cancelPress(e); };
+    el.ontouchend = function (e) { document.location.href = e.srcElement.href; cancelPress(e); };
 };
 
 
@@ -77,27 +77,28 @@ function bindGripEvents(el) {
     el.ontouchmove = sendTouchCoords;
 };
 
+
 // performs the click event
 function sendClick(e) {
-    if (e.currentTarget.pressedEvent)
-        sendRequest(e.currentTarget.href + '&s=1');
+    if (e.srcElement.pressedEvent)
+        sendRequest(e.srcElement.href + '&s=1');
     return cancelPress(e);
 };
 
 
 // ends the press
 function sendKeyUp(e) {
-    if (e.currentTarget.pressedEvent)
-        sendRequest(e.currentTarget.href + '&s=0');
+    if (e.srcElement.pressedEvent)
+        sendRequest(e.srcElement.href + '&s=0');
     return cancelPress(e);
 };
 
 
 // performs the button pressing
 function sendKeyPress(e) {
-    e.currentTarget.xhttp = null;
+    e.srcElement.xhttp = null;
     initPress(e);
-    keepPressing(e.currentTarget, true);
+    keepPressing(e.srcElement, true);
     return false;
 };
 
@@ -105,7 +106,7 @@ function sendKeyPress(e) {
 // starts the button press
 function sendKeyDown(e) {
     initPress(e);
-    sendRequest(e.currentTarget.href + '&s=1');
+    sendRequest(e.srcElement.href + '&s=1');
     return false;
 };
 
@@ -116,7 +117,7 @@ function sendTouchCoords(e) {
     if (!touch)
         return false;
 
-    var rect = e.currentTarget.getBoundingClientRect();
+    var rect = e.srcElement.getBoundingClientRect();
     var ctrX = rect.left + rect.width / 2;
     var ctrY = rect.top + rect.height / 2;
 
@@ -130,11 +131,11 @@ function sendTouchCoords(e) {
         y = 0;
     }
 
-    if (e.currentTarget.lastX != x || e.currentTarget.lastY != y)
-        sendRequest(e.currentTarget.href + '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2));
+    if (e.srcElement.lastX != x || e.srcElement.lastY != y)
+        sendRequest(e.srcElement.href + '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2));
 
-    e.currentTarget.lastX = x;
-    e.currentTarget.lastY = y;
+    e.srcElement.lastX = x;
+    e.srcElement.lastY = y;
     return false;
 };
 
@@ -151,16 +152,16 @@ function keepPressing(el, applyDelay) {
 
 // initializes the button press
 function initPress(e) {
-    setClass(e.currentTarget, 'active', true);
-    e.currentTarget.pressedEvent = e;
+    setClass(e.srcElement, 'active', true);
+    e.srcElement.pressedEvent = e;
     return false;
 };
 
 
 // cancels the button press
 function cancelPress(e) {
-    setClass(e.currentTarget, 'active', false);
-    e.currentTarget.pressedEvent = null;
+    setClass(e.srcElement, 'active', false);
+    e.srcElement.pressedEvent = null;
     return false;
 };
 
@@ -170,16 +171,22 @@ function getTouch(e, minDistance) {
     if (!e.touches || e.touches.length == 0)
         return false;
 
-    var curTouch = e.touches[0];
-    var lastTouch = e.currentTarget.lastTouch;
+    var curTouch = null;
+    var lastTouch = e.srcElement.lastTouch;
 
-    if (minDistance && lastTouch) {        
+    // finding the related touch
+    for (var i = 0; i < e.touches.length; i++)
+        if (e.touches[i].target == e.srcElement)
+            curTouch = e.touches[i];
+
+    // application of deadzone (minimum distance)
+    if (curTouch && minDistance && lastTouch) {        
         var dist = Math.sqrt(Math.pow(Math.abs(curTouch.pageX - lastTouch.pageX), 2) + Math.pow(Math.abs(curTouch.pageY - lastTouch.pageY), 2));
         if (dist < minDistance)
             return null;
     }
 
-    e.currentTarget.lastTouch = curTouch;
+    e.srcElement.lastTouch = curTouch;
     return curTouch;
 };
 
@@ -191,7 +198,7 @@ function isTouched(e) {
         return false;
 
     var el = document.elementFromPoint(touch.pageX, touch.pageY);
-    return e.currentTarget == el || e.currentTarget.contains(el);
+    return e.srcElement == el || e.srcElement.contains(el);
 };
 
 
