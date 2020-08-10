@@ -17,7 +17,7 @@ function onLoad() {
 // initializes the application
 function init() {
     console.log('Initializing...');
-    setStatus();
+    setStatusText();
     connect(APP_URL);
 };
 
@@ -38,7 +38,7 @@ function setBaseUrl(url) {
 // checks the app version
 function connect(url) {
     setBaseUrl(url);
-    setStatus('Connecting...');
+    setStatusText('Connecting...');
 
     console.log('Connecting to url: ' + url);
     sendRequest('?c=app&v=getversion', function (data) { onConnectSuccess(data, url); }, function (data) { onConnectError(data, url); });
@@ -51,7 +51,7 @@ function onConnectSuccess(data) {
 
     var parts = data.split(',');
     if (APP_VERSION == parts[0]) {
-        setStatus(parts[1]);
+        setStatusText(parts[1]);
         onHashChange();
     }
     else {
@@ -68,7 +68,7 @@ function onConnectError(error, url) {
     if (url && url.length)
         connect('');
     else
-        setConnStatus('status-error');
+        setAppStatus('status-error');
 };
 
 
@@ -94,5 +94,5 @@ function onLoadViewSuccess(html) {
 // handles error during view loading
 function onLoadViewError(error) {
     console.log('View loading error: ' + error);
-    setConnStatus('status-error');
+    setAppStatus('status-error');
 };

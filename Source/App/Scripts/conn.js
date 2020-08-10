@@ -22,7 +22,7 @@ function sendRequest(query, onSuccess, onError, timeout) {
 function handleResponse(xhttp, onSuccess, onError) {
     if (xhttp.readyState == 4) {
         if (xhttp.status == 200) {
-            setConnStatus();
+            setAppStatus();
 
             if (onSuccess)
                 onSuccess(xhttp.responseText);
@@ -31,8 +31,11 @@ function handleResponse(xhttp, onSuccess, onError) {
             if (onError)
                 onError(xhttp.responseText ? xhttp.responseText : xhttp.status);
             else {
-                setConnStatus('status-error');
-                setTimeout(setConnStatus, 1000);
+                setAppStatus('status-error');
+                setTimeout(function () {
+                    if (document.xhttp == xhttp)
+                        setAppStatus();
+                }, 1000);
             }
         }
     }

@@ -28,6 +28,7 @@ function bindEvents() {
     }
 };
 
+
 // binds the link events
 function bindLinkEvents(el) {
     el.ontouchstart = el.onmousedown = initPress;
@@ -111,23 +112,29 @@ function sendKeyDown(e) {
 
 // sends the touch coordinates
 function sendTouchCoords(e) {
-    if (!e.touches || e.touches.length == 0)
+    var touch = getTouch(e, 10);
+    if (!touch)
         return false;
 
-    var touch = e.touches[0];
     var rect = e.currentTarget.getBoundingClientRect();
-
     var ctrX = rect.left + rect.width / 2;
     var ctrY = rect.top + rect.height / 2;
 
     var s = Math.sqrt(Math.pow(rect.width / 2, 2) / 2);
     var x = (touch.pageX - ctrX) / s;
     var y = (ctrY - touch.pageY) / s;
+    var deadZone = 0.2;
 
-    if (Math.abs(x) < 0.2 && Math.abs(y) < 0.2)
-        sendRequest(e.currentTarget.href + '&s=0');
-    else
+    if (Math.abs(x) < deadZone && Math.abs(y) < deadZone) {
+        x = 0;
+        y = 0;
+    }
+
+    if (e.currentTarget.lastX != x || e.currentTarget.lastY != y)
         sendRequest(e.currentTarget.href + '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2));
+
+    e.currentTarget.lastX = x;
+    e.currentTarget.lastY = y;
     return false;
 };
 
@@ -158,12 +165,31 @@ function cancelPress(e) {
 };
 
 
+// returns a touch object if the minimum distance from previous event is exceeded
+function getTouch(e, minDistance) {
+    if (!e.touches || e.touches.length == 0)
+        return false;
+
+    var curTouch = e.touches[0];
+    var lastTouch = e.currentTarget.lastTouch;
+
+    if (minDistance && lastTouch) {        
+        var dist = Math.sqrt(Math.pow(Math.abs(curTouch.pageX - lastTouch.pageX), 2) + Math.pow(Math.abs(curTouch.pageY - lastTouch.pageY), 2));
+        if (dist < minDistance)
+            return null;
+    }
+
+    e.currentTarget.lastTouch = curTouch;
+    return curTouch;
+};
+
+
 // returns true or false if the element is touched
 function isTouched(e) {
-    if (!e.touches || e.touches.length == 0)
-        return null;
+    var touch = getTouch(e);
+    if (!touch)
+        return false;
 
-    var touch = e.touches[0];
     var el = document.elementFromPoint(touch.pageX, touch.pageY);
     return e.currentTarget == el || e.currentTarget.contains(el);
 };
@@ -179,15 +205,15 @@ function setClass(el, className, set) {
 
 
 // connection status
-function setConnStatus(className) {
+function setAppStatus(className) {
     document.body.className = className ? className : '';
 };
 
 
 // sets the status
-function setStatus(statusText) {
+function setStatusText(statusText) {
     document.getElementById('status-normal').innerText = statusText ? statusText : '';
-    setConnStatus();
+    setAppStatus();
 };
 
 
