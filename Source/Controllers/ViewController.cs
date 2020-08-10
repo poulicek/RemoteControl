@@ -9,6 +9,14 @@ namespace RemoteControl.Controllers
 {
     public class ViewController : IController
     {
+        private readonly string serverUrl;
+
+        public ViewController(string serverUrl)
+        {
+            this.serverUrl = serverUrl;
+        }
+
+
         public void ProcessRequest(HttpContext context)
         {
             context.Response.CacheAge = TimeSpan.Zero;
@@ -39,6 +47,13 @@ namespace RemoteControl.Controllers
                     {
                         { "{View-Media}", this.getResource("media").ReadString() },
                         { "{View-Gamepad}", this.getResource("gamepad").ReadString() },
+                    }));
+                    break;
+
+                case "link":
+                    context.Response.Write(FilesController.FillTemplate(s, new Dictionary<string, string>()
+                    {
+                        { "{Link}", this.serverUrl },
                     }));
                     break;
 
