@@ -33,7 +33,7 @@ function bindEvents() {
 function bindLinkEvents(el) {
     el.ontouchstart = el.onmousedown = initPress;
     el.ontouchcancel = el.onmouseup = el.onmouseout = cancelPress;
-    el.ontouchend = function (e) { document.location.href = e.srcElement.href; cancelPress(e); };
+    el.ontouchend = function (e) { document.location.href = e.currentTarget.href; cancelPress(e); };
 };
 
 
@@ -80,25 +80,25 @@ function bindGripEvents(el) {
 
 // performs the click event
 function sendClick(e) {
-    if (e.srcElement.pressedEvent)
-        sendRequest(e.srcElement.href + '&s=1');
+    if (e.currentTarget.pressedEvent)
+        sendRequest(e.currentTarget.href + '&s=1');
     return cancelPress(e);
 };
 
 
 // ends the press
 function sendKeyUp(e) {
-    if (e.srcElement.pressedEvent)
-        sendRequest(e.srcElement.href + '&s=0');
+    if (e.currentTarget.pressedEvent)
+        sendRequest(e.currentTarget.href + '&s=0');
     return cancelPress(e);
 };
 
 
 // performs the button pressing
 function sendKeyPress(e) {
-    e.srcElement.xhttp = null;
+    e.currentTarget.xhttp = null;
     initPress(e);
-    keepPressing(e.srcElement, true);
+    keepPressing(e.currentTarget, true);
     return false;
 };
 
@@ -106,7 +106,7 @@ function sendKeyPress(e) {
 // starts the button press
 function sendKeyDown(e) {
     initPress(e);
-    sendRequest(e.srcElement.href + '&s=1');
+    sendRequest(e.currentTarget.href + '&s=1');
     return false;
 };
 
@@ -117,7 +117,7 @@ function sendTouchCoords(e) {
     if (!touch)
         return false;
 
-    var rect = e.srcElement.getBoundingClientRect();
+    var rect = e.currentTarget.getBoundingClientRect();
     var ctrX = rect.left + rect.width / 2;
     var ctrY = rect.top + rect.height / 2;
 
@@ -131,11 +131,11 @@ function sendTouchCoords(e) {
         y = 0;
     }
 
-    if (e.srcElement.lastX != x || e.srcElement.lastY != y)
-        sendRequest(e.srcElement.href + '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2));
+    if (e.currentTarget.lastX != x || e.currentTarget.lastY != y)
+        sendRequest(e.currentTarget.href + '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2));
 
-    e.srcElement.lastX = x;
-    e.srcElement.lastY = y;
+    e.currentTarget.lastX = x;
+    e.currentTarget.lastY = y;
     return false;
 };
 
@@ -152,16 +152,16 @@ function keepPressing(el, applyDelay) {
 
 // initializes the button press
 function initPress(e) {
-    setClass(e.srcElement, 'active', true);
-    e.srcElement.pressedEvent = e;
+    setClass(e.currentTarget, 'active', true);
+    e.currentTarget.pressedEvent = e;
     return false;
 };
 
 
 // cancels the button press
 function cancelPress(e) {
-    setClass(e.srcElement, 'active', false);
-    e.srcElement.pressedEvent = null;
+    setClass(e.currentTarget, 'active', false);
+    e.currentTarget.pressedEvent = null;
     return false;
 };
 
@@ -172,11 +172,11 @@ function getTouch(e, minDistance) {
         return false;
 
     var curTouch = null;
-    var lastTouch = e.srcElement.lastTouch;
+    var lastTouch = e.currentTarget.lastTouch;
 
     // finding the related touch
     for (var i = 0; i < e.touches.length; i++)
-        if (e.touches[i].target == e.srcElement)
+        if (e.touches[i].target == e.currentTarget)
             curTouch = e.touches[i];
 
     // application of deadzone (minimum distance)
@@ -186,7 +186,7 @@ function getTouch(e, minDistance) {
             return null;
     }
 
-    e.srcElement.lastTouch = curTouch;
+    e.currentTarget.lastTouch = curTouch;
     return curTouch;
 };
 
@@ -198,7 +198,7 @@ function isTouched(e) {
         return false;
 
     var el = document.elementFromPoint(touch.pageX, touch.pageY);
-    return e.srcElement == el || e.srcElement.contains(el);
+    return e.currentTarget == el || e.currentTarget.contains(el);
 };
 
 
