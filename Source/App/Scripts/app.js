@@ -41,7 +41,7 @@ function connect(url) {
     setStatusText('Connecting...');
 
     console.log('Connecting to url: ' + url);
-    sendRequest('?c=app&v=getversion', function (data) { onConnectSuccess(data, url); }, function (data) { onConnectError(data, url); });
+    sendRequest(url + '?c=app&v=getversion', function (data) { onConnectSuccess(data, url); }, function (data) { onConnectError(data, url); });
 };
 
 

@@ -4,6 +4,7 @@ function sendRequest(query, onSuccess, onError, timeout) {
         var xhttp = new XMLHttpRequest();
         document.xhttp = xhttp;
 
+        xhttp.query = query;
         xhttp.onreadystatechange = function () { handleResponse(this, onSuccess, onError) };
         xhttp.open('GET', query, true);
         xhttp.timeout = timeout ? timeout : 500;
@@ -28,8 +29,12 @@ function handleResponse(xhttp, onSuccess, onError) {
                 onSuccess(xhttp.responseText);
         }
         else {
+            var errorText = xhttp.status == 0
+                ? "Server unrecheable: " + xhttp.query
+                : (xhttp.responseText ? xhttp.responseText : xhttp.status);
+
             if (onError)
-                onError(xhttp.responseText ? xhttp.responseText : xhttp.status);
+                onError(errorText);
             else {
                 setAppStatus('status-error');
                 setTimeout(function () {
