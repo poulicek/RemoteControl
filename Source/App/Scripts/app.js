@@ -1,6 +1,7 @@
 ﻿var APP_URL = document.getElementById('app-url').content;
 var APP_VERSION = document.getElementById('app-version').content;
 var DEFAULT_VIEW = 'combined';
+var DEBUG_MODE = false;
 
 window.onload = onLoad;
 window.onhashchange = onHashChange;
@@ -50,6 +51,8 @@ function onConnectSuccess(data) {
     console.log('Connected: ' + data);
 
     var parts = data.split(',');
+    DEBUG_MODE = parts.length > 2 && parts[2] == 'debug';
+
     if (APP_VERSION == parts[0]) {
         setStatusText(parts[1]);
         onHashChange();
@@ -68,7 +71,7 @@ function onConnectError(error, url) {
     if (url && url.length)
         connect('');
     else
-        setAppStatus('status-error');
+        setAppStatus('status-error', error);
 };
 
 
@@ -94,5 +97,5 @@ function onLoadViewSuccess(html) {
 // handles error during view loading
 function onLoadViewError(error) {
     console.log('View loading error: ' + error);
-    setAppStatus('status-error');
+    setAppStatus('status-error', error);
 };

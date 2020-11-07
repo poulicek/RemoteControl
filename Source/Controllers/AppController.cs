@@ -23,7 +23,11 @@ namespace RemoteControl.Controllers
             switch (context.Request.Query["v"])
             {
                 case "getversion":
-                    context.Response.Write($"{this.appVersion},{Environment.MachineName}");
+                    var debug = string.Empty;
+#if DEBUG
+                    debug += ",debug";
+#endif
+                    context.Response.Write($"{this.appVersion},{Environment.MachineName}{debug}");
                     break;
 
                 case "qr":

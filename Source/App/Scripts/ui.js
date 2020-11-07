@@ -212,8 +212,12 @@ function setClass(el, className, set) {
 
 
 // connection status
-function setAppStatus(className) {
+function setAppStatus(className, errorText) {
     document.body.className = className ? className : '';
+
+    // showing of log message
+    if (DEBUG_MODE)
+        document.getElementById('status-error-text').innerText = errorText;
 };
 
 

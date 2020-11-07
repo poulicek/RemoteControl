@@ -36,7 +36,7 @@ function handleResponse(xhttp, onSuccess, onError) {
             if (onError)
                 onError(errorText);
             else {
-                setAppStatus('status-error');
+                setAppStatus('status-error', errorText);
                 setTimeout(function () {
                     if (document.xhttp == xhttp)
                         setAppStatus();
