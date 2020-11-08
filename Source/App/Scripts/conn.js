@@ -7,7 +7,7 @@ function sendRequest(query, onSuccess, onError, timeout) {
         xhttp.query = query;
         xhttp.onreadystatechange = function () { handleResponse(this, onSuccess, onError) };
         xhttp.open('GET', query, true);
-        xhttp.timeout = timeout ? timeout : 500;
+        xhttp.timeout = timeout ? timeout : 2000;
         xhttp.send();
 
         return xhttp;

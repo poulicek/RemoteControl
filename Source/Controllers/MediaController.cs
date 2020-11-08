@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
@@ -27,6 +28,10 @@ namespace RemoteControl.Controllers
                     this.display.TurnOff();
                     break;
 
+                case "standby":
+                    this.setSuppendStateAsync();
+                    break;
+
                 default:
                     if (int.TryParse(context.Request.Query["v"], out var keyCode))
                     {
@@ -37,6 +42,25 @@ namespace RemoteControl.Controllers
                     }
                     break;
             }
+        }
+
+
+        private void setSuppendStateAsync()
+        {
+            ThreadingHelper.DoAsync(() =>
+            {
+                var time = DateTime.Now;
+
+                // turning of the display triggers sleep if S0 power state is supported
+                this.display.TurnOff();
+
+                // giving a chance the computer to go to sleep
+                Thread.Sleep(10000);
+
+                // turning on standby if the computer remained active while the screen was off
+                if ((DateTime.Now - time).TotalSeconds < 10.5)
+                    Application.SetSuspendState(PowerState.Suspend, true, true);
+            });
         }
 
 
