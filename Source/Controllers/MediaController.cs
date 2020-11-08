@@ -2,6 +2,8 @@
 using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
+using TrayToolkit.OS.Input;
+using TrayToolkit.UI;
 
 namespace RemoteControl.Controllers
 {
@@ -27,7 +29,12 @@ namespace RemoteControl.Controllers
 
                 default:
                     if (int.TryParse(context.Request.Query["v"], out var keyCode))
+                    {
+#if DEBUG
+                        BalloonTooltip.Show(((ActionKey)(Keys)keyCode).ToString());
+#endif
                         ((Keys)keyCode).Down();
+                    }
                     break;
             }
         }

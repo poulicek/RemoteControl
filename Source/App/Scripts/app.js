@@ -2,16 +2,31 @@
 var APP_VERSION = document.getElementById('app-version').content;
 var DEFAULT_VIEW = 'combined';
 var DEBUG_MODE = false;
+var DEFAULT_HEIGHT = 0;
 
 window.onload = onLoad;
 window.onhashchange = onHashChange;
+window.onorientationchange = onOrientationChanged;
 
 
 // handles the load event
 function onLoad() {
+
+    if (window.innerHeight > window.innerWidth)
+        DEFAULT_HEIGHT = document.body.offsetHeight;
+
     preventDoubleTap();
     bindEvents();
     init();
+};
+
+
+// compensates iOS bug width screen height after rotation
+function onOrientationChanged() {
+    document.body.className =
+        window.innerHeight > window.innerWidth && DEFAULT_HEIGHT && document.body.offsetHeight != DEFAULT_HEIGHT
+            ? 'compensate-ios-padding'
+            : null;
 };
 
 
