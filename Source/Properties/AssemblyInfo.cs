@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Remote Control")]
+[assembly: AssemblyTitle("Simple Remote Control")]
 [assembly: AssemblyDescription("Enables controlling the PC from a smart phone or tablet")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("BitIT s.r.o.")]
-[assembly: AssemblyProduct("Remote Control")]
+[assembly: AssemblyProduct("Simple Remote Control")]
 [assembly: AssemblyCopyright("Copyright © BitIT s.r.o. 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

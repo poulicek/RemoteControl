@@ -43,7 +43,7 @@
 
       <Extensions>
         <uap5:Extension Category="windows.startupTask">
-          <uap5:StartupTask TaskId="BrightnessControl" Enabled="true" DisplayName="Brightness Control" />
+          <uap5:StartupTask TaskId="RemoteControl" Enabled="true" DisplayName="Simple Remote Control" />
         </uap5:Extension>
       </Extensions>
       
