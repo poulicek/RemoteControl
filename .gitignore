@@ -6,3 +6,5 @@ bin
 obj
 Debug
 Release
+/Package/AppPackages
+/Package/BundleArtifacts
