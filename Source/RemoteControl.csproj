@@ -66,10 +66,13 @@
     <Compile Include="Controllers\MediaController.cs" />
     <Compile Include="Controllers\AppController.cs" />
     <Compile Include="Controllers\KeysController.cs" />
+    <Compile Include="Logic\TimedWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Server\HttpContext.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponse.cs" />
-    <Compile Include="Controllers\MainController.cs" />
+    <Compile Include="Logic\MainLoop.cs" />
     <Compile Include="Server\HttpServer.cs" />
     <Compile Include="UI\TrayIcon.cs">
       <SubType>Form</SubType>

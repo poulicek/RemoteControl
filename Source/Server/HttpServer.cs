@@ -11,7 +11,10 @@ using System.Threading.Tasks;
 namespace RemoteControl.Server
 {
     public class HttpServer : IDisposable
-    {        
+    {
+        public event Action ListeningStopped;
+
+        private bool disposing;
         private TcpListener listener;
 
         public bool IsListening { get; private set; }
@@ -67,11 +70,31 @@ namespace RemoteControl.Server
         /// </summary>
         public void Listen()
         {
+            if (this.disposing)
+                throw new InvalidOperationException("The HttpServer object is already disposed.");
+
+            if (this.IsListening)
+                return;            
+
             this.listener = new TcpListener(IPAddress.Any, this.Port);
             this.listener.Start();
             this.IsListening = true;
 
             this.keepListening();
+        }
+
+
+        /// <summary>
+        /// Stops listing to incoming connetctions
+        /// </summary>
+        public void Stop()
+        {
+            try
+            {
+                this.IsListening = false;
+                this.listener?.Stop();
+            }
+            catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
         }
 
 
@@ -87,9 +110,22 @@ namespace RemoteControl.Server
                     var tcpClient = await this.listener.AcceptTcpClientAsync();
                     this.handleTcpClientAsync(tcpClient);
                 }
-                catch (ObjectDisposedException) { }
+                catch (ObjectDisposedException) { this.onConnectionBroke(); }
+                catch (InvalidOperationException) { this.onConnectionBroke(); }
                 catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
             }
+        }
+
+
+
+        /// <summary>
+        /// Handles the broken connection
+        /// </summary>
+        private void onConnectionBroke()
+        {
+            this.IsListening = false;
+            if (!this.disposing)
+                this.ListeningStopped?.Invoke();
         }
 
 
@@ -171,8 +207,8 @@ namespace RemoteControl.Server
 
         public void Dispose()
         {
-            this.IsListening = false;
-            this.listener?.Stop();
+            this.disposing = true;
+            this.Stop();
         }
     }
 }

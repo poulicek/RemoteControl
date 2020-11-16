@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using RemoteControl.Controllers;
+using RemoteControl.Logic;
 using TrayToolkit.Helpers;
 using TrayToolkit.UI;
 
@@ -11,14 +11,21 @@ namespace RemoteControl.UI
     {
         private MainForm dialog;
         private readonly Bitmap tooltipIcon = ResourceHelper.GetResourceImage("Resources.IconDark.png");
-        private readonly MainController controller = new MainController();
+        private readonly MainLoop controller = new MainLoop();
 
         public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
         {
             this.controller.ConnectedChanged += this.onConnectedChanged;
             this.controller.ConnectionError += this.onConnectionError;
-            this.controller.StartServer();
         }
+
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            this.controller.InitServer();
+        }
+
 
         #region State Event Handlers
 
@@ -29,7 +36,7 @@ namespace RemoteControl.UI
 
         private void onConnectionError(Exception ex)
         {
-            BalloonTooltip.Show("Network connection not available", this.tooltipIcon, ex.Message);
+            BalloonTooltip.Show("Network connection not available", this.tooltipIcon, ex.Message, 5000);
         }
 
         #endregion

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Drawing;
 using System.Windows.Forms;
-using QRCoder;
-using RemoteControl.Controllers;
-using TrayToolkit.Helpers;
+using RemoteControl.Logic;
 
 namespace RemoteControl.UI
 {
@@ -15,7 +12,7 @@ namespace RemoteControl.UI
             this.DoubleBuffered = true;
         }
 
-        public MainForm(MainController controller) : this()
+        public MainForm(MainLoop controller) : this()
         {
             this.webBrowser.ProgressChanged += this.onProgressChanged;
             this.webBrowser.Url = new Uri(controller.ServerUrl + "?v=" + controller.AppVersion + "#link");
