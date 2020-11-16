@@ -42,9 +42,19 @@ namespace RemoteControl.Logic
         /// </summary>
         public void InitServer()
         {
-            this.lastException = null;
-            this.trySuspendExisting();
-            this.startServer();
+            try
+            {
+                // naive aproach to speed up the startup
+                this.server.Listen();
+                this.ConnectedChanged?.Invoke(this.IsConnected);
+            }
+            catch
+            {
+                // robust aproach when the naive fails
+                this.lastException = null;
+                this.trySuspendExisting();
+                this.startServer();
+            }
         }
 
 
@@ -100,9 +110,7 @@ namespace RemoteControl.Logic
                 // propagating the first-time error
                 if (this.lastException == null)
                     this.ConnectionError?.Invoke(ex);
-
                 this.lastException = ex;
-                this.ConnectedChanged?.Invoke(this.IsConnected);
 
                 // restarting the connection
                 if (startAgainAfterMs > 0)
@@ -150,9 +158,9 @@ namespace RemoteControl.Logic
             try
             {
                 this.server.Listen();
-                this.ConnectedChanged?.Invoke(this.IsConnected);
             }
             catch (Exception ex) { this.onStartServerError(ex); }
+            finally { this.ConnectedChanged?.Invoke(this.IsConnected); }
         }
 
 
