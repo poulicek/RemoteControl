@@ -12,19 +12,16 @@ namespace RemoteControl.Server
 {
     public class HttpServer : IDisposable
     {
-        public event Action ListeningStopped;
+        public event Action ListeningChanged;
+        public event Action<Exception> ErrorOccured;
+        public event Action<HttpContext> RequestReceived;
 
         private bool disposing;
         private TcpListener listener;
 
-        public bool IsListening { get; private set; }
-        public string AllowOrigin { get; set; }
-
-        public event Action<Exception> ErrorOccured;
-        public event Action<HttpContext> RequestReceived;
-
         public int Port { get; }
-
+        public bool IsListening { get; private set; }
+        public string AllowOrigin { get; set; }       
         public X509Certificate Certificate { get; }
 
 
@@ -81,6 +78,8 @@ namespace RemoteControl.Server
             this.IsListening = true;
 
             this.keepListening();
+
+            this.raiseListeningChanged();
         }
 
 
@@ -89,12 +88,18 @@ namespace RemoteControl.Server
         /// </summary>
         public void Stop()
         {
-            try
-            {
-                this.IsListening = false;
-                this.listener?.Stop();
-            }
-            catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
+            this.IsListening = false;
+            this.listener?.Stop();
+        }
+
+
+        /// <summary>
+        /// Disposes the object
+        /// </summary>
+        public void Dispose()
+        {
+            this.disposing = true;
+            this.Stop();
         }
 
 
@@ -102,18 +107,22 @@ namespace RemoteControl.Server
         /// Starts the asynchronous listening
         /// </summary>
         private async void keepListening()
-        {            
-            while (this.IsListening)
+        {
+            try
             {
-                try
+                while (this.IsListening && !this.disposing)
                 {
-                    var tcpClient = await this.listener.AcceptTcpClientAsync();
-                    this.handleTcpClientAsync(tcpClient);
+                    try
+                    {
+                        var tcpClient = await this.listener.AcceptTcpClientAsync();
+                        this.handleTcpClientAsync(tcpClient);
+                    }
+                    catch (ObjectDisposedException) { break; }
+                    catch (InvalidOperationException) { break; }
+                    catch (Exception ex) { this.raiseError(ex); }
                 }
-                catch (ObjectDisposedException) { this.onConnectionBroke(); }
-                catch (InvalidOperationException) { this.onConnectionBroke(); }
-                catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
             }
+            finally { this.onConnectionBroke(); }
         }
 
 
@@ -125,7 +134,7 @@ namespace RemoteControl.Server
         {
             this.IsListening = false;
             if (!this.disposing)
-                this.ListeningStopped?.Invoke();
+                this.raiseListeningChanged();
         }
 
 
@@ -153,9 +162,9 @@ namespace RemoteControl.Server
                             this.processContext(context);
                 }
             }
-            catch (AuthenticationException) { }
             catch (IOException) { }
-            catch (Exception ex) { this.ErrorOccured?.Invoke(ex); }
+            catch (AuthenticationException) { }
+            catch (Exception ex) { this.raiseError(ex); }
         }
 
 
@@ -174,8 +183,34 @@ namespace RemoteControl.Server
                 context.Response.StatusCode = HttpStatusCode.InternalServerError;
                 context.Response.Write(ex.ToString());
 
+                
+            }
+        }
+
+
+        /// <summary>
+        /// Raises an error event
+        /// </summary>
+        private void raiseError(Exception ex)
+        {
+            try
+            {
                 this.ErrorOccured?.Invoke(ex);
             }
+            catch { }
+        }
+
+
+        /// <summary>
+        /// Raises an error event
+        /// </summary>
+        private void raiseListeningChanged()
+        {
+            try
+            {
+                this.ListeningChanged?.Invoke();
+            }
+            catch { }
         }
 
 
@@ -202,13 +237,6 @@ namespace RemoteControl.Server
             var req = new CertificateRequest("cn=" + this.HostName, ECDsa.Create(ECCurve.NamedCurves.nistP384), HashAlgorithmName.SHA256);
             var cert = req.CreateSelfSigned(DateTimeOffset.UtcNow, DateTimeOffset.UtcNow.AddYears(5));
             return new X509Certificate2(cert.Export(X509ContentType.Pfx));
-        }
-
-
-        public void Dispose()
-        {
-            this.disposing = true;
-            this.Stop();
         }
     }
 }

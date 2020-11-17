@@ -72,7 +72,7 @@
     <Compile Include="Server\HttpContext.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponse.cs" />
-    <Compile Include="Logic\MainLoop.cs" />
+    <Compile Include="Logic\InputListener.cs" />
     <Compile Include="Server\HttpServer.cs" />
     <Compile Include="UI\TrayIcon.cs">
       <SubType>Form</SubType>

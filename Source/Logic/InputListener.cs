@@ -7,7 +7,7 @@ using TrayToolkit.Helpers;
 
 namespace RemoteControl.Logic
 {
-    public class MainLoop : IDisposable
+    public class InputListener : IDisposable
     {
         private const int SERVER_PORT = 7211;
         private const int RETRY_CONN_AFTER_MS = 5000;
@@ -18,19 +18,19 @@ namespace RemoteControl.Logic
         private bool disposed;
         private Exception lastException;
 
-        public bool IsConnected { get { return this.server.IsListening; } }
-        public string ServerUrl { get { return this.server.GetUrl(); } }
+        public bool IsConnected => this.server.IsListening;
+        public string ServerUrl => this.server.GetUrl();
         public string AppVersion { get; } = ResourceHelper.GetLastWriteTime().GetHashCode().ToString("x");
 
         public event Action<bool> ConnectedChanged;
         public event Action<Exception> ConnectionError;
 
 
-        public MainLoop()
+        public InputListener()
         {
             this.server.ErrorOccured += this.onHttpErrorOccured;
             this.server.RequestReceived += this.ProcessRequest;
-            this.server.ListeningStopped += this.onListeningStopped;
+            this.server.ListeningChanged += this.onListeningChanged;
 
             this.initControllers();
         }
@@ -46,14 +46,13 @@ namespace RemoteControl.Logic
             {
                 // naive aproach to speed up the startup
                 this.server.Listen();
-                this.ConnectedChanged?.Invoke(this.IsConnected);
             }
             catch
             {
                 // robust aproach when the naive fails
                 this.lastException = null;
-                this.trySuspendExisting();
-                this.startServer();
+                this.suspendOtherInstance();
+                this.keepStarting();
             }
         }
 
@@ -93,30 +92,9 @@ namespace RemoteControl.Logic
         /// <summary>
         /// Handles listeining stopped event
         /// </summary>
-        private void onListeningStopped()
+        private void onListeningChanged()
         {
             this.ConnectedChanged?.Invoke(this.IsConnected);
-            this.retryServerStart();
-        }
-
-
-        /// <summary>
-        /// Handles server listening error
-        /// </summary>
-        private void onStartServerError(Exception ex, int startAgainAfterMs = RETRY_CONN_AFTER_MS)
-        {
-            try
-            {
-                // propagating the first-time error
-                if (this.lastException == null)
-                    this.ConnectionError?.Invoke(ex);
-                this.lastException = ex;
-
-                // restarting the connection
-                if (startAgainAfterMs > 0)
-                    this.retryServerStart(startAgainAfterMs);
-            }
-            catch (Exception ex2) { ThreadingHelper.HandleException(ex2); }
         }
 
 
@@ -150,17 +128,20 @@ namespace RemoteControl.Logic
         /// <summary>
         /// Starts the server receiving the requests
         /// </summary>
-        private void startServer()
+        private void keepStarting()
         {
-            if (this.disposed)
-                return;
-
             try
             {
+                if (this.IsConnected || this.disposed)
+                    return;
+
                 this.server.Listen();
             }
-            catch (Exception ex) { this.onStartServerError(ex); }
-            finally { this.ConnectedChanged?.Invoke(this.IsConnected); }
+            catch (Exception ex)
+            {
+                this.retryServerStart();
+                this.raiseFirstTimeError(ex);
+            }
         }
 
 
@@ -169,7 +150,7 @@ namespace RemoteControl.Logic
         /// </summary>
         private void retryServerStart(int delayMs = RETRY_CONN_AFTER_MS)
         {
-            new Timer(o => this.startServer(), null, delayMs, Timeout.Infinite);
+            new Timer(o => this.keepStarting(), null, delayMs, Timeout.Infinite);
         }
 
 
@@ -188,10 +169,26 @@ namespace RemoteControl.Logic
         /// <summary>
         /// Tries to suspend the existing server
         /// </summary>
-        private bool trySuspendExisting()
+        private void suspendOtherInstance()
         {
             using (var wc = new TimedWebClient(1000))
-                return wc.UrlExists(this.ServerUrl + "?c=suspend");
+                wc.UrlExists(this.ServerUrl + "?c=suspend");
+            Thread.Sleep(100);
+        }
+
+
+        /// <summary>
+        /// Registers the last error and rises an event if it's the first one
+        /// </summary>
+        private void raiseFirstTimeError(Exception ex)
+        {
+            try
+            {
+                if (this.lastException == null)
+                    this.ConnectionError?.Invoke(ex);
+                this.lastException = ex;
+            }
+            catch { }
         }
     }
 }

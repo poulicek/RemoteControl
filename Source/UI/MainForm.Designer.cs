@@ -61,6 +61,7 @@ namespace RemoteControl.UI
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Remote Control";
+            this.TopMost = true;
             this.ResumeLayout(false);
 
         }

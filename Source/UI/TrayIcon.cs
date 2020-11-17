@@ -11,19 +11,19 @@ namespace RemoteControl.UI
     {
         private MainForm dialog;
         private readonly Bitmap tooltipIcon = ResourceHelper.GetResourceImage("Resources.IconDark.png");
-        private readonly MainLoop controller = new MainLoop();
+        private readonly InputListener listener = new InputListener();
 
         public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
         {
-            this.controller.ConnectedChanged += this.onConnectedChanged;
-            this.controller.ConnectionError += this.onConnectionError;
+            this.listener.ConnectedChanged += this.onConnectedChanged;
+            this.listener.ConnectionError += this.onConnectionError;
         }
 
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            this.controller.InitServer();
+            this.listener.InitServer();
         }
 
 
@@ -50,7 +50,7 @@ namespace RemoteControl.UI
 
         protected override Icon getIconFromBitmap(Bitmap bmp)
         {
-            if (this.controller.IsConnected)
+            if (this.listener.IsConnected)
                 return base.getIconFromBitmap(bmp);
 
             using (bmp)
@@ -62,18 +62,26 @@ namespace RemoteControl.UI
             if (e.Button != MouseButtons.Left)
                 return;
 
-            if (this.dialog == null || this.dialog.IsDisposed)
-                this.dialog = new MainForm(this.controller);
-            
-            this.dialog.Show();
-            this.dialog.WindowState = FormWindowState.Normal;
-            this.dialog.Activate();
+            if (!this.listener.IsConnected)
+                this.listener.InitServer();
+
+            if (this.dialog?.Visible == true && this.dialog.WindowState == FormWindowState.Normal)
+                this.dialog.Close();
+            else
+            {
+                if (this.dialog == null || this.dialog.IsDisposed)
+                    this.dialog = new MainForm(this.listener);
+
+                this.dialog.Show();
+                this.dialog.WindowState = FormWindowState.Normal;
+                this.dialog.Activate();
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
             this.tooltipIcon.Dispose();
-            this.controller.Dispose();
+            this.listener.Dispose();
             base.Dispose(disposing);
         }
     }

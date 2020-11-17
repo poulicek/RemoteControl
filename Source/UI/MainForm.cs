@@ -12,10 +12,10 @@ namespace RemoteControl.UI
             this.DoubleBuffered = true;
         }
 
-        public MainForm(MainLoop controller) : this()
+        public MainForm(InputListener listener) : this()
         {
             this.webBrowser.ProgressChanged += this.onProgressChanged;
-            this.webBrowser.Url = new Uri(controller.ServerUrl + "?v=" + controller.AppVersion + "#link");
+            this.webBrowser.Url = new Uri(listener.ServerUrl + "?v=" + listener.AppVersion + "#link");
         }
 
         private void onProgressChanged(object sender, WebBrowserProgressChangedEventArgs e)
