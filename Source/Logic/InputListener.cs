@@ -40,7 +40,7 @@ namespace RemoteControl.Logic
         /// <summary>
         /// Starts the server receiving the requests
         /// </summary>
-        public void InitServer()
+        public void StartServer()
         {
             try
             {
@@ -51,7 +51,6 @@ namespace RemoteControl.Logic
             {
                 // robust aproach when the naive fails
                 this.lastException = null;
-                this.suspendOtherInstance();
                 this.keepStarting();
             }
         }
@@ -135,6 +134,7 @@ namespace RemoteControl.Logic
                 if (this.IsConnected || this.disposed)
                     return;
 
+                this.suspendOtherInstance();
                 this.server.Listen();
             }
             catch (Exception ex)

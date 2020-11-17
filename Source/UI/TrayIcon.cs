@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.Win32;
 using RemoteControl.Logic;
 using TrayToolkit.Helpers;
 using TrayToolkit.UI;
@@ -17,29 +18,8 @@ namespace RemoteControl.UI
         {
             this.listener.ConnectedChanged += this.onConnectedChanged;
             this.listener.ConnectionError += this.onConnectionError;
+            SystemEvents.SessionSwitch += this.onSessionSwitch;
         }
-
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
-            this.listener.InitServer();
-        }
-
-
-        #region State Event Handlers
-
-        private void onConnectedChanged(bool connected)
-        {
-            this.updateLook();
-        }
-
-        private void onConnectionError(Exception ex)
-        {
-            BalloonTooltip.Show("Network connection not available", this.tooltipIcon, ex.Message, 5000);
-        }
-
-        #endregion
 
         protected override string getIconName(bool lightMode)
         {
@@ -57,13 +37,37 @@ namespace RemoteControl.UI
                 return base.getIconFromBitmap(bmp.MakeGrayscale());
         }
 
+        #region Event Handlers
+
+        private void onSessionSwitch(object sender, SessionSwitchEventArgs e)
+        {
+            if (!this.listener.IsConnected && (e.Reason == SessionSwitchReason.SessionLogon || e.Reason == SessionSwitchReason.SessionUnlock))
+                this.listener.StartServer();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            this.listener.StartServer();
+        }
+
+        private void onConnectedChanged(bool connected)
+        {
+            this.updateLook();
+        }
+
+        private void onConnectionError(Exception ex)
+        {
+            BalloonTooltip.Show("Network connection not available", this.tooltipIcon, ex.Message, 5000);
+        }
+
         protected override void onTrayIconClick(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left)
                 return;
 
             if (!this.listener.IsConnected)
-                this.listener.InitServer();
+                this.listener.StartServer();
 
             if (this.dialog?.Visible == true && this.dialog.WindowState == FormWindowState.Normal)
                 this.dialog.Close();
@@ -78,8 +82,11 @@ namespace RemoteControl.UI
             }
         }
 
+        #endregion
+
         protected override void Dispose(bool disposing)
         {
+            SystemEvents.SessionSwitch -= this.onSessionSwitch;
             this.tooltipIcon.Dispose();
             this.listener.Dispose();
             base.Dispose(disposing);
