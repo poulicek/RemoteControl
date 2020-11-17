@@ -251,7 +251,7 @@ function setAppStatus(className, errorText) {
 
     // showing of log message
     if (DEBUG_MODE)
-        document.getElementById('status-error-text').innerText = errorText;
+        document.getElementById('status-error-text').innerText = errorText ? errorText.trim() : '';
 };
 
 
