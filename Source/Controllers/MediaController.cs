@@ -34,12 +34,7 @@ namespace RemoteControl.Controllers
 
                 default:
                     if (int.TryParse(context.Request.Query["v"], out var keyCode))
-                    {
-#if DEBUG
-                        BalloonTooltip.Show(((ActionKey)(Keys)keyCode).ToString());
-#endif
                         ((Keys)keyCode).Down();
-                    }
                     break;
             }
         }
