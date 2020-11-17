@@ -17,10 +17,11 @@ namespace RemoteControl.Controllers
             BalloonTooltip.Show(((ActionKey)(Keys)keyCode).ToString());
 #endif
 
+            var scanMode = context.Request.Query["a"] == "1";
             if (!int.TryParse(context.Request.Query["s"], out var keyState) || keyState == 1)
-                ((Keys)keyCode).Down(true);
+                ((Keys)keyCode).Down(scanMode);
             else
-                ((Keys)keyCode).Up(true);
+                ((Keys)keyCode).Up(scanMode);
         }
     }
 }

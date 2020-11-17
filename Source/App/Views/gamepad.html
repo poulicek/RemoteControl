@@ -17,6 +17,7 @@
     #view-gamepad .cross .circle.active { min-width: 100%; min-height: 100%; }
 
     #view-gamepad #top .button { font-size: .6em; justify-self: left; }
+    #view-gamepad #top:last-of-type { display: none; }
     #view-gamepad #bottom .button.long { width: 70vmin; }
     #view-gamepad #bottom .button { font-size: .6em; justify-self: center; }
     #view-gamepad #bottom .button:first-of-type { display: none; }
@@ -31,6 +32,9 @@
         #view-gamepad .cross { width: 60vmin; height: 60vmin; }
         #view-gamepad .cross:last-of-type { display: grid; font-size: 70%; }
 
+        #view-gamepad #top { grid-template-columns: 1fr 1fr; }
+        #view-gamepad #top .button:last-of-type { display: grid; justify-self: right; }
+
         #view-gamepad #bottom { grid-template-columns: 1fr 50vmin 1fr; }
         #view-gamepad #bottom .button.long { width: 50vmin; }
         #view-gamepad #bottom .button:first-of-type { display: grid; justify-self: left; }
@@ -42,31 +46,32 @@
 
 <div id="view-gamepad" class="grid">
     <div id="top">
-        <a rel="down" class="button bottom small" href="?c=key&v=27">ESC</a>
+        <a rel="down" class="button bottom small" href="?c=key&v=27&a=">ESC</a>
+        <a class="button bottom small" href="#" onclick="switchScanMode(this);">SCAN</a>
     </div>
     <div id="middle">
         <div class="cross">
-            <a rel="down" class="icon button outline" href="?c=key&v=38"><span>&#58134;</span></a>
-            <a rel="down" class="icon button outline" href="?c=key&v=39"><span>&#58133;</span></a>
-            <a rel="down" class="icon button outline" href="?c=key&v=37"><span>&#58132;</span></a>
-            <a rel="down" class="icon button outline" href="?c=key&v=40"><span>&#58131;</span></a>
-            <a rel="grip" class="circle button outline" href="?c=grip&v=38,39,40,37"></a>
+            <a rel="down" class="icon button outline" href="?c=key&v=38&a="><span>&#58134;</span></a>
+            <a rel="down" class="icon button outline" href="?c=key&v=39&a="><span>&#58133;</span></a>
+            <a rel="down" class="icon button outline" href="?c=key&v=37&a="><span>&#58132;</span></a>
+            <a rel="down" class="icon button outline" href="?c=key&v=40&a="><span>&#58131;</span></a>
+            <a rel="grip" class="circle button outline" href="?c=grip&v=38,39,40,37&a="></a>
         </div>
         <div id="center">
             <a rel="down" class="icon button small" href="?c=key&v=8"></a>
             <a rel="down" class="icon button small" href="?c=key&v=13"></a>
         </div>
         <div class="cross">
-            <a rel="down" class="button outline" href="?c=key&v=89"><span>Y</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=66"><span>B</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=88"><span>X</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=65"><span>A</span></a>
-            <a rel="grip" class="circle button outline" href="?c=grip&v=89,66,65,88"></a>
+            <a rel="down" class="button outline" href="?c=key&v=89&a="><span>Y</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=66&a="><span>B</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=88&a="><span>X</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=65&a="><span>A</span></a>
+            <a rel="grip" class="circle button outline" href="?c=grip&v=89,66,65,88&a="></a>
         </div>
     </div>
     <div id="bottom">
-        <a rel="down" class="button small" href="?c=key&v=160">SHIFT</a>
-        <a rel="down" class="button outline small long" href="?c=key&v=32">SPACE</a>
-        <a rel="down" class="button small" href="?c=key&v=163">CTRL</a>
+        <a rel="down" class="button small" href="?c=key&v=160&a=">SHIFT</a>
+        <a rel="down" class="button outline small long" href="?c=key&v=32&a=">SPACE</a>
+        <a rel="down" class="button small" href="?c=key&v=163&a=">CTRL</a>
     </div>
 </div>

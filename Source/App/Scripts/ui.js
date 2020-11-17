@@ -1,4 +1,6 @@
-﻿// binds the events on links
+﻿var SCAN_MODE = false;
+
+// binds the events on links
 function bindEvents() {
     var els = document.getElementsByTagName('a');
     for (var i = 0; i < els.length; i++) {
@@ -24,8 +26,23 @@ function bindEvents() {
             case 'grip':
                 bindGripEvents(el);
                 break;
+
+            default:
+                bindDefaultEvents(el);
+                break;
         }
     }
+};
+
+
+function bindDefaultEvents(el) {
+    el.ontouchend = el.onmouseup = el.onclick;
+    el.ontouchstart = el.onmousedown = initPress;
+    el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
+    el.ontouchmove = function (e) {
+        if (!isTouched(e))
+            return cancelPress(e);
+    };
 };
 
 
@@ -63,7 +80,7 @@ function bindPressEvents(el) {
 function bindClickEvents(el) {
     el.ontouchend = el.onmouseup = sendClick;
     el.ontouchstart = el.onmousedown = initPress;
-    el.ontouchcancel = el.onclick = el.onmouseout = cancelPress
+    el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
     el.ontouchmove = function(e) {
         if (!isTouched(e))
             return cancelPress(e);
@@ -78,10 +95,27 @@ function bindGripEvents(el) {
 };
 
 
+// switches the scan mode
+function switchScanMode(el) {
+    SCAN_MODE = !SCAN_MODE;
+    setClass(el, 'active', SCAN_MODE);
+    setClass(el, 'selected', SCAN_MODE);
+    return false;
+};
+
+
+// constructs the url
+function getUrl(url, params) {
+    if (url.includes('&a='))
+        url = url.replace('&a=', '&a=' + (SCAN_MODE ? 1 : 0));
+    return url + params;
+};
+
+
 // performs the click event
 function sendClick(e) {
     if (e.currentTarget.pressedEvent)
-        sendRequest(e.currentTarget.href + '&s=1');
+        sendRequest(getUrl(e.currentTarget.href, '&s=1'));
     return cancelPress(e);
 };
 
@@ -89,7 +123,7 @@ function sendClick(e) {
 // ends the press
 function sendKeyUp(e) {
     if (e.currentTarget.pressedEvent)
-        sendRequest(e.currentTarget.href + '&s=0');
+        sendRequest(getUrl(e.currentTarget.href, '&s=0'));
     return cancelPress(e);
 };
 
@@ -106,7 +140,7 @@ function sendKeyPress(e) {
 // starts the button press
 function sendKeyDown(e) {
     initPress(e);
-    sendRequest(e.currentTarget.href + '&s=1');
+    sendRequest(getUrl(e.currentTarget.href, '&s=1'));
     return false;
 };
 
@@ -132,7 +166,7 @@ function sendTouchCoords(e) {
     }
 
     if (e.currentTarget.lastX != x || e.currentTarget.lastY != y)
-        sendRequest(e.currentTarget.href + '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2));
+        sendRequest(getUrl(e.currentTarget.href, '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2)));
 
     e.currentTarget.lastX = x;
     e.currentTarget.lastY = y;
@@ -144,7 +178,7 @@ function sendTouchCoords(e) {
 function keepPressing(el, applyDelay) {
     if (el.pressedEvent) {
         if (!el.xhttp || el.xhttp.readyState == 4)
-            el.xhttp = sendRequest(el.href + '&s=1');
+            el.xhttp = sendRequest(getUrl(el.href, '&s=1'));
         setTimeout(keepPressing, applyDelay ? 500 : 31, el);
     }
 };
