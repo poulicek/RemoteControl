@@ -42,11 +42,11 @@ namespace RemoteControl.Controllers
         {
             switch (view)
             {
-                case "combined":
+                case "main":
                     context.Response.Write(FilesController.FillTemplate(s, new Dictionary<string, string>()
                     {
-                        { "{View-Media}", this.getResource("media").ReadString() },
-                        { "{View-Gamepad}", this.getResource("gamepad").ReadString() },
+                        { "{View-Portrait}", this.getResource("media").ReadString() },
+                        { "{View-Landscape}", this.getResource("gamepad").ReadString() },
                     }));
                     break;
 

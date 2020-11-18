@@ -1,6 +1,6 @@
 ﻿var APP_URL = document.getElementById('app-url').content;
 var APP_VERSION = document.getElementById('app-version').content;
-var DEFAULT_VIEW = 'combined';
+var DEFAULT_VIEW = 'main';
 var DEBUG_MODE = false;
 var DEFAULT_HEIGHT = 0;
 

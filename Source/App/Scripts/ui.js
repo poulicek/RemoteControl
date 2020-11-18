@@ -27,6 +27,10 @@ function bindEvents() {
                 bindGripEvents(el);
                 break;
 
+            case 'script':
+                bindScriptEvents(el);
+                break;
+
             default:
                 bindDefaultEvents(el);
                 break;
@@ -34,9 +38,9 @@ function bindEvents() {
     }
 };
 
-
+// binds default events for the link
 function bindDefaultEvents(el) {
-    el.ontouchend = el.onmouseup = el.onclick;
+    el.ontouchend = el.onmouseup = function () { window.location.href = el.href; };
     el.ontouchstart = el.onmousedown = initPress;
     el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
     el.ontouchmove = function (e) {
@@ -45,6 +49,16 @@ function bindDefaultEvents(el) {
     };
 };
 
+// binds the script events
+function bindScriptEvents(el) {
+    el.ontouchend = el.onmouseup = el.onclick;
+    el.ontouchstart = el.onmousedown = initPress;
+    el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
+    el.ontouchmove = function (e) {
+        if (!isTouched(e))
+            return cancelPress(e);
+    };
+};
 
 // binds the link events
 function bindLinkEvents(el) {
