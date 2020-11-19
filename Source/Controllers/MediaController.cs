@@ -50,10 +50,10 @@ namespace RemoteControl.Controllers
                 this.display.TurnOff();
 
                 // giving a chance the computer to go to sleep
-                Thread.Sleep(10000);
+                Thread.Sleep(3000);
 
                 // turning on standby if the computer remained active while the screen was off
-                if ((DateTime.Now - time).TotalSeconds < 10.5)
+                if ((DateTime.Now - time).TotalSeconds < 3.5)
                     Application.SetSuspendState(PowerState.Suspend, true, true);
             });
         }

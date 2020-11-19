@@ -121,6 +121,7 @@ namespace RemoteControl.Logic
             this.controllers.Add("key", new KeysController());
             this.controllers.Add("media", new MediaController());
             this.controllers.Add("grip", new GripController());
+            this.controllers.Add("menu", new MenuController());
         }
 
 

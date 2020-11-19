@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Web;
 
 namespace RemoteControl.Server
 {
@@ -45,6 +46,14 @@ namespace RemoteControl.Server
             this.Write(sb.ToString());            
         }
 
+        /// <summary>
+        /// Returns the MIME type
+        /// </summary>
+        public string GetMime(string fileName)
+        {
+            return MimeMapping.GetMimeMapping(fileName);
+        }
+
 
         public void Write()
         {
@@ -62,9 +71,10 @@ namespace RemoteControl.Server
         public void Write(byte[] bytes, string mime = "text/html")
         {
             if (!this.headerWritten)
-                this.writeHeader(mime, bytes.Length);
+                this.writeHeader(mime, bytes?.Length ?? 0);
 
-            this.stream.Write(bytes, 0, bytes.Length);
+            if (bytes?.Length > 0)
+                this.stream.Write(bytes, 0, bytes.Length);
         }
 
 
