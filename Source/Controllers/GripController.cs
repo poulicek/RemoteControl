@@ -68,25 +68,25 @@ namespace RemoteControl.Controllers
             /// <summary>
             /// Releases the button
             /// </summary>
-            public void Release()
+            public void Release(bool scanMode)
             {
-                this.Press(new Keys[0]);
+                this.Press(new Keys[0], scanMode);
             }
 
 
             /// <summary>
             /// Presses the keys according to the coordinates
             /// </summary>
-            public void Press(PointF coords)
+            public void Press(PointF coords, bool scanMode)
             {
-                this.Press(this.getPressedKeys(this.keys, coords));
+                this.Press(this.getPressedKeys(this.keys, coords), scanMode);
             }
 
 
             /// <summary>
             /// Presses the keys
             /// </summary>
-            public void Press(Keys[] keys)
+            public void Press(Keys[] keys, bool scanMode)
             {
                 lock (this.pressedKeys)
                 {
@@ -95,13 +95,13 @@ namespace RemoteControl.Controllers
 
                     foreach (var key in unpressKeys)
                     {
-                        key.Up();
+                        key.Up(scanMode);
                         this.pressedKeys.Remove(key);
                     }
 
                     foreach (var key in pressKeys)
                     {
-                        key.Down();
+                        key.Down(scanMode);
                         this.pressedKeys.Add(key);
                     }
 
@@ -125,10 +125,11 @@ namespace RemoteControl.Controllers
             if (button == null)
                 return;
 
+            var scanMode = context.Request.Query["a"] == "1";
             if (int.TryParse(context.Request.Query["s"], out var keyState) && keyState == 0)
-                button.Release();
+                button.Release(scanMode);
             else
-                button.Press(this.parseCoords(context.Request.Query["o"].Split(',')));
+                button.Press(this.parseCoords(context.Request.Query["o"].Split(',')), scanMode);
                 
         }
 

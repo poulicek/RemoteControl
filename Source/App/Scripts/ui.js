@@ -1,4 +1,4 @@
-﻿var SCAN_MODE = false;
+﻿var SCAN_MODE = 1;
 
 // binds the events on links
 function bindEvents() {
@@ -217,15 +217,17 @@ function cancelPress(e) {
 // returns a touch object if the minimum distance from previous event is exceeded
 function getTouch(e, minDistance) {
     if (!e.touches || e.touches.length == 0)
-        return false;
+        return null;
 
     var curTouch = null;
     var lastTouch = e.currentTarget.lastTouch;
 
     // finding the related touch
-    for (var i = 0; i < e.touches.length; i++)
-        if (e.touches[i].target == e.currentTarget)
+    for (var i = 0; i < e.touches.length; i++) {
+        var touchTarget = e.touches[i].target;
+        if (touchTarget == e.currentTarget || e.currentTarget.contains(touchTarget))
             curTouch = e.touches[i];
+    }
 
     // application of deadzone (minimum distance)
     if (curTouch && minDistance && lastTouch) {        

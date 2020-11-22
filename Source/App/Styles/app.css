@@ -12,6 +12,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 
 .icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
 .grid { display: grid; box-sizing: border-box; width: 100%; height: 100%; align-items: center; padding: 5%; }
+.hidden { display: none !important; }
 
 .button { display: grid; min-width: .6in; min-height: .6in; padding: 5px; border-radius: 10px; margin: 5px; align-items: center; }
 .button { color: white; text-decoration: none; justify-content: center; }

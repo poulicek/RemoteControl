@@ -12,10 +12,11 @@ namespace RemoteControl.Controllers
                 return;
 
             var scanMode = context.Request.Query["a"] == "1";
-            if (!int.TryParse(context.Request.Query["s"], out var keyState) || keyState == 1)
-                ((Keys)keyCode).Down(scanMode);
-            else
+            if (int.TryParse(context.Request.Query["s"], out var keyState) && keyState == 0)
                 ((Keys)keyCode).Up(scanMode);
+            else
+                ((Keys)keyCode).Down(scanMode);
+                
         }
     }
 }
