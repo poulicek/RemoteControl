@@ -12,7 +12,7 @@ namespace RemoteControl.UI
     {
         private MainForm dialog;
         private readonly Bitmap tooltipIcon = ResourceHelper.GetResourceImage("Resources.IconDark.png");
-        private readonly InputListener listener = new InputListener();
+        private readonly RequestHandler listener = new RequestHandler();
 
         public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
         {

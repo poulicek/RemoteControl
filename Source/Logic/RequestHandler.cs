@@ -7,7 +7,7 @@ using TrayToolkit.Helpers;
 
 namespace RemoteControl.Logic
 {
-    public class InputListener : IDisposable
+    public class RequestHandler : IDisposable
     {
         private const int SERVER_PORT = 7211;
         private const int RETRY_CONN_AFTER_MS = 5000;
@@ -26,7 +26,7 @@ namespace RemoteControl.Logic
         public event Action<Exception> ConnectionError;
 
 
-        public InputListener()
+        public RequestHandler()
         {
             this.server.ErrorOccured += this.onHttpErrorOccured;
             this.server.RequestReceived += this.ProcessRequest;
@@ -122,6 +122,7 @@ namespace RemoteControl.Logic
             this.controllers.Add("media", new MediaController());
             this.controllers.Add("grip", new GripController());
             this.controllers.Add("menu", new MenuController());
+            this.controllers.Add("rdp", new RdpController());
         }
 
 

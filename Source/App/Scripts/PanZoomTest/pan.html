@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="full-screen" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <style>
+        html { width: 100%; height: 100%; }
+        body { width: 100%; height: 100%; background: black; margin: 0px; overflow: hidden; }
+        #show { position: fixed; top: 0; left: 0; background: red; color: white; z-index: 999; }
+        #frame { background: url('bing.jpg'); width: 100%; height: 100%; }
+        #canvas { width: 100%; height: 100%; object-fit: contain; }
+    </style>
+    <title>HTML Tutorial</title>
+</head>
+
+<body>
+    <div id="show">-</div>
+    <!-- <div id="frame"></div> -->
+    <!-- <img id="canvas" src=".?c=rdp&v=screen" /> -->
+    <img id="canvas" src="bing.jpg" />
+</body>
+
+<script type="text/javascript">
+
+    enablePanZoom(document.getElementById('canvas'));
+
+    function enablePanZoom(el) {
+
+        // viewport object
+        var viewport = {
+            x: 0,
+            y: 0,
+            z: 1,
+
+            rangeX: 0,
+            rangeY: 0,
+
+            // sets the given zoom
+            zoom: function (zoom, offset) {
+
+                zoom = Math.round(100 * zoom) / 100;
+
+                if (zoom < 1)
+                    zoom = 1;
+
+                if (zoom == this.z)
+                    return;
+
+                var ratio = zoom / this.z;
+                this.z = zoom;
+
+                var shiftX = Math.round(this.x * ratio - offset.x * (ratio - 1));
+                var shiftY = Math.round(this.y * ratio - offset.y * (ratio - 1));
+
+                this.setPosition(shiftX, shiftY);
+            },
+
+            // set the given position
+            setPosition: function (x, y) {
+
+                var maxX = Math.max(0, Math.floor(this.z * this.rangeX - window.innerWidth / 2));
+                var maxY = Math.max(0, Math.floor(this.z * this.rangeY - window.innerHeight / 2));
+
+                this.x = Math.max(-maxX, Math.min(maxX, x));
+                this.y = Math.max(-maxY, Math.min(maxY, y));
+            },
+
+            // sets the translation by given offset
+            pan: function (offsetX, offsetY) {
+                this.setPosition(this.x + offsetX, this.y + offsetY);
+            },
+
+            // returns the css transformation value
+            getTransformation: function () {
+                return 'matrix(' + this.z + ', 0, 0, ' + this.z + ', ' + this.x + ', ' + this.y + ')';
+            }
+        };
+
+
+        // event handlers
+        var eventHandlers = {
+
+            // context variables
+            lastZoom: null,
+            lastTouch: null,
+            firstTouch: null,
+
+            bind: function (el) {
+                window.addEventListener('resize', this.onInit);
+                el.addEventListener('load', this.onInit);
+                el.addEventListener('click', this.onClick);
+                el.addEventListener('touchstart', this.onTouchStart);
+                el.addEventListener('touchmove', this.onTouchMove);
+                el.addEventListener('wheel', this.onWheel);
+            },
+
+
+            onTouchStart: function (e) {
+                // reset is needed because Android (new touch may have same Id as previous one)
+                // preventDefault cannot be called otherwise onClick doesn't work
+                this.lastTouch = null;
+            },
+
+
+            onTouchMove: function (e) {
+
+                try {
+                    e.preventDefault();
+
+                    var touch = getTouch(e.touches);
+
+                    // detecting new touch combination
+                    if (!this.lastTouch || touch.id != this.lastTouch.id) {
+                        this.lastZoom = viewport.z;
+                        this.firstTouch = touch;
+                    }
+                    else {
+
+                        // panning and zooming
+                        // on it iOS can be handled by gestureMove event providing scale directly but it doesn't support Android
+                        if (touch.dist && this.firstTouch.dist)
+                            viewport.zoom(this.lastZoom * touch.dist / this.firstTouch.dist, getOffset(touch));
+                        viewport.pan(touch.clientX - this.lastTouch.clientX, touch.clientY - this.lastTouch.clientY);
+                    }
+
+                    this.lastTouch = touch;
+                    update(el);
+                }
+                catch (e) {
+                    alert(e.toString());
+                }
+            },
+
+            onInit: function (e) {
+                setTranslationRange(el);
+            },
+
+            onClick: function (e) {
+                var coords = getRealCoords(e.clientX, e.clientY);
+                alert(coords.x + ' ' + coords.y);
+            },
+
+
+            onWheel: function (e) {
+
+                e.preventDefault();
+
+                // support of mouse on PC
+                if (e.ctrlKey)
+                    viewport.zoom(Math.max(1, viewport.z * Math.pow(2, -e.deltaY / 100)), getOffset(e));
+                else if (e.shiftKey)
+                    viewport.pan(-e.deltaY, 0);
+                else
+                    viewport.pan(-e.deltaX, -e.deltaY);
+
+                update(el);
+            }
+        };
+
+        // helpers
+
+        function getTouch(touches) {
+
+            if (touches.length == 0)
+                return null;
+
+            if (touches.length == 1) {
+                var t = touches[0];
+                return {
+                    clientX: Math.floor(t.pageX),
+                    clientY: Math.floor(t.pageY),
+                    id: t.identifier
+                };
+            }
+
+            var t1 = touches[0];
+            var t2 = touches[1];
+            return {
+                clientX: Math.floor((t1.pageX + t2.pageX) / 2),
+                clientY: Math.floor((t1.pageY + t2.pageY) / 2),
+                id: t1.identifier + t2.identifier,
+                dist: Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY)
+            };
+        };
+
+
+        function setTranslationRange() {
+            var size = getRealSize(el);
+            viewport.rangeX = Math.floor(size.width / 2);
+            viewport.rangeY = Math.floor(size.height / 2);
+            update(el);
+        };
+
+
+        function getRealCoords(clientX, clientY) {
+
+            var imgSize = getRealSize(el);
+            imgSize.width *= viewport.z;
+            imgSize.height *= viewport.z;
+
+            // computing the offset from center, because the image and the screen are co-centric
+            var imgPoint = {
+                x: (clientX - window.innerWidth / 2) - viewport.x + imgSize.width / 2,
+                y: (clientY - window.innerHeight / 2) - viewport.y + imgSize.height / 2
+            };
+
+            // computing the real coordinates within the original size of the image
+            return {
+                x: Math.floor(el.naturalWidth * imgPoint.x / imgSize.width),
+                y: Math.floor(el.naturalHeight * imgPoint.y / imgSize.height)
+            };
+        };
+
+
+        function getRealSize(el) {
+            if (!el.naturalWidth || !el.naturalHeight)
+                return { width: el.innerWidth, height: el.clientHeight };
+
+            return el.clientWidth > el.clientHeight
+                ? { width: Math.floor(el.clientHeight * el.naturalWidth / el.naturalHeight), height: el.clientHeight }
+                : { width: el.clientWidth, height: Math.floor(el.clientWidth * el.naturalHeight / el.naturalWidth) };
+        };
+
+
+        function getOffset(e) {
+            return { x: e.clientX - el.clientWidth / 2, y: e.clientY - el.clientHeight / 2 };
+        };
+
+
+        function update(el) {
+            print();
+            el.style.transform = viewport.getTransformation();
+        };
+
+
+        function print() {
+            document.getElementById('show').innerText = viewport.x + ' ' + viewport.y + ' ' + viewport.z;
+        };
+
+
+        function reload() {
+            el.src = el.src;
+        };
+
+        // execution
+        eventHandlers.bind(el);
+        reload();
+    };
+
+
+</script>
+
+</html>

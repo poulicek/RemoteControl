@@ -47,6 +47,7 @@ namespace RemoteControl.Controllers
                     {
                         { "{View-Portrait}", this.getResource("media").ReadString() },
                         { "{View-Landscape}", this.getResource("gamepad").ReadString() },
+                        //{ "{View-Landscape}", this.getResource("rdp").ReadString() },
                     }));
                     break;
 

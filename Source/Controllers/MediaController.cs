@@ -3,8 +3,6 @@ using System.Threading;
 using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
-using TrayToolkit.OS.Input;
-using TrayToolkit.UI;
 
 namespace RemoteControl.Controllers
 {

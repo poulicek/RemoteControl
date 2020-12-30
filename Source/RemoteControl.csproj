@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\GripController.cs" />
+    <Compile Include="Controllers\RdpController.cs" />
     <Compile Include="Controllers\MenuController.cs" />
     <Compile Include="Controllers\ViewController.cs" />
     <Compile Include="Controllers\FilesController.cs" />
@@ -73,7 +74,7 @@
     <Compile Include="Server\HttpContext.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponse.cs" />
-    <Compile Include="Logic\InputListener.cs" />
+    <Compile Include="Logic\RequestHandler.cs" />
     <Compile Include="Server\HttpServer.cs" />
     <Compile Include="UI\TrayIcon.cs">
       <SubType>Form</SubType>
@@ -122,6 +123,8 @@
     <EmbeddedResource Include="App\touch-icon-iphone.png" />
     <EmbeddedResource Include="App\Views\main.html" />
     <EmbeddedResource Include="App\Views\menu.html" />
+    <EmbeddedResource Include="App\Scripts\panZoom.js" />
+    <EmbeddedResource Include="App\Views\rdp.html" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>

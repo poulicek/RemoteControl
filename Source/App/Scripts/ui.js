@@ -31,6 +31,10 @@ function bindEvents() {
                 bindScriptEvents(el);
                 break;
 
+            case 'panzoom':
+                bindPanZoomEvents(el);
+                break;
+
             default:
                 bindDefaultEvents(el);
                 break;
@@ -47,6 +51,17 @@ function bindDefaultEvents(el) {
         if (!isTouched(e))
             return cancelPress(e);
     };
+};
+
+// binds the pan-zoom events
+function bindPanZoomEvents(el) {
+    el.onclick = function (e) { return false; };
+
+    var imgEls = el.getElementsByTagName('img');
+    for (var i = 0; i < imgEls.length; i++)
+        enablePanZoom(imgEls[i], function (x, y) {
+            sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y));
+        });
 };
 
 // binds the script events
@@ -140,7 +155,6 @@ function sendKeyUp(e) {
         sendRequest(getUrl(e.currentTarget.href, '&s=0'));
     return cancelPress(e);
 };
-
 
 // performs the button pressing
 function sendKeyPress(e) {
