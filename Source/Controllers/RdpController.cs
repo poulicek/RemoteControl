@@ -3,6 +3,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 using RemoteControl.Server;
+using TrayToolkit.Helpers;
 using TrayToolkit.UI;
 
 namespace RemoteControl.Controllers
@@ -19,7 +20,8 @@ namespace RemoteControl.Controllers
                     break;
 
                 case "click":
-                    BalloonTooltip.Show($"Click: {context.Request.Query["x"]} {context.Request.Query["y"]}");
+                    if (int.TryParse(context.Request.Query["x"], out var x) && int.TryParse(context.Request.Query["y"], out var y))
+                        InputHelper.LeftMouseClick(x, y);
                     break;
             }
         }

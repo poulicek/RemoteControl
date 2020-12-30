@@ -58,10 +58,15 @@ function bindPanZoomEvents(el) {
     el.onclick = function (e) { return false; };
 
     var imgEls = el.getElementsByTagName('img');
-    for (var i = 0; i < imgEls.length; i++)
-        enablePanZoom(imgEls[i], function (x, y) {
+    for (var i = 0; i < imgEls.length; i++) {
+        var img = imgEls[i];
+        enablePanZoom(img, function (x, y) {
             sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y));
+            img.src = img.src;
         });
+
+        img.addEventListener('load', function () { img.src = img.src; });
+    }
 };
 
 // binds the script events

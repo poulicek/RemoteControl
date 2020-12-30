@@ -1,5 +1,7 @@
 ﻿function enablePanZoom(el, pointerClickHandler) {
 
+    var imgSize = { width: el.clientWidth, height: el.clientHeight }; 
+
     // viewport object
     var viewport = {
         x: 0,
@@ -60,13 +62,15 @@
         firstTouch: null,
 
         bind: function (el) {
-            window.addEventListener('resize', this.onInit);
-            el.addEventListener('load', this.onInit);
+            window.addEventListener('resize', this.onLoad);
+            el.addEventListener('load', this.onLoad);
             el.addEventListener('click', this.onClick);
             el.addEventListener('touchstart', this.onTouchStart);
             el.addEventListener('touchmove', this.onTouchMove);
             el.addEventListener('touchend', this.onTouchEnd);
             el.addEventListener('wheel', this.onWheel);
+
+            this.onLoad();
         },
 
 
@@ -111,7 +115,13 @@
             }
         },
 
-        onInit: function (e) {
+        onLoad: function (e) {
+
+            imgSize = {
+                width: el.naturalWidth ? el.naturalWidth : el.clientWidth,
+                height: el.naturalHeight ? el.naturalHeight : el.clientHeight
+            }
+
             setRange(el);
         },
 
@@ -180,37 +190,35 @@
     // returns the real coordinates in the image
     function getRealCoords(clientX, clientY) {
 
-        var imgSize = getRealSize(el);
-        imgSize.width *= viewport.z;
-        imgSize.height *= viewport.z;
+        var realSize = getRealSize(el);
+        realSize.width *= viewport.z;
+        realSize.height *= viewport.z;
 
         // computing the offset from center, because the image and the screen are co-centric
         var imgPoint = {
-            x: (clientX - window.innerWidth / 2) - viewport.x + imgSize.width / 2,
-            y: (clientY - window.innerHeight / 2) - viewport.y + imgSize.height / 2
+            x: (clientX - window.innerWidth / 2) - viewport.x + realSize.width / 2,
+            y: (clientY - window.innerHeight / 2) - viewport.y + realSize.height / 2
         };
 
         // computing the real coordinates within the original size of the image
         var coords = {
-            x: Math.floor(el.naturalWidth * imgPoint.x / imgSize.width),
-            y: Math.floor(el.naturalHeight * imgPoint.y / imgSize.height)
+            x: Math.floor(imgSize.width * imgPoint.x / realSize.width),
+            y: Math.floor(imgSize.height * imgPoint.y / realSize.height)
         };
 
-        return coords.x >= 0 && coords.x < el.naturalWidth && coords.y >= 0 && coords.y < el.naturalHeight ? coords : null;
+        return coords.x >= 0 && coords.x < imgSize.width && coords.y >= 0 && coords.y < imgSize.height ? coords : null;
     };
 
 
     // returns the real size of the image
     function getRealSize(el) {
-        if (!el.naturalWidth || !el.naturalHeight)
-            return { width: el.innerWidth, height: el.clientHeight };
 
         var ratioEl = Math.abs(el.clientWidth / el.clientHeight - 1);
-        var ratioImg = Math.abs(el.naturalWidth / el.naturalHeight - 1);
+        var ratioImg = Math.abs(imgSize.width / imgSize.height - 1);
 
         return ratioImg < ratioEl
-            ? { width: Math.floor(el.clientHeight * el.naturalWidth / el.naturalHeight), height: el.clientHeight }
-            : { width: el.clientWidth, height: Math.floor(el.clientWidth * el.naturalHeight / el.naturalWidth) };
+            ? { width: Math.floor(el.clientHeight * imgSize.width / imgSize.height), height: el.clientHeight }
+            : { width: el.clientWidth, height: Math.floor(el.clientWidth * imgSize.height / imgSize.width) };
     };
 
 
@@ -225,15 +233,7 @@
         el.style.transform = viewport.getTransformation();
     };
 
-
-    // reloads teh image
-    function reload() {
-        el.src = el.src;
-    };
-
-
     // EXECUTION
 
     eventHandlers.bind(el);
-    reload();
 };

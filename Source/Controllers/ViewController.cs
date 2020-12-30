@@ -46,8 +46,8 @@ namespace RemoteControl.Controllers
                     context.Response.Write(FilesController.FillTemplate(s, new Dictionary<string, string>()
                     {
                         { "{View-Portrait}", this.getResource("media").ReadString() },
-                        { "{View-Landscape}", this.getResource("gamepad").ReadString() },
-                        //{ "{View-Landscape}", this.getResource("rdp").ReadString() },
+                        //{ "{View-Landscape}", this.getResource("gamepad").ReadString() },
+                        { "{View-Landscape}", this.getResource("rdp").ReadString() },
                     }));
                     break;
 
