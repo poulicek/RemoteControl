@@ -73,17 +73,27 @@
             this.onLoad();
         },
 
-
         onTouchStart: function (e) {
             // reset is needed because Android (new touch may have same Id as previous one)
             // preventDefault cannot be called otherwise onClick doesn't work
-            this.lastTouch = null;
-            this.firstTouch = getTouch(e.touches);
+            eventHandlers.lastTouch = null;
+            eventHandlers.firstTouch = getTouch(e.touches);
+
+            setTimeout(function (e) {
+                if (eventHandlers.firstTouch && !eventHandlers.lastTouch) {
+                    var e = eventHandlers.firstTouch;
+                    e.which = 3;
+                    eventHandlers.onClick(e);
+                    eventHandlers.firstTouch = null;
+                }
+            }, 500);
         },
 
         onTouchEnd: function (e) {
-            if (this.firstTouch && !this.lastTouch)
-                eventHandlers.onClick(this.firstTouch);
+            if (eventHandlers.firstTouch && !eventHandlers.lastTouch)
+                eventHandlers.onClick(eventHandlers.firstTouch);
+
+            eventHandlers.firstTouch = null;
         },
 
         onTouchMove: function (e) {
@@ -94,20 +104,20 @@
                 var touch = getTouch(e.touches);
 
                 // detecting new touch combination
-                if (!this.lastTouch || touch.id != this.lastTouch.id) {
-                    this.lastZoom = viewport.z;
-                    this.firstTouch = touch;
+                if (!eventHandlers.lastTouch || touch.id != eventHandlers.lastTouch.id) {
+                    eventHandlers.lastZoom = viewport.z;
+                    eventHandlers.firstTouch = touch;
                 }
                 else {
 
                     // panning and zooming
                     // on it iOS can be handled by gestureMove event providing scale directly but it doesn't support Android
-                    if (touch.dist && this.firstTouch.dist)
-                        viewport.zoom(this.lastZoom * touch.dist / this.firstTouch.dist, getOffset(touch));
-                    viewport.pan(touch.clientX - this.lastTouch.clientX, touch.clientY - this.lastTouch.clientY);
+                    if (touch.dist && eventHandlers.firstTouch.dist)
+                        viewport.zoom(eventHandlers.lastZoom * touch.dist / eventHandlers.firstTouch.dist, getOffset(touch));
+                    viewport.pan(touch.clientX - eventHandlers.lastTouch.clientX, touch.clientY - eventHandlers.lastTouch.clientY);
                 }
 
-                this.lastTouch = touch;
+                eventHandlers.lastTouch = touch;
                 update(el);
             }
             catch (e) {
@@ -131,7 +141,7 @@
 
             var coords = getRealCoords(e.clientX, e.clientY);
             if (coords)
-                pointerClickHandler(coords.x, coords.y);
+                pointerClickHandler(coords.x, coords.y, e.which);
         },
 
         onWheel: function (e) {
@@ -163,7 +173,8 @@
             return {
                 clientX: Math.floor(t.pageX),
                 clientY: Math.floor(t.pageY),
-                id: t.identifier
+                id: t.identifier,
+                time: new Date().getTime()
             };
         }
 
@@ -173,6 +184,7 @@
             clientX: Math.floor((t1.pageX + t2.pageX) / 2),
             clientY: Math.floor((t1.pageY + t2.pageY) / 2),
             id: t1.identifier + t2.identifier,
+            time: new Date().getTime(),
             dist: Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY)
         };
     };
@@ -180,6 +192,10 @@
 
     // updates the pan range
     function setRange() {
+
+        if (viewport.rangeX || viewport.rangeY)
+            return;
+
         var size = getRealSize(el);
         viewport.rangeX = Math.floor(size.width / 2);
         viewport.rangeY = Math.floor(size.height / 2);
@@ -202,23 +218,25 @@
 
         // computing the real coordinates within the original size of the image
         var coords = {
-            x: Math.floor(imgSize.width * imgPoint.x / realSize.width),
-            y: Math.floor(imgSize.height * imgPoint.y / realSize.height)
+            x: Math.floor(10000 * imgPoint.x / realSize.width) / 10000,
+            y: Math.floor(10000 * imgPoint.y / realSize.height) / 10000
         };
 
-        return coords.x >= 0 && coords.x < imgSize.width && coords.y >= 0 && coords.y < imgSize.height ? coords : null;
+        return coords.x >= 0 && coords.x < 1 && coords.y >= 0 && coords.y < 1 ? coords : null;
     };
 
 
     // returns the real size of the image
     function getRealSize(el) {
 
-        var ratioEl = Math.abs(el.clientWidth / el.clientHeight - 1);
-        var ratioImg = Math.abs(imgSize.width / imgSize.height - 1);
+        var ratio = imgSize.width / imgSize.height;
 
-        return ratioImg < ratioEl
-            ? { width: Math.floor(el.clientHeight * imgSize.width / imgSize.height), height: el.clientHeight }
-            : { width: el.clientWidth, height: Math.floor(el.clientWidth * imgSize.height / imgSize.width) };
+        var slopeEl = Math.abs(el.clientWidth / el.clientHeight - 1);
+        var slopeImg = Math.abs(ratio - 1);
+
+        return slopeImg < slopeEl
+            ? { width: Math.floor(el.clientHeight * ratio), height: el.clientHeight }
+            : { width: el.clientWidth, height: Math.floor(el.clientWidth / ratio) };
     };
 
 

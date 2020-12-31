@@ -60,8 +60,8 @@ function bindPanZoomEvents(el) {
     var imgEls = el.getElementsByTagName('img');
     for (var i = 0; i < imgEls.length; i++) {
         var img = imgEls[i];
-        enablePanZoom(img, function (x, y) {
-            sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y));
+        enablePanZoom(img, function (x, y, b) {
+            sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + b));
             img.src = img.src;
         });
 

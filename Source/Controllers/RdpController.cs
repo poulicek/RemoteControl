@@ -15,13 +15,12 @@ namespace RemoteControl.Controllers
             switch (context.Request.Query["v"])
             {
                 case "screen":
-                    var s = this.getScreenShot();
-                    context.Response.Write(s, "image/jpeg");
+                    context.Response.Write(this.getScreenShot(), "image/jpeg");
                     break;
 
                 case "click":
-                    if (int.TryParse(context.Request.Query["x"], out var x) && int.TryParse(context.Request.Query["y"], out var y))
-                        InputHelper.LeftMouseClick(x, y);
+                    if (float.TryParse(context.Request.Query["x"], out var xRatio) && float.TryParse(context.Request.Query["y"], out var yRatio))
+                        this.perfromMouseClick(xRatio, yRatio, int.TryParse(context.Request.Query["b"], out var btn) ? btn : 1);
                     break;
             }
         }
@@ -57,6 +56,16 @@ namespace RemoteControl.Controllers
                     return codec;
 
             return null;
+        }
+
+
+        private void perfromMouseClick(float xRatio, float yRatio, int btn)
+        {
+            var rect = Screen.AllScreens[0].Bounds;
+            var x = (int)(xRatio * rect.Width);
+            var y = (int)(yRatio * rect.Height);
+
+            InputHelper.MouseClick(x, y, (InputHelper.MouseButton)btn);
         }
     }
 }
