@@ -193,9 +193,6 @@
     // updates the pan range
     function setRange() {
 
-        if (viewport.rangeX || viewport.rangeY)
-            return;
-
         var size = getRealSize(el);
         viewport.rangeX = Math.floor(size.width / 2);
         viewport.rangeY = Math.floor(size.height / 2);
