@@ -57,17 +57,38 @@ function bindDefaultEvents(el) {
 function bindPanZoomEvents(el) {
     el.onclick = function (e) { return false; };
 
+    // function reloading the images if necessary
+    var realoadImg = function (img) {
+        if (window.getComputedStyle(img).visibility == 'visible')
+            img.src = img.getAttribute('data-src');
+    };
+
     var imgEls = el.getElementsByTagName('img');
     for (var i = 0; i < imgEls.length; i++) {
-        var img = imgEls[i];
-        enablePanZoom(img, function (x, y, b) {
-            sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + b));
-            img.src = img.src;
-        });
 
-        img.addEventListener('load', function () { img.src = img.src; });
+        var img = imgEls[i];
+
+        // onclick function definition
+        var onclickFnc = function(x, y, b) {
+            sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + b));
+            realoadImg(img);
+        };        
+
+        // enabling the pan and zoom
+        enablePanZoom(img, onclickFnc);
+
+        // using primarily the data-src attribute as the 'src'
+        // attribute would cause automatic load even when the image isn't visible
+        if (img.src)
+            img.setAttribute('data-src', img.src);
+
+        // automatic loading of the image
+        window.addEventListener('orientationchange', function () { this.setTimeout(function () { realoadImg(img); }, 50); });
+        img.addEventListener('load', function () { realoadImg(img) });
+        realoadImg(img);
     }
 };
+
 
 // binds the script events
 function bindScriptEvents(el) {
