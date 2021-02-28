@@ -84,7 +84,10 @@ function bindPanZoomEvents(el) {
 
         // automatic loading of the image
         window.addEventListener('orientationchange', function () { this.setTimeout(function () { realoadImg(img); }, 50); });
-        img.addEventListener('load', function () { realoadImg(img) });
+        img.addEventListener('load', function () {
+            el.classList.add('loaded');
+            realoadImg(img);
+        });
         realoadImg(img);
     }
 };
