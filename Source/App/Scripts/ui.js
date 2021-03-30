@@ -60,7 +60,7 @@ function bindPanZoomEvents(el) {
     // function reloading the images if necessary
     var realoadImg = function (img) {
         if (window.getComputedStyle(img).visibility == 'visible')
-            img.src = img.getAttribute('data-src');
+            img.src = img.getAttribute('data-src') + '&w=' + img.cutout;
     };
 
     var imgEls = el.getElementsByTagName('img');
@@ -83,11 +83,18 @@ function bindPanZoomEvents(el) {
             img.setAttribute('data-src', img.src);
 
         // automatic loading of the image
-        window.addEventListener('orientationchange', function () { this.setTimeout(function () { realoadImg(img); }, 50); });
+        window.addEventListener('resize', function () { realoadImg(img); });
         img.addEventListener('load', function () {
             el.classList.add('loaded');
             realoadImg(img);
         });
+
+        // handling of loading errors
+        img.addEventListener('error', function () {
+            el.classList.remove('loaded');
+            setTimeout(function () { realoadImg(img); }, 500);
+        });
+
         realoadImg(img);
     }
 };

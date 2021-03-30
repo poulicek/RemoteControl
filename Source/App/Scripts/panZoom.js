@@ -39,6 +39,8 @@
 
             this.x = Math.max(-maxX, Math.min(maxX, x));
             this.y = Math.max(-maxY, Math.min(maxY, y));
+
+            el.cutout = getCutout(this.x, this.y, this.z, maxX, maxY).join();
         },
 
         // sets the translation by given offset
@@ -70,23 +72,27 @@
             el.addEventListener('touchend', this.onTouchEnd);
             el.addEventListener('wheel', this.onWheel);
 
+            viewport.setPosition(0, 0);
             this.onLoad();
         },
 
         onTouchStart: function (e) {
             // reset is needed because Android (new touch may have same Id as previous one)
             // preventDefault cannot be called otherwise onClick doesn't work
+            var touch = getTouch(e.touches);
             eventHandlers.lastTouch = null;
-            eventHandlers.firstTouch = getTouch(e.touches);
+            eventHandlers.firstTouch = touch;
 
-            setTimeout(function (e) {
-                if (eventHandlers.firstTouch && !eventHandlers.lastTouch) {
-                    var e = eventHandlers.firstTouch;
-                    e.which = 3;
-                    eventHandlers.onClick(e);
-                    eventHandlers.firstTouch = null;
-                }
-            }, 500);
+            if (touch.touchesCount == 1) {
+                setTimeout(function (e) {
+                    if (eventHandlers.firstTouch && !eventHandlers.lastTouch && eventHandlers.firstTouch.id == touch.id) {
+                        var e = eventHandlers.firstTouch;
+                        e.which = 3;
+                        eventHandlers.onClick(e);
+                        eventHandlers.firstTouch = null;
+                    }
+                }, 500);
+            }
         },
 
         onTouchEnd: function (e) {
@@ -125,7 +131,7 @@
             }
         },
 
-        onLoad: function (e) {
+        onLoad: function () {
 
             imgSize = {
                 width: el.naturalWidth ? el.naturalWidth : el.clientWidth,
@@ -139,7 +145,7 @@
             if (!pointerClickHandler)
                 return;
 
-            var coords = getRealCoords(e.clientX, e.clientY);
+            var coords = getRelativeCoords(e.clientX, e.clientY);
             if (coords)
                 pointerClickHandler(coords.x, coords.y, e.which);
         },
@@ -174,7 +180,8 @@
                 clientX: Math.floor(t.pageX),
                 clientY: Math.floor(t.pageY),
                 id: t.identifier,
-                time: new Date().getTime()
+                time: new Date().getTime(),
+                touchesCount: touches.length
             };
         }
 
@@ -185,46 +192,94 @@
             clientY: Math.floor((t1.pageY + t2.pageY) / 2),
             id: t1.identifier + t2.identifier,
             time: new Date().getTime(),
-            dist: Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY)
+            dist: Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY),
+            touchesCount: touches.length
         };
+    };
+
+
+    // returns the relative cutout window to be displyed
+    function getCutout(x, y, z, maxX, maxY) {
+
+        // getting the virtual size of the image if it was stretched to the whole screen
+        var s = getViewportSize(el);
+
+        // relative width of the cutout 0-1 (size of the screen vs. size of the image)
+        var w = (s.width / z) / imgSize.width;
+        var h = (s.height / z) / imgSize.height
+
+        // relative location of the cutout 0-1 (max values mean ho much can viewpoirt shift from the center)
+        var ratioX = maxX == 0 ? 0 : (1 + -x / maxX) / 2;
+        var ratioY = maxY == 0 ? 0 : (1 + -y / maxY) / 2;
+
+        // multiplier to ensure correct resolution of numbers
+        var r = 100000;
+
+        return new Array(
+            Math.floor(r * ratioX),
+            Math.floor(r * ratioY),
+            Math.ceil(r * w),
+            Math.ceil(r * h));
     };
 
 
     // updates the pan range
     function setRange() {
 
-        var size = getRealSize(el);
+        var size = getImageSize(el);
         viewport.rangeX = Math.floor(size.width / 2);
         viewport.rangeY = Math.floor(size.height / 2);
         update(el);
     };
 
 
-    // returns the real coordinates in the image
-    function getRealCoords(clientX, clientY) {
+    // returns the relative coordinates in the image
+    function getRelativeCoords(clientX, clientY) {
 
-        var realSize = getRealSize(el);
-        realSize.width *= viewport.z;
-        realSize.height *= viewport.z;
-
-        // computing the offset from center, because the image and the screen are co-centric
-        var imgPoint = {
-            x: (clientX - window.innerWidth / 2) - viewport.x + realSize.width / 2,
-            y: (clientY - window.innerHeight / 2) - viewport.y + realSize.height / 2
-        };
+        var bounds = getImageBounds();
+        var imgPoint = getImagePoint(bounds, clientX, clientY);
 
         // computing the real coordinates within the original size of the image
         var coords = {
-            x: Math.floor(10000 * imgPoint.x / realSize.width) / 10000,
-            y: Math.floor(10000 * imgPoint.y / realSize.height) / 10000
+            x: Math.floor(10000 * imgPoint.x / bounds.width) / 10000,
+            y: Math.floor(10000 * imgPoint.y / bounds.height) / 10000
         };
 
         return coords.x >= 0 && coords.x < 1 && coords.y >= 0 && coords.y < 1 ? coords : null;
     };
 
 
-    // returns the real size of the image
-    function getRealSize(el) {
+    // returns the current image bounds
+    function getImageBounds() {
+
+        var clientSize = getImageSize(el);
+        clientSize.width *= viewport.z;
+        clientSize.height *= viewport.z;
+
+        // computing the offset from center, because the image and the screen are co-centric
+        return {
+            x: Math.floor(clientSize.width / 2 - viewport.x),
+            y: Math.floor(clientSize.height / 2 - viewport.y),
+            width: Math.floor(clientSize.width),
+            height: Math.floor(clientSize.height),
+        };
+
+    };
+
+
+    // returns the pixel coordinates in the image
+    function getImagePoint(bounds, clientX, clientY) {
+
+        // computing the offset from center, because the image and the screen are co-centric
+        return {
+            x: Math.floor((clientX - window.innerWidth / 2) + bounds.x),
+            y: Math.floor((clientY - window.innerHeight / 2) + bounds.y)
+        };
+    };
+
+
+    // returns the size of the image on the screen
+    function getImageSize(el) {
 
         var ratio = imgSize.width / imgSize.height;
 
@@ -234,6 +289,20 @@
         return slopeImg < slopeEl
             ? { width: Math.floor(el.clientHeight * ratio), height: el.clientHeight }
             : { width: el.clientWidth, height: Math.floor(el.clientWidth / ratio) };
+    };
+
+
+    // returns the resolution of the viewport depending on the image size
+    function getViewportSize(el) {
+
+        var ratio = el.clientWidth / el.clientHeight;
+
+        var slopeEl = Math.abs(ratio - 1);
+        var slopeImg = Math.abs(imgSize.width / imgSize.height - 1);
+
+        return slopeImg < slopeEl
+            ? { width: Math.floor(imgSize.height * ratio), height: imgSize.height }
+            : { width: imgSize.width, height: Math.floor(imgSize.width / ratio) };
     };
 
 

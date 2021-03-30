@@ -43,7 +43,6 @@ namespace RemoteControl.UI
             this.webBrowser.MinimumSize = new System.Drawing.Size(27, 25);
             this.webBrowser.Name = "webBrowser";
             this.webBrowser.ScrollBarsEnabled = false;
-            this.webBrowser.Size = new System.Drawing.Size(462, 593);
             this.webBrowser.TabIndex = 0;
             this.webBrowser.Visible = false;
             // 
@@ -52,7 +51,7 @@ namespace RemoteControl.UI
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(6)))), ((int)(((byte)(35)))), ((int)(((byte)(43)))));
-            this.ClientSize = new System.Drawing.Size(462, 593);
+            this.ClientSize = new System.Drawing.Size(480, 600);
             this.Controls.Add(this.webBrowser);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

@@ -181,9 +181,7 @@ namespace RemoteControl.Server
             catch (Exception ex)
             {
                 context.Response.StatusCode = HttpStatusCode.InternalServerError;
-                context.Response.Write(ex.ToString());
-
-                
+                context.Response.Write(ex.ToString());                
             }
         }
 
