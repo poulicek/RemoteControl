@@ -125,6 +125,7 @@
     <EmbeddedResource Include="App\Views\menu.html" />
     <EmbeddedResource Include="App\Scripts\panZoom.js" />
     <EmbeddedResource Include="App\Views\rdp.html" />
+    <EmbeddedResource Include="App\Scripts\rdp.js" />
     <Content Include="Resources\TrayIcon.ico" />
   </ItemGroup>
   <ItemGroup>

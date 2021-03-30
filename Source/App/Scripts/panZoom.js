@@ -95,7 +95,7 @@
             }
         },
 
-        onTouchEnd: function (e) {
+        onTouchEnd: function () {
             if (eventHandlers.firstTouch && !eventHandlers.lastTouch)
                 eventHandlers.onClick(eventHandlers.firstTouch);
 
@@ -147,7 +147,7 @@
 
             var coords = getRelativeCoords(e.clientX, e.clientY);
             if (coords)
-                pointerClickHandler(coords.x, coords.y, e.which);
+                pointerClickHandler(el, coords.x, coords.y, e.which);
         },
 
         onWheel: function (e) {
