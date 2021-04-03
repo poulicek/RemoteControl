@@ -26,7 +26,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; }
-.status-error #status-error { visibility: visible; color: #AD4141; }
+.status-error #status-error { visibility: visible; color: #AD4141; z-index: 999; }
 .status-error #status-normal { visibility: hidden; }
 .status-error .reload { visibility: visible; }
 

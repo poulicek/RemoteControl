@@ -102,7 +102,7 @@
 
         onTouchEnd: function () {
 
-            if (!eventHandlers.touchMoved)
+            if (eventHandlers.firstTouch && !eventHandlers.touchMoved)
                 eventHandlers.onClick(eventHandlers.firstTouch);
 
             eventHandlers.firstTouch = null;

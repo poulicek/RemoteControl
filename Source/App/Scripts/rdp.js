@@ -44,6 +44,7 @@
 
     // handles the image load event
     function onLoad(e) {
+        setAppStatus();
         el.classList.add('loaded');
         reloadImage(e.currentTarget);
     }
@@ -51,6 +52,7 @@
 
     // handles the image error event
     function onError(e) {
+        setAppStatus('status-error');
         el.classList.remove('loaded');
         var img = e.currentTarget;
         setTimeout(function () { reloadImage(img); }, 500);
@@ -63,7 +65,6 @@
         sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + b));
         reloadImage(e.currentTarget);
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY);
-        
     };
 
 

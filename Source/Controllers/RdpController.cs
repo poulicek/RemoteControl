@@ -20,7 +20,7 @@ namespace RemoteControl.Controllers
                 case "screen":
                     {
                         var cutout = context.Request.Query["w"]?.Split(',');
-                        context.Response.Write(this.getScreenShot(this.readRelativeCutout(cutout)), "image/png");
+                        context.Response.Write(this.getScreenShot(this.readRelativeCutout(cutout), out var format), format == ImageFormat.Png ? "image/png" : "image/jpeg");
                         break;
                     }
 
@@ -34,6 +34,33 @@ namespace RemoteControl.Controllers
         }
 
 
+        /// <summary>
+        /// Returns a screenshot
+        /// </summary>
+        private byte[] getScreenShot(RectangleF cutout, out ImageFormat format)
+        {
+            const float inflation = 0.3f;
+
+            var screenRect = Screen.AllScreens[0].Bounds;
+            var cutoutRect = this.projectCutout(cutout, screenRect);
+            cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
+
+            using (var img = new Bitmap(screenRect.Width, screenRect.Height, PixelFormat.Format24bppRgb))
+            using (var g = Graphics.FromImage(img))
+            using (var ms = new MemoryStream())
+            {
+                // setting the PNG format for smaller sizes
+                format = 2 * cutoutRect.Width * cutoutRect.Height > screenRect.Width * screenRect.Height ? ImageFormat.Jpeg : ImageFormat.Png;
+                g.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
+                img.Save(ms, this.getEncoder(format), this.getQualityParams(25));
+                return ms.ToArray();
+            }
+        }
+
+
+        /// <summary>
+        /// Parses the cutout and returns its relative values (0 .. 1)
+        /// </summary>
         private RectangleF readRelativeCutout(string[] cutout)
         {
             if (cutout?.Length != 4)
@@ -47,6 +74,9 @@ namespace RemoteControl.Controllers
         }
 
 
+        /// <summary>
+        /// Projects the relative cutout to screen coordinates
+        /// </summary>
         private Rectangle projectCutout(RectangleF relativeCutout, Rectangle screenRect)
         {
             if (relativeCutout.IsEmpty)
@@ -61,26 +91,9 @@ namespace RemoteControl.Controllers
         }
 
 
-        private byte[] getScreenShot(RectangleF cutout)
-        {
-            const float inflation = 0.3f;
-
-            var screenRect = Screen.AllScreens[0].Bounds;
-            var cutoutRect = this.projectCutout(cutout, screenRect);
-            cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
-
-            using (var img = new Bitmap(screenRect.Width, screenRect.Height, PixelFormat.Format24bppRgb))
-            using (var g = Graphics.FromImage(img))
-            using (var ms = new MemoryStream())
-            {
-                g.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
-                img.Save(ms, ImageFormat.Png);
-                return ms.ToArray();
-            }            
-        }
-
-
-
+        /// <summary>
+        /// Performs a mouse click on the provided location
+        /// </summary>
         private void perfromMouseClick(float xRatio, float yRatio, int btn)
         {
             var rect = Screen.AllScreens[0].Bounds;
@@ -91,6 +104,35 @@ namespace RemoteControl.Controllers
         }
 
 
+        /// <summary>
+        /// Returns the quality parameters for the JPEG encoder
+        /// </summary>
+        private EncoderParameters getQualityParams(long quality)
+        {
+            var encParams = new EncoderParameters(1);
+            encParams.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+
+            return encParams;
+        }
+
+
+        /// <summary>
+        /// Returns the encoder based on the image format
+        /// </summary>
+        private ImageCodecInfo getEncoder(ImageFormat format)
+        {
+            foreach (var codec in ImageCodecInfo.GetImageEncoders())
+                if (codec.FormatID == format.Guid)
+                    return codec;
+
+            return null;
+        }
+
+
+        /// <summary>
+        /// Resamples the image if its size exceeds on of the maximums
+        /// </summary>
+        /// <returns></returns>
         private Bitmap resample(Bitmap src, int maxWidth, int maxHeight)
         {
             if (src.Width <= maxWidth && src.Height <= maxHeight)
