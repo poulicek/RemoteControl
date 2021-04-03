@@ -62,6 +62,7 @@
         lastZoom: null,
         lastTouch: null,
         firstTouch: null,
+        touchMoved: false,
 
         bind: function (el) {
             window.addEventListener('resize', this.onLoad);
@@ -82,30 +83,36 @@
             var touch = getTouch(e.touches);
             eventHandlers.lastTouch = null;
             eventHandlers.firstTouch = touch;
+            eventHandlers.touchMoved = touch.touchesCount > 1;
 
             if (touch.touchesCount == 1) {
-                setTimeout(function (e) {
-                    if (eventHandlers.firstTouch && !eventHandlers.lastTouch && eventHandlers.firstTouch.id == touch.id) {
-                        var e = eventHandlers.firstTouch;
-                        e.which = 3;
-                        eventHandlers.onClick(e);
-                        eventHandlers.firstTouch = null;
-                    }
-                }, 500);
+                setTimeout(function () { eventHandlers.onLongTouch(touch); }, 500);
             }
         },
 
+
+        onLongTouch: function (t) {
+
+            if (eventHandlers.touchMoved || !eventHandlers.firstTouch || eventHandlers.firstTouch.id != t.id)
+                return;
+
+            eventHandlers.firstTouch.which = 3; // setting the secondary button
+            eventHandlers.onClick(eventHandlers.firstTouch);
+        },
+
         onTouchEnd: function () {
-            if (eventHandlers.firstTouch && !eventHandlers.lastTouch)
+
+            if (!eventHandlers.touchMoved)
                 eventHandlers.onClick(eventHandlers.firstTouch);
 
             eventHandlers.firstTouch = null;
+            eventHandlers.lastTouch = null;
         },
 
         onTouchMove: function (e) {
 
             try {
-                e.preventDefault();
+                //e.preventDefault();
 
                 var touch = getTouch(e.touches);
 
@@ -113,14 +120,23 @@
                 if (!eventHandlers.lastTouch || touch.id != eventHandlers.lastTouch.id) {
                     eventHandlers.lastZoom = viewport.z;
                     eventHandlers.firstTouch = touch;
+
+                    // consider the scene moved if multiple touches are detected
+                    if (touch.touchesCount > 1)
+                        eventHandlers.touchMoved = true;
                 }
                 else {
 
                     // panning and zooming
-                    // on it iOS can be handled by gestureMove event providing scale directly but it doesn't support Android
+                    // on iOS it can be handled by gestureMove event providing scale directly but it doesn't support Android
                     if (touch.dist && eventHandlers.firstTouch.dist)
                         viewport.zoom(eventHandlers.lastZoom * touch.dist / eventHandlers.firstTouch.dist, getOffset(touch));
                     viewport.pan(touch.clientX - eventHandlers.lastTouch.clientX, touch.clientY - eventHandlers.lastTouch.clientY);
+
+                    // setting the moved property if is threshold exceeded
+                    var dist = Math.hypot(touch.clientX - eventHandlers.lastTouch.clientX, touch.clientY - eventHandlers.lastTouch.clientY);
+                    if (dist > 5)
+                        eventHandlers.touchMoved = true;
                 }
 
                 eventHandlers.lastTouch = touch;
@@ -142,12 +158,14 @@
         },
 
         onClick: function (e) {
+            eventHandlers.firstTouch = null;
+
             if (!pointerClickHandler)
                 return;
 
             var coords = getRelativeCoords(e.clientX, e.clientY);
             if (coords)
-                pointerClickHandler(el, coords.x, coords.y, e.which);
+                pointerClickHandler(e, coords.x, coords.y, e.which);
         },
 
         onWheel: function (e) {
@@ -181,7 +199,8 @@
                 clientY: Math.floor(t.pageY),
                 id: t.identifier,
                 time: new Date().getTime(),
-                touchesCount: touches.length
+                touchesCount: touches.length,
+                currentTarget: t.target
             };
         }
 
@@ -192,8 +211,9 @@
             clientY: Math.floor((t1.pageY + t2.pageY) / 2),
             id: t1.identifier + t2.identifier,
             time: new Date().getTime(),
-            dist: Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY),
-            touchesCount: touches.length
+            touchesCount: touches.length,
+            currentTarget: t1.target,
+            dist: Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY)
         };
     };
 

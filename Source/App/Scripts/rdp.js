@@ -52,14 +52,33 @@
     // handles the image error event
     function onError(e) {
         el.classList.remove('loaded');
-        setTimeout(function () { reloadImage(e.currentTarget); }, 500);
+        var img = e.currentTarget;
+        setTimeout(function () { reloadImage(img); }, 500);
     }
 
 
     // onclick function definition
-    function onClick(img, x, y, b) {
+    function onClick(e, x, y, b) {
+
         sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + b));
-        reloadImage(img);
+        reloadImage(e.currentTarget);
+        showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY);
+        
+    };
+
+
+    // shows the touch effect
+    function showTouchEffect(el, clientX, clientY) {
+
+        // initialisation
+        el.className = '';
+        el.style.left = clientX + 'px';
+        el.style.top = clientY + 'px';
+
+        el.classList.add('fadeIn');
+        void el.offsetWidth;
+        el.classList.add('animate');
+        el.classList.add('fadeOut');
     };
 
     // binding the actions

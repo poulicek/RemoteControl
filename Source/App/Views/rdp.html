@@ -1,6 +1,10 @@
 ﻿<style>
     #a-wrapper { cursor: default; }
     #canvas { width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; z-index: 999; }
+    #click-spot { visibility: hidden; display: block; position: absolute; border-radius: 50%; background: #6D93AE; border: 1px solid #0C1F2B; z-index: 999; transform: translate(-50%, -50%); }
+    #click-spot.animate { transition: opacity .5s, width .5s, height .5s; }
+    #click-spot.fadeIn { opacity: 0.5; width: .7in; height: .7in; visibility: visible; }
+    #click-spot.fadeOut { opacity: 0; width: 0px; height: 0px; visibility: visible; }
     .loaded .loading { display: none; }
     .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6D93AE; font-size: 200%; font-weight: normal; }
 </style>
@@ -8,4 +12,5 @@
 <a rel="panzoom" href="?c=rdp&v=click" id="a-wrapper">
     <span class="icon loading">hourglass_empty</span>
     <img id="canvas" data-src="?c=rdp&v=screen" />
+    <span id="click-spot"></span>
 </a>
