@@ -41,16 +41,16 @@ namespace RemoteControl.Controllers
         {
             const float inflation = 0.3f;
 
-            var screenRect = Screen.AllScreens[0].Bounds;
-            var cutoutRect = this.projectCutout(cutout, screenRect);
+            var screenSize = SystemHelper.GetScaledScreenSize();
+            var cutoutRect = this.projectCutout(cutout, screenSize);
             cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
 
-            using (var img = new Bitmap(screenRect.Width, screenRect.Height, PixelFormat.Format24bppRgb))
+            using (var img = new Bitmap(screenSize.Width, screenSize.Height, PixelFormat.Format24bppRgb))
             using (var g = Graphics.FromImage(img))
             using (var ms = new MemoryStream())
             {
                 // setting the PNG format for smaller sizes
-                format = 2 * cutoutRect.Width * cutoutRect.Height > screenRect.Width * screenRect.Height ? ImageFormat.Jpeg : ImageFormat.Png;
+                format = 2 * cutoutRect.Width * cutoutRect.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
                 g.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
                 img.Save(ms, this.getEncoder(format), this.getQualityParams(25));
                 return ms.ToArray();
@@ -77,15 +77,15 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Projects the relative cutout to screen coordinates
         /// </summary>
-        private Rectangle projectCutout(RectangleF relativeCutout, Rectangle screenRect)
+        private Rectangle projectCutout(RectangleF relativeCutout, Size screenSize)
         {
             if (relativeCutout.IsEmpty)
-                return screenRect;
+                return new Rectangle(Point.Empty, screenSize);
 
-            var rangeW = (int)Math.Ceiling(relativeCutout.Width * screenRect.Width);
-            var rangeH = (int)Math.Ceiling(relativeCutout.Height * screenRect.Height);
-            var rangeX = (int)(relativeCutout.X * (screenRect.Width - rangeW));
-            var rangeY = (int)(relativeCutout.Y * (screenRect.Height - rangeH));
+            var rangeW = (int)Math.Ceiling(relativeCutout.Width * screenSize.Width);
+            var rangeH = (int)Math.Ceiling(relativeCutout.Height * screenSize.Height);
+            var rangeX = (int)(relativeCutout.X * (screenSize.Width - rangeW));
+            var rangeY = (int)(relativeCutout.Y * (screenSize.Height - rangeH));
 
             return new Rectangle(rangeX, rangeY, rangeW, rangeH);
         }
