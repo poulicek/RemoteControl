@@ -4,7 +4,8 @@
     #click-spot { visibility: hidden; display: block; position: absolute; border-radius: 50%; background: #6D93AE; border: 1px solid #0C1F2B; z-index: 999; transform: translate(-50%, -50%); pointer-events: none; }
     #click-spot.animate { transition: opacity .5s, width .5s, height .5s; }
     #click-spot.fadeIn { opacity: 0.5; width: .7in; height: .7in; visibility: visible; }
-    #click-spot.fadeOut { opacity: 0; width: 0px; height: 0px; visibility: visible; }
+    #click-spot.fadeOutSmall { opacity: 0; width: 0px; height: 0px; visibility: visible; }
+    #click-spot.fadeOutBig { opacity: 0; width: 3in; height: 3in; visibility: visible; }
     .loaded #canvas { opacity: 1; }
     .loaded .loading { display: none; }
     .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6D93AE; font-size: 200%; font-weight: normal; }

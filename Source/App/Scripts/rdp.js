@@ -62,12 +62,12 @@
     // onclick function definition
     function onClick(e, x, y, b) {
         sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + (b ? b : '')));
-        showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY);
+        showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
     };
 
 
     // shows the touch effect
-    function showTouchEffect(el, clientX, clientY) {
+    function showTouchEffect(el, clientX, clientY, secondary) {
 
         // initialisation
         el.className = '';
@@ -77,7 +77,7 @@
         el.classList.add('fadeIn');
         void el.offsetWidth;
         el.classList.add('animate');
-        el.classList.add('fadeOut');
+        el.classList.add(secondary ? 'fadeOutBig' : 'fadeOutSmall');
     };
 
     // binding the actions

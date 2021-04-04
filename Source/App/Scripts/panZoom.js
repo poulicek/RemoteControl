@@ -67,42 +67,44 @@
         bind: function (el) {
             window.addEventListener('resize', this.onLoad);
             el.addEventListener('load', this.onLoad);
-            el.addEventListener('click', this.onClick);
             el.addEventListener('touchstart', this.onTouchStart);
             el.addEventListener('touchmove', this.onTouchMove);
             el.addEventListener('touchend', this.onTouchEnd);
             el.addEventListener('wheel', this.onWheel);
+            el.addEventListener('click', this.onClick);
 
             viewport.setPosition(0, 0);
             this.onLoad();
         },
 
         onTouchStart: function (e) {
+
             // reset is needed because Android (new touch may have same Id as previous one)
-            // preventDefault cannot be called otherwise onClick doesn't work
             var touch = getTouch(e.touches);
-            eventHandlers.lastTouch = null;
+
+            eventHandlers.lastZoom = viewport.z;
             eventHandlers.firstTouch = touch;
+            eventHandlers.lastTouch = touch;
             eventHandlers.touchMoved = touch.touchesCount > 1;
 
             if (touch.touchesCount == 1) {
-                setTimeout(function () { eventHandlers.onLongTouch(touch); }, 500);
+                setTimeout(function () { eventHandlers.onLongTouch(touch); }, 800);
             }
         },
 
 
         onLongTouch: function (t) {
 
-            if (eventHandlers.touchMoved || !eventHandlers.firstTouch || eventHandlers.firstTouch.id != t.id)
+            if (eventHandlers.touchMoved || eventHandlers.firstTouch !== t)
                 return;
 
-            eventHandlers.firstTouch.which = 3; // setting the secondary button
-            eventHandlers.onClick(eventHandlers.firstTouch);
+            t.which = 3; // setting the secondary button
+            eventHandlers.onClick(t);
         },
 
         onTouchEnd: function () {
 
-            if (eventHandlers.firstTouch && !eventHandlers.touchMoved)
+            if (!eventHandlers.touchMoved)
                 eventHandlers.onClick(eventHandlers.firstTouch);
 
             eventHandlers.firstTouch = null;
@@ -112,8 +114,6 @@
         onTouchMove: function (e) {
 
             try {
-                //e.preventDefault();
-
                 var touch = getTouch(e.touches);
 
                 // detecting new touch combination
@@ -132,9 +132,12 @@
                     if (touch.dist && eventHandlers.firstTouch.dist)
                         viewport.zoom(eventHandlers.lastZoom * touch.dist / eventHandlers.firstTouch.dist, getOffset(touch));
                     viewport.pan(touch.clientX - eventHandlers.lastTouch.clientX, touch.clientY - eventHandlers.lastTouch.clientY);
+                }
 
-                    // setting the moved property if is threshold exceeded
-                    var dist = Math.hypot(touch.clientX - eventHandlers.lastTouch.clientX, touch.clientY - eventHandlers.lastTouch.clientY);
+
+                // setting the moved property if is threshold exceeded
+                if (!eventHandlers.touchMoved) {
+                    var dist = Math.hypot(touch.clientX - eventHandlers.firstTouch.clientX, touch.clientY - eventHandlers.firstTouch.clientY);
                     if (dist > 5)
                         eventHandlers.touchMoved = true;
                 }
@@ -158,7 +161,12 @@
         },
 
         onClick: function (e) {
-            eventHandlers.firstTouch = null;
+
+            if (eventHandlers.touchMoved)
+                return;
+
+            // preventing the onClick to be called twice
+            eventHandlers.touchMoved = true;
 
             if (!pointerClickHandler)
                 return;
