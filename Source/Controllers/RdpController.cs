@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
@@ -45,12 +44,13 @@ namespace RemoteControl.Controllers
             var cutoutRect = this.projectCutout(cutout, screenSize);
             cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
 
+            // setting the PNG format for smaller sizes
+            format = 2 * cutoutRect.Width * cutoutRect.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
+
             using (var img = new Bitmap(screenSize.Width, screenSize.Height, PixelFormat.Format24bppRgb))
             using (var g = Graphics.FromImage(img))
             using (var ms = new MemoryStream())
             {
-                // setting the PNG format for smaller sizes
-                format = 2 * cutoutRect.Width * cutoutRect.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
                 g.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
                 img.Save(ms, this.getEncoder(format), this.getQualityParams(25));
                 return ms.ToArray();
@@ -96,9 +96,9 @@ namespace RemoteControl.Controllers
         /// </summary>
         private void perfromMouseClick(float xRatio, float yRatio, int btn)
         {
-            var rect = Screen.AllScreens[0].Bounds;
-            var x = (int)(xRatio * rect.Width);
-            var y = (int)(yRatio * rect.Height);
+            var s = SystemHelper.GetScaledScreenSize();
+            var x = (int)(xRatio * s.Width);
+            var y = (int)(yRatio * s.Height);
 
             InputHelper.MouseClick(x, y, (InputHelper.MouseButton)btn);
         }
