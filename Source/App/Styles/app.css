@@ -30,7 +30,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .status-error #status-normal { visibility: hidden; }
 .status-error .reload { visibility: visible; }
 
-#status-error-text { padding: 5%; position: fixed; z-index: 999; bottom: 0px; margin: 0px; white-space: normal; background: rgba(0, 0, 0, .9); width: 100%; box-sizing: border-box; }
+#status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; background: rgba(0, 0, 0, .9); width: 100%; box-sizing: border-box; }
 #status-error-text:empty { display: none; }
 
 @supports (-webkit-touch-callout: none) {

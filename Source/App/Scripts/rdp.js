@@ -61,9 +61,7 @@
 
     // onclick function definition
     function onClick(e, x, y, b) {
-
-        sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + b));
-        reloadImage(e.currentTarget);
+        sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + (b ? b : '')));
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY);
     };
 
