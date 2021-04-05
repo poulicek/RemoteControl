@@ -43,7 +43,7 @@ namespace RemoteControl.Controllers
         {
             const float inflation = 0.3f;
 
-            var screenSize = SystemHelper.GetScaledScreenSize();
+            var screenSize = ScreenHelper.GetScaledScreenSize();
             var cutoutRect = this.projectCutout(cutout, screenSize);
             cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
 
@@ -62,6 +62,7 @@ namespace RemoteControl.Controllers
             }
         }
 
+
         /// <summary>
         /// Projects the cutout of the screen considering the scale
         /// </summary>
@@ -75,10 +76,7 @@ namespace RemoteControl.Controllers
             var canvasImg = new Bitmap(canvasSize.Width, canvasSize.Height, PixelFormat.Format24bppRgb);
             using (var canvasG = Graphics.FromImage(canvasImg))
             {
-                if (highQuality)
-                    canvasG.SetHighQuality();
-                else
-                    canvasG.SetLowQuality();
+                canvasG.SetQuality(highQuality);
                 canvasG.DrawImage(screenImg, new RectangleF(cutoutRect.X / scale, cutoutRect.Y / scale, cutoutRect.Width / scale, cutoutRect.Height / scale), cutoutRect, GraphicsUnit.Pixel);
             }
 
@@ -124,7 +122,7 @@ namespace RemoteControl.Controllers
         /// </summary>
         private void perfromMouseClick(float xRatio, float yRatio, int btn)
         {
-            var s = SystemHelper.GetScaledScreenSize();
+            var s = ScreenHelper.GetScaledScreenSize();
             var x = (int)(xRatio * s.Width);
             var y = (int)(yRatio * s.Height);
 
