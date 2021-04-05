@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
+using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
@@ -19,13 +21,14 @@ namespace RemoteControl.Controllers
                 case "screen":
                     {
                         var cutout = context.Request.Query["w"]?.Split(',');
-                        context.Response.Write(this.getScreenShot(this.readRelativeCutout(cutout), out var format), format == ImageFormat.Png ? "image/png" : "image/jpeg");
+                        var data = this.getScreenShot(this.readRelativeCutout(cutout), out var format);
+                        context.Response.Write(data, format == ImageFormat.Png ? "image/png" : "image/jpeg");
                         break;
                     }
 
                 case "click":
                     {
-                        if (float.TryParse(context.Request.Query["x"], out var xRatio) && float.TryParse(context.Request.Query["y"], out var yRatio))
+                        if (float.TryParse(context.Request.Query["x"], NumberStyles.Any, CultureInfo.InvariantCulture, out var xRatio) && float.TryParse(context.Request.Query["y"], NumberStyles.Any, CultureInfo.InvariantCulture, out var yRatio))
                             this.perfromMouseClick(xRatio, yRatio, int.TryParse(context.Request.Query["b"], out var btn) ? btn : 1);
                         break;
                     }
@@ -47,14 +50,39 @@ namespace RemoteControl.Controllers
             // setting the PNG format for smaller sizes
             format = 2 * cutoutRect.Width * cutoutRect.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
 
-            using (var img = new Bitmap(screenSize.Width, screenSize.Height, PixelFormat.Format24bppRgb))
-            using (var g = Graphics.FromImage(img))
+            using (var screenImg = new Bitmap(screenSize.Width, screenSize.Height, PixelFormat.Format24bppRgb))
+            using (var screenG = Graphics.FromImage(screenImg))
             using (var ms = new MemoryStream())
             {
-                g.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
-                img.Save(ms, this.getEncoder(format), this.getQualityParams(25));
+                screenG.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
+                using (var canvasImg = this.projectCoutout(screenImg, screenSize, cutoutRect, format == ImageFormat.Png))
+                    canvasImg.Save(ms, this.getEncoder(format), this.getQualityParams(25));
+
                 return ms.ToArray();
             }
+        }
+
+        /// <summary>
+        /// Projects the cutout of the screen considering the scale
+        /// </summary>
+        private Bitmap projectCoutout(Bitmap screenImg, Size screenSize, Rectangle cutoutRect, bool highQuality)
+        {
+            var scale = (float)screenSize.Width / Screen.AllScreens[0].Bounds.Width;
+            if (scale <= 1)
+                return screenImg;
+
+            var canvasSize = new Size((int)Math.Ceiling(screenSize.Width / scale), (int)Math.Ceiling(screenSize.Height / scale));
+            var canvasImg = new Bitmap(canvasSize.Width, canvasSize.Height, PixelFormat.Format24bppRgb);
+            using (var canvasG = Graphics.FromImage(canvasImg))
+            {
+                if (highQuality)
+                    canvasG.SetHighQuality();
+                else
+                    canvasG.SetLowQuality();
+                canvasG.DrawImage(screenImg, new RectangleF(cutoutRect.X / scale, cutoutRect.Y / scale, cutoutRect.Width / scale, cutoutRect.Height / scale), cutoutRect, GraphicsUnit.Pixel);
+            }
+
+            return canvasImg;
         }
 
 
@@ -133,7 +161,7 @@ namespace RemoteControl.Controllers
         /// Resamples the image if its size exceeds on of the maximums
         /// </summary>
         /// <returns></returns>
-        private Bitmap resample(Bitmap src, int maxWidth, int maxHeight)
+        private Bitmap resample(Bitmap src, int maxWidth, int maxHeight, bool highQuality)
         {
             if (src.Width <= maxWidth && src.Height <= maxHeight)
                 return src;
@@ -155,7 +183,11 @@ namespace RemoteControl.Controllers
 
             var dst = new Bitmap(w, h, PixelFormat.Format24bppRgb);
             using (var g = Graphics.FromImage(dst))
+            {
+                if (highQuality)
+                    g.SetHighQuality();
                 g.DrawImage(src, new Rectangle(0, 0, w, h), 0, 0, src.Width, src.Height, GraphicsUnit.Pixel);
+            }
 
             return dst;
         }
