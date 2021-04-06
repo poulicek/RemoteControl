@@ -21,8 +21,8 @@ namespace RemoteControl.Controllers
                 case "screen":
                     {
                         var cutout = context.Request.Query["w"]?.Split(',');
-                        var data = this.getScreenShot(this.readRelativeCutout(cutout), out var format);
-                        context.Response.Write(data, format == ImageFormat.Png ? "image/png" : "image/jpeg");
+                        var data = this.getScreenShot(this.readRelativeCutout(cutout), out var codec);
+                        context.Response.Write(data, codec.MimeType);
                         break;
                     }
 
@@ -39,7 +39,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Returns a screenshot
         /// </summary>
-        private byte[] getScreenShot(RectangleF cutout, out ImageFormat format)
+        private byte[] getScreenShot(RectangleF cutout, out ImageCodecInfo codec)
         {
             const float inflation = 0.3f;
 
@@ -48,15 +48,15 @@ namespace RemoteControl.Controllers
             cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
 
             // setting the PNG format for smaller sizes
-            format = 2 * cutoutRect.Width * cutoutRect.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
+            var format = 2 * cutoutRect.Width * cutoutRect.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
 
-            using (var screenImg = new Bitmap(screenSize.Width, screenSize.Height, PixelFormat.Format24bppRgb))
+            using (var screenImg = new Bitmap(screenSize.Width, screenSize.Height))
             using (var screenG = Graphics.FromImage(screenImg))
             using (var ms = new MemoryStream())
             {
                 screenG.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
                 using (var canvasImg = this.projectCoutout(screenImg, screenSize, cutoutRect, format == ImageFormat.Png))
-                    canvasImg.Save(ms, this.getEncoder(format), this.getQualityParams(25));
+                    canvasImg.Save(ms, codec = this.getEncoder(format), this.getQualityParams(25));
 
                 return ms.ToArray();
             }
@@ -73,7 +73,7 @@ namespace RemoteControl.Controllers
                 return screenImg;
 
             var canvasSize = new Size((int)Math.Ceiling(screenSize.Width / scale), (int)Math.Ceiling(screenSize.Height / scale));
-            var canvasImg = new Bitmap(canvasSize.Width, canvasSize.Height, PixelFormat.Format24bppRgb);
+            var canvasImg = new Bitmap(canvasSize.Width, canvasSize.Height);
             using (var canvasG = Graphics.FromImage(canvasImg))
             {
                 canvasG.SetQuality(highQuality);
