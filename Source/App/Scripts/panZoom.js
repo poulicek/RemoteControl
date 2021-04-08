@@ -11,6 +11,12 @@
         rangeX: 0,
         rangeY: 0,
 
+        // resets the viewport's position
+        resetPosition: function () {
+            this.z = 1;
+            this.setPosition(0, 0);
+        },
+
         // sets the given zoom
         zoom: function (zoom, offset) {
 
@@ -65,7 +71,7 @@
         touchMoved: false,
 
         bind: function (el) {
-            window.addEventListener('resize', this.onLoad);
+            window.addEventListener('resize', this.onWindowResize);
             el.addEventListener('load', this.onLoad);
             el.addEventListener('touchstart', this.onTouchStart);
             el.addEventListener('touchmove', this.onTouchMove);
@@ -150,6 +156,13 @@
             }
         },
 
+        onWindowResize: function () {
+
+            setRange(el);
+            viewport.resetPosition();
+            update(el);
+        },
+
         onLoad: function () {
 
             imgSize = {
@@ -158,6 +171,7 @@
             }
 
             setRange(el);
+            update(el);
         },
 
         onClick: function (e) {
@@ -257,7 +271,6 @@
         var size = getImageSize(el);
         viewport.rangeX = Math.floor(size.width / 2);
         viewport.rangeY = Math.floor(size.height / 2);
-        update(el);
     };
 
 

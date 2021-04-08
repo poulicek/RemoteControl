@@ -8,7 +8,7 @@
 * { touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
 body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B; color: #6D93AE; position: fixed; font-family: Roboto, Arial, Tahoma; font-size: .3in; }
 #view { height: 100%; animation-duration: .5s; animation-timing-function: ease-in; display: grid; }
-#app-state { height: 100%; }
+#app-state { height: 100%; display: flex;}
 
 .icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
 .grid { display: grid; box-sizing: border-box; width: 100%; height: 100%; align-items: center; padding: 5%; }
@@ -26,11 +26,14 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; }
-.status-error #status-error { visibility: visible; color: #AD4141; z-index: 999; }
+.status-error #status-error { visibility: visible; }
 .status-error #status-normal { visibility: hidden; }
 .status-error .reload { visibility: visible; }
 
-#status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; background: rgba(0, 0, 0, .9); width: 100%; box-sizing: border-box; }
+#status-error { color: #AD4141; z-index: 9999; }
+#status-error * { background: rgba(12, 31, 43, .85); }
+#status-error .icon { padding: 12px; border-radius: 20%; }
+#status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; width: 100%; box-sizing: border-box; }
 #status-error-text:empty { display: none; }
 
 @supports (-webkit-touch-callout: none) {

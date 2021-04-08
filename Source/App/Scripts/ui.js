@@ -272,11 +272,24 @@ function setClass(el, className, set) {
 
 // connection status
 function setAppStatus(className, errorText) {
-    document.getElementById('app-state').className = className ? className : '';
+
+    if (!className)
+        className = '';
+
+    // setting the class name if changed
+    var el = document.getElementById('app-state');
+    if (el.className != className)
+        el.className = className;
 
     // showing of log message
-    if (DEBUG_MODE)
-        document.getElementById('status-error-text').innerText = errorText ? errorText.trim() : '';
+    if (DEBUG_MODE) {
+
+        errorText = errorText ? errorText.trim() : '';
+        el = document.getElementById('status-error-text');
+
+        if (el.innerText != errorText)
+            el.innerText = errorText;
+    }
 };
 
 

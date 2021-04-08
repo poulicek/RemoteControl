@@ -37,16 +37,28 @@
 
     // reloading the image if necessary
     function reloadImage(img) {
-        if (window.getComputedStyle(img).visibility == 'visible')
+        if (window.getComputedStyle(img).visibility == 'visible') {
+            el.isEmpty = false;
             img.src = img.getAttribute('data-src') + '&w=' + img.cutout;
+        }
+        else if (!el.isEmpty) {
+            el.isEmpty = true;
+            img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';
+        }
     };
 
 
     // handles the image load event
     function onLoad(e) {
-        setAppStatus();
-        el.classList.add('loaded');
-        reloadImage(e.currentTarget);
+
+        if (el.isEmpty) {
+            el.classList.remove('loaded');
+        }
+        else {
+            setAppStatus();
+            el.classList.add('loaded');
+            reloadImage(e.currentTarget);
+        }
     }
 
 
