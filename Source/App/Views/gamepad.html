@@ -16,8 +16,9 @@
     #view-gamepad .cross .circle { transition: all .15s ease-out; }
     #view-gamepad .cross .circle.active { min-width: 100%; min-height: 100%; }
 
-    #view-gamepad #top { visibility: hidden; }
-    #view-gamepad #top .button { font-size: .6em; }
+    #view-gamepad #top .narrow { visibility: visible; display: grid; grid-template-columns: 1fr; }
+    #view-gamepad #top .wide { visibility: hidden; display: grid; grid-template-columns: 1fr 1fr; }
+    #view-gamepad #top .wide .button { font-size: .6em; }
 
     #view-gamepad #bottom .button.long { width: 70vmin; }
     #view-gamepad #bottom .button { font-size: .6em; justify-self: center; }
@@ -33,7 +34,8 @@
         #view-gamepad .cross { width: 60vmin; height: 60vmin; }
         #view-gamepad .cross:last-of-type { display: grid; font-size: 70%; }
 
-        #view-gamepad #top { visibility: visible; display: grid; grid-template-columns: 1fr 1fr; }
+        #view-gamepad #top .wide { visibility: visible; }
+        #view-gamepad #top .narrow { visibility: hidden; }
         #view-gamepad #top .button:first-of-type { display: grid; justify-self: left; }
         #view-gamepad #top .button:last-of-type { display: grid; justify-self: right; }
 
@@ -48,8 +50,13 @@
 
 <div id="view-gamepad" class="grid">
     <div id="top">
-        <a rel="down" class="button bottom small" href="?c=key&v=27&a=">ESC</a>
-        <a rel="script" class="button bottom small selected" href="#" onclick="switchScanMode(this);">SCAN</a>
+        <div class="narrow">
+            <a class="button icon" href="#main">&#xe500;</a>
+        </div>
+        <div class="wide">
+            <a rel="down" class="button bottom small" href="?c=key&v=27&a=">ESC</a>
+            <a rel="script" class="button bottom small selected" href="#" onclick="switchScanMode(this);">SCAN</a>
+        </div>
     </div>
     <div id="middle">
         <div class="cross">
