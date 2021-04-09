@@ -1,35 +1,37 @@
 ﻿<style>
-    #view-media.grid { grid-template-rows: 20% 1.5fr 1fr; }
+    #view-media.grid { grid-template-rows: auto 1fr auto auto; }
 
-    #view-media .top { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    #view-media .top { display: grid; grid-template-columns: 1fr 1fr; }
     #view-media .top > .button:first-child { justify-self: left; }
     #view-media .top > .button:last-child { justify-self: right; }
 
     #view-media .button.large { min-height: .6in; }
     #view-media .wide-only { visibility: hidden; position: absolute; }
-    #view-media #media-buttons > div:first-child { display: grid; grid-template-columns: auto auto auto auto auto; }
-    #view-media #media-buttons > div:last-child { display: grid; grid-template-columns: .5fr 1fr 1fr .5fr; }
-    #view-media #media-buttons > div:last-child > .button:first-child { grid-column: 2; }
+    #view-media #media-buttons > div { display: grid; }
+    #view-media #media-buttons > div:nth-child(1) { grid-template-columns: auto auto auto auto auto; }
+    #view-media #media-buttons > div:nth-child(2) { grid-template-columns: .5fr 1fr 1fr .5fr; }
+    #view-media #media-buttons > div:nth-child(2) > .button:first-child { grid-column: 2; }
+
+    #view-media #footer { display: grid; justify-items: left; }
 
     #view-media .center { display: grid; height: 100%; grid-template-columns: 15% auto 5% auto 15%; align-items: center; grid-gap: 5px; }
-    #view-media .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; }
+    #view-media .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; padding-top: 2vh; padding-bottom: 2vh; }
     #view-media .center div .button { width: 100%; }
     #view-media .center span:first-child { justify-self: right; }
-    #view-media .center span:last-child { justify-self: left; }    
+    #view-media .center span:last-child { justify-self: left; }
 
-    @media screen and (min-width: 320px) and (orientation: landscape)
-    {
+    @media screen and (min-width: 480px) and (orientation: landscape) {
         #view-media .center div { flex-wrap: nowrap; }
         #view-media .wide-only { visibility: visible; position: initial; }
-        #view-media #media-buttons > div:last-child { display: none; }
+        #view-media #media-buttons > div:nth-child(2) { display: none; }
     }
 
 </style>
 
 <div id="view-media" class="grid">
+
     <div class="top">
         <a class="button icon" href="#menu">&#xe5c3;</a>
-        <a class="button icon" href="#gamepad">&#xe338;</a>
         <a rel="click" class="button icon" href="?c=media&v=standby">&#59564;</a>
     </div>
 
@@ -59,5 +61,9 @@
             <a rel="press" class="button icon small" href="?c=media&v=37">&#57702;</a>
             <a rel="press" class="button icon small" href="?c=media&v=39">&#57690;</a>
         </div>
+    </div>
+
+    <div id="footer">
+        <a class="button icon small" href="#gamepad">&#xe338;</a>
     </div>
 </div>

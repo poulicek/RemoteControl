@@ -140,5 +140,8 @@
       <Name>TrayToolkit</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="App\Res\MaterialIcons-Regular.woff2" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

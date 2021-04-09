@@ -1,15 +1,23 @@
 ﻿<style>
-    #view-menu.grid { grid-template-rows: 20% 1fr; }
+    #view-menu.grid { grid-template-rows: auto 1fr; }
     #view-menu.grid > .button:first-of-type { justify-self: left; }
 
-    .menu-items { align-self: start; }
-    .menu-item { width: 64px; height: 64px; background-position: center; background-repeat: no-repeat; margin: 2vmin; display: inline-block; }
+    #view-menu .menu-items { align-self: start; padding: 4vmin; display: grid; grid-template-columns: 1fr 1fr 1fr; }
+    #view-menu .menu-item { width: 64px; height: 64px; background-position: center; background-repeat: no-repeat; margin: 2vmin; margin-bottom: 4vmin; display: inline-block; }
+
+    @media screen and (min-width: 480px) and (orientation: landscape) {
+        #view-menu .menu-items { display: block; }
+    }
+
 </style>
 
 <div id="view-menu" class="grid">
-    <a class="button icon" href="#main">&#58820;</a>
+
+    <a class="button icon" href="javascript:history.back()">&#58820;</a>
+
     <div class="menu-items">
         <a rel="click" class="menu-item button outline" href="?c=menu&v=0" style="background-image: url('?c=menu&v=0&r=icon')">&nbsp;</a>
         <a rel="click" class="menu-item button outline" href="?c=menu&v=1" style="background-image: url('?c=menu&v=1&r=icon')">&nbsp;</a>
     </div>
+
 </div>
