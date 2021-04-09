@@ -36,6 +36,8 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 #status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; width: 100%; box-sizing: border-box; }
 #status-error-text:empty { display: none; }
 
+#keyboard { position: absolute; opacity: 0; }
+
 @supports (-webkit-touch-callout: none) {
     @media (orientation: portrait) {
         body.compensate-ios-padding { top: 20px; height: calc(100% - 20px) }

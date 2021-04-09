@@ -25,7 +25,8 @@
     #view-gamepad #bottom .button:first-of-type { display: none; }
     #view-gamepad #bottom .button:last-of-type { display: none; }
 
-    #view-gamepad #footer { display: grid; justify-items: left; }
+    #view-gamepad #footer { display: grid; justify-items: left; grid-auto-flow: column; width: 100%; }
+    #view-gamepad #footer .button:last-child { justify-self: right; }
 
     @media screen and (min-width: 480px) and (orientation: landscape) {
         #view-gamepad.grid { grid-template-rows: .3in auto .3in; }
@@ -72,10 +73,10 @@
             <a rel="down" class="icon button small" href="?c=key&v=13"></a>
         </div>
         <div class="cross">
-            <a rel="down" class="button outline" href="?c=key&v=89&a="><span>Y</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=66&a="><span>B</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=88&a="><span>X</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=65&a="><span>A</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=89&a=" style="border-color: #ffd4a8; color: #ffd4a8 "><span>Y</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=66&a=" style="border-color: #ffa8a8; color: #ffa8a8 "><span>B</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=88&a=" style="border-color: #a8d7ff; color: #a8d7ff"><span>X</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=65&a=" style="border-color: #a8ffb3; color: #a8ffb3"><span>A</span></a>
             <a rel="grip" class="circle button outline" href="?c=grip&v=89,66,65,88&a="></a>
         </div>
     </div>
@@ -88,6 +89,7 @@
 
     <div id="footer">
         <a class="button icon small" href="#main">&#xe500;</a>
+        <a rel="js" class="button icon small" href="javascript:focusKeyboard();">&#xe312;</a>
     </div>
 
 </div>

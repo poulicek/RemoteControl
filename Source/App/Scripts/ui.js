@@ -35,6 +35,10 @@ function bindEvents() {
                 bindPanZoomEvents(el);
                 break;
 
+            case 'js':
+                bindJsEvents(el);
+                break;
+
             default:
                 bindDefaultEvents(el);
                 break;
@@ -44,6 +48,10 @@ function bindEvents() {
 
 // binds default events for the link
 function bindDefaultEvents(el) {
+
+    if (el.href.substr(0, 11) == 'javascript:')
+        return;
+
     el.ontouchend = el.onmouseup = function () { window.location.href = el.href; };
     el.ontouchstart = el.onmousedown = initPress;
     el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
@@ -52,6 +60,19 @@ function bindDefaultEvents(el) {
             return cancelPress(e);
     };
 };
+
+
+// binds javascript events
+function bindJsEvents(el) {
+    el.ontouchstart = el.onmousedown = function(e) { e.passThrough = true; initPress(e); };
+    el.ontouchend = el.onmouseup = function(e) { cancelPress(e); };
+    el.ontouchcancel = el.onmouseout = cancelPress;
+    el.ontouchmove = function (e) {
+        if (!isTouched(e))
+            return cancelPress(e);
+    };
+
+}
 
 // binds the pan-zoom events
 function bindPanZoomEvents(el) {
@@ -132,7 +153,7 @@ function switchScanMode(el) {
 function getUrl(url, params) {
     if (url.includes('&a='))
         url = url.replace('&a=', '&a=' + (SCAN_MODE ? 1 : 0));
-    return url + params;
+    return url + (params ? params : '');
 };
 
 
@@ -304,5 +325,21 @@ function setStatusText(statusText) {
 function preventDoubleTap() {
     var els = document.getElementsByTagName('*');
     for (var i = 0; i < els.length; i++)
-        els[i].ontouchstart = function (e) { e.preventDefault(); };
+        els[i].ontouchstart = function (e) { if (!e.passThrough) { e.preventDefault(); return false; } };
+};
+
+
+// focuses the input causing appearance of the virtual keyboard
+function focusKeyboard() {
+    var f = document.getElementById('keyboard');
+    f.focus();
+};
+
+
+// handles the key change event
+function onKeyChanged(el) {
+    if (el.value) {
+        sendRequest('?c=key&r=' + el.value);
+        el.value = '';
+    }
 };

@@ -12,7 +12,8 @@
     #view-media #media-buttons > div:nth-child(2) { grid-template-columns: .5fr 1fr 1fr .5fr; }
     #view-media #media-buttons > div:nth-child(2) > .button:first-child { grid-column: 2; }
 
-    #view-media #footer { display: grid; justify-items: left; }
+    #view-media #footer { display: grid; justify-items: left; grid-auto-flow: column; width: 100%; }
+    #view-media #footer .button:last-child { justify-self: right; }
 
     #view-media .center { display: grid; height: 100%; grid-template-columns: 15% auto 5% auto 15%; align-items: center; grid-gap: 5px; }
     #view-media .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; padding-top: 2vh; padding-bottom: 2vh; }
@@ -65,5 +66,6 @@
 
     <div id="footer">
         <a class="button icon small" href="#gamepad">&#xe338;</a>
+        <a rel="js" class="button icon small" href="javascript:focusKeyboard();">&#xe312;</a>
     </div>
 </div>

@@ -8,9 +8,11 @@
     #view-rdp #click-spot.fadeOutSmall { opacity: 0; width: 0px; height: 0px; visibility: visible; }
     #view-rdp #click-spot.fadeOutBig { opacity: 0; width: 3in; height: 3in; visibility: visible; }
 
-    #view-rdp .loaded #canvas { opacity: 1; }
-    #view-rdp .loaded .loading { display: none; }
     #view-rdp .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6D93AE; font-size: 200%; font-weight: normal; }
+
+    #view-rdp.loaded #canvas { opacity: 1; }
+    #view-rdp.loaded .loading { display: none; }
+    
 </style>
 
 <a rel="panzoom" href="?c=rdp&v=click" id="view-rdp">
