@@ -14,14 +14,16 @@
     #view-rdp .loaded #canvas { opacity: 1; }
     #view-rdp .loaded .loading { display: none; }
 
-    #view-rdp #footer.grid { grid-auto-flow: column; justify-items: left; align-items: end; padding: 2vmin; }
-    #view-rdp #footer .button { position: relative; z-index: 999;  background: rgba(12, 31, 43, .85); }
-    #view-rdp #footer .button:last-child { justify-self: right; }
+    #view-rdp #controls.grid { grid-template-columns: 1fr 1fr; padding: 2vmin; }
+    #view-rdp #controls .button { position: relative; z-index: 999; background: rgba(12, 31, 43, .85); }
+    #view-rdp #controls .button:nth-child(1) { justify-self: left; align-self: start; }
+    #view-rdp #controls .button:nth-child(2) { justify-self: left; align-self: end; grid-row: 2; }
+    #view-rdp #controls .button:nth-child(3) { justify-self: right; align-self: end; grid-row: 2; }
 
-    #view-rdp.topleft { }
+    #view-rdp.topleft #controls .button:nth-child(1) { visibility: hidden; }
     #view-rdp.topright { }
-    #view-rdp.bottomleft #footer .button:nth-child(1) { visibility: hidden; }
-    #view-rdp.bottomright #footer .button:nth-child(2) { visibility: hidden; }
+    #view-rdp.bottomleft #controls .button:nth-child(2) { visibility: hidden; }
+    #view-rdp.bottomright #controls .button:nth-child(3) { visibility: hidden; }
     
 </style>
 
@@ -32,8 +34,9 @@
         <span id="click-spot"></span>
     </a>
 
-    <div id="footer" class="grid">
-        <a class="button icon small" href="#gamepad">&#xe338;</a>
+    <div id="controls" class="grid">
+        <a class="button icon" href="#menu">&#xe5c3;</a>
+        <a class="button icon small" href="#gamepad" >&#xe338;</a>
         <a rel="js" class="button icon small" href="javascript:focusKeyboard();">&#xe312;</a>
     </div>
 </div>
