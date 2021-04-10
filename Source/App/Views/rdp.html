@@ -1,5 +1,6 @@
 ﻿<style>
-    #view-rdp { cursor: default; background: #0C1F2B; }
+    #view-rdp { width: 100%; height: 100%; }
+    #view-rdp > a { cursor: default; background: #0C1F2B; }
     #view-rdp #canvas { width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; z-index: 999; opacity: 0; background: #0C1F2B; }
 
     #view-rdp #click-spot { visibility: hidden; display: block; position: absolute; border-radius: 50%; background: #6D93AE; border: 1px solid #0C1F2B; z-index: 999; transform: translate(-50%, -50%); pointer-events: none; }
@@ -10,13 +11,25 @@
 
     #view-rdp .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6D93AE; font-size: 200%; font-weight: normal; }
 
-    #view-rdp.loaded #canvas { opacity: 1; }
-    #view-rdp.loaded .loading { display: none; }
+    #view-rdp .loaded #canvas { opacity: 1; }
+    #view-rdp .loaded .loading { display: none; }
+
+    #view-rdp #footer.grid { grid-auto-flow: column; justify-items: left; align-items: end; padding: 2vmin; }
+    #view-rdp #footer .button { position: relative; z-index: 999;  background: rgba(12, 31, 43, .85); }
+    #view-rdp #footer .button:last-child { justify-self: right; }
+    
     
 </style>
 
-<a rel="panzoom" href="?c=rdp&v=click" id="view-rdp">
-    <span class="icon loading">hourglass_empty</span>
-    <img id="canvas" data-src="?c=rdp&v=screen" />
-    <span id="click-spot"></span>
-</a>
+<div id="view-rdp">
+    <a rel="panzoom" href="?c=rdp&v=click">
+        <span class="icon loading">hourglass_empty</span>
+        <img id="canvas" data-src="?c=rdp&v=screen" />
+        <span id="click-spot"></span>
+    </a>
+
+    <div id="footer" class="grid">
+        <a class="button icon small" href="#gamepad">&#xe338;</a>
+        <a rel="js" class="button icon small" href="javascript:focusKeyboard();">&#xe312;</a>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 ﻿<style>
     #view-gamepad.grid { grid-template-rows: auto 3fr 1fr auto; }
-    #view-gamepad.grid > div { display: grid; }
+    #view-gamepad.grid > div { display: grid; height: 100%; }
     #view-gamepad #center { display: none; }
 
     #view-gamepad .cross { display: grid; grid-template-columns: auto auto; width: 70vmin; height: 70vmin; max-width: 45vh; max-height: 45vh; margin: auto; transform: rotate(45deg); }
@@ -21,28 +21,28 @@
     #view-gamepad #top .button:nth-child(1) { display: grid; justify-self: left; }
 
     #view-gamepad #bottom .button.long { width: 70vmin; }
-    #view-gamepad #bottom .button { font-size: .6em; justify-self: center; }
+    #view-gamepad #bottom .button.string { font-size: .6em; justify-self: center; }
     #view-gamepad #bottom .button:first-of-type { display: none; }
     #view-gamepad #bottom .button:last-of-type { display: none; }
 
-    #view-gamepad #footer { display: grid; justify-items: left; grid-auto-flow: column; width: 100%; }
+    #view-gamepad #footer { justify-items: left; grid-auto-flow: column; width: 100%; }
     #view-gamepad #footer .button:last-child { justify-self: right; }
 
     @media screen and (min-width: 480px) and (orientation: landscape) {
-        #view-gamepad.grid { grid-template-rows: .3in auto .3in; }
+        #view-gamepad.grid { grid-template-rows: auto auto auto; padding: 2vmin; }
         #view-gamepad #middle { grid-template-columns: 1fr auto 1fr; }
         #view-gamepad #center { display: grid; align-self: start; }
 
-        #view-gamepad .cross { max-width: 35vw; max-height: 35vw; }
+        #view-gamepad .cross { max-width: 33vw; max-height: 33vw; }
         #view-gamepad .cross:last-of-type { display: grid; font-size: 70%; }
 
-        #view-gamepad #top { visibility: visible; }
-        #view-gamepad #top .button { font-size: .6em; }
+        #view-gamepad #top { visibility: visible; align-items: start; }
+        #view-gamepad #top .button.string { font-size: .6em; }
         #view-gamepad #top .button:nth-child(1) { display: none; }
         #view-gamepad #top .button:nth-child(2) { display: grid; justify-self: left; }
         #view-gamepad #top .button:nth-child(3) { display: grid; justify-self: right; }
 
-        #view-gamepad #bottom { grid-template-columns: 1fr 50vmin 1fr; }
+        #view-gamepad #bottom { grid-template-columns: 1fr 50vmin 1fr; align-items: end; }
         #view-gamepad #bottom .button.long { width: 50vmin; }
         #view-gamepad #bottom .button:nth-child(1) { display: grid; justify-self: left; }
         #view-gamepad #bottom .button:nth-child(3) { display: grid; justify-self: right; }
@@ -55,9 +55,9 @@
 <div id="view-gamepad" class="grid">
 
     <div id="top">
-        <a class="button icon " href="#menu">&#xe5c3;</a>
-        <a rel="down" class="button bottom small" href="?c=key&v=27&a=">ESC</a>
-        <a rel="script" class="button bottom small selected" href="#" onclick="switchScanMode(this);">SCAN</a>
+        <a class="button icon" href="#menu">&#xe5c3;</a>
+        <a rel="down" class="button bottom small string" href="?c=key&v=27&a=">ESC</a>
+        <a rel="script" class="button bottom small selected string" href="#" onclick="switchScanMode(this);">SCAN</a>
     </div>
 
     <div id="middle">
@@ -73,18 +73,23 @@
             <a rel="down" class="icon button small" href="?c=key&v=13"></a>
         </div>
         <div class="cross">
-            <a rel="down" class="button outline" href="?c=key&v=89&a=" style="border-color: #ffd4a8; color: #ffd4a8 "><span>Y</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=66&a=" style="border-color: #ffa8a8; color: #ffa8a8 "><span>B</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=88&a=" style="border-color: #a8d7ff; color: #a8d7ff"><span>X</span></a>
-            <a rel="down" class="button outline" href="?c=key&v=65&a=" style="border-color: #a8ffb3; color: #a8ffb3"><span>A</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=88&a="><span>X</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=163&a="><span>CTRL</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=165&a="><span>ALT</span></a>
+            <a rel="down" class="button outline" href="?c=key&v=160&a="><span>SHIFT</span></a>
             <a rel="grip" class="circle button outline" href="?c=grip&v=89,66,65,88&a="></a>
         </div>
     </div>
 
     <div id="bottom">
-        <a rel="down" class="button small" href="?c=key&v=160&a=">SHIFT</a>
-        <a rel="down" class="button outline small long" href="?c=key&v=32&a=">SPACE</a>
-        <a rel="down" class="button small" href="?c=key&v=163&a=">CTRL</a>
+
+        <a class="button icon small" href="#main">&#xe500;</a>
+        <!--<a rel="down" class="button small string" href="?c=key&v=160&a=">SHIFT</a>-->
+
+        <a rel="down" class="button outline small long string" href="?c=key&v=32&a=">SPACE</a>
+
+        <a rel="js" class="button icon small" href="javascript:focusKeyboard();">&#xe312;</a>
+        <!--<a rel="down" class="button small string" href="?c=key&v=163&a=">CTRL</a>-->
     </div>
 
     <div id="footer">

@@ -46,12 +46,9 @@ function bindEvents() {
     }
 };
 
+
 // binds default events for the link
 function bindDefaultEvents(el) {
-
-    if (el.href.substr(0, 11) == 'javascript:')
-        return;
-
     el.ontouchend = el.onmouseup = function () { window.location.href = el.href; };
     el.ontouchstart = el.onmousedown = initPress;
     el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
@@ -72,7 +69,8 @@ function bindJsEvents(el) {
             return cancelPress(e);
     };
 
-}
+};
+
 
 // binds the pan-zoom events
 function bindPanZoomEvents(el) {
@@ -89,13 +87,6 @@ function bindScriptEvents(el) {
         if (!isTouched(e))
             return cancelPress(e);
     };
-};
-
-// binds the link events
-function bindLinkEvents(el) {
-    el.ontouchstart = el.onmousedown = initPress;
-    el.ontouchcancel = el.onmouseup = el.onmouseout = cancelPress;
-    el.ontouchend = function (e) { document.location.href = e.currentTarget.href; cancelPress(e); };
 };
 
 
@@ -337,9 +328,8 @@ function focusKeyboard() {
 
 
 // handles the key change event
-function onKeyChanged(el) {
-    if (el.value) {
-        sendRequest('?c=key&r=' + el.value);
-        el.value = '';
-    }
+function onKeyChanged(e) {
+    if (e.keyCode)
+        sendRequest('?c=key&v=' + e.keyCode);
+    e.currentTarget.value = '  '; // these whitespaces ensure the holding of the backspace repeates the key strokes
 };
