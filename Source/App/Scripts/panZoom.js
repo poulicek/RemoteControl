@@ -1,4 +1,4 @@
-﻿function enablePanZoom(el, pointerClickHandler) {
+﻿function enablePanZoom(el, onClickHandler, onViewChangedHandler) {
 
     var imgSize = { width: el.clientWidth, height: el.clientHeight }; 
 
@@ -8,8 +8,13 @@
         y: 0,
         z: 1,
 
+        maxX: 0,
+        maxY: 0,
+
         rangeX: 0,
         rangeY: 0,
+
+        cutout: [],
 
         // resets the viewport's position
         resetPosition: function () {
@@ -40,13 +45,16 @@
         // set the given position
         setPosition: function (x, y) {
 
-            var maxX = Math.max(0, Math.floor(this.z * this.rangeX - window.innerWidth / 2));
-            var maxY = Math.max(0, Math.floor(this.z * this.rangeY - window.innerHeight / 2));
+            this.maxX = Math.max(0, Math.floor(this.z * this.rangeX - window.innerWidth / 2));
+            this.maxY = Math.max(0, Math.floor(this.z * this.rangeY - window.innerHeight / 2));
 
-            this.x = Math.max(-maxX, Math.min(maxX, x));
-            this.y = Math.max(-maxY, Math.min(maxY, y));
+            this.x = Math.max(-this.maxX, Math.min(this.maxX, x));
+            this.y = Math.max(-this.maxY, Math.min(this.maxY, y));
 
-            el.cutout = getCutout(this.x, this.y, this.z, maxX, maxY).join();
+            this.cutout = getCutout(this.x, this.y, this.z, this.maxX, this.maxY);
+
+            if (onViewChangedHandler)
+                onViewChangedHandler(this);
         },
 
         // sets the translation by given offset
@@ -182,12 +190,12 @@
             // preventing the onClick to be called twice
             eventHandlers.touchMoved = true;
 
-            if (!pointerClickHandler)
+            if (!onClickHandler)
                 return;
 
             var coords = getRelativeCoords(e.clientX, e.clientY);
             if (coords)
-                pointerClickHandler(e, coords.x, coords.y, e.which);
+                onClickHandler(e, coords.x, coords.y, e.which);
         },
 
         onWheel: function (e) {

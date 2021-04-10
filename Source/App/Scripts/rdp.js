@@ -1,5 +1,7 @@
 ﻿function enableRemoteControl(el) {
 
+    var cutout = '';
+
     // binds the actions
     function bindActions() {
         el.onclick = function () { return false; };
@@ -19,7 +21,7 @@
     function bindImage(img) {
 
         // enabling the pan and zoom
-        enablePanZoom(img, onClick);
+        enablePanZoom(img, onClick, onViewChanged);
 
         // using primarily the data-src attribute as the 'src'
         // attribute would cause automatic load even when the image isn't visible
@@ -39,7 +41,7 @@
     function reloadImage(img) {
         if (window.getComputedStyle(img).visibility == 'visible') {
             el.isEmpty = false;
-            img.src = img.getAttribute('data-src') + '&w=' + img.cutout;
+            img.src = img.getAttribute('data-src') + '&w=' + cutout;
         }
         else if (!el.isEmpty) {
             el.isEmpty = true;
@@ -71,10 +73,32 @@
     }
 
 
-    // onclick function definition
+    // onclick handler definition
     function onClick(e, x, y, b) {
         sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + (b ? b : '')));
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
+    };
+
+
+    // onviewchanged handler definition
+    function onViewChanged(vp) {
+        cutout = vp.cutout.join();
+
+        var className = '';
+
+        if (vp.z == 1)
+            className = '';
+        else if (vp.x == -vp.maxX && vp.y == -vp.maxY)
+            className = 'bottomright';
+        else if (vp.x == -vp.maxX && vp.y == vp.maxY)
+            className = 'topright';
+        else if (vp.x == vp.maxX && vp.y == -vp.maxY)
+            className = 'bottomleft';
+        else if (vp.x == vp.maxX && vp.y == vp.maxY)
+            className = 'topleft';
+
+        if (el.parentNode.className != className)
+            el.parentNode.className = className;
     };
 
 

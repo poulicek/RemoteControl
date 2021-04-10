@@ -17,7 +17,11 @@
     #view-rdp #footer.grid { grid-auto-flow: column; justify-items: left; align-items: end; padding: 2vmin; }
     #view-rdp #footer .button { position: relative; z-index: 999;  background: rgba(12, 31, 43, .85); }
     #view-rdp #footer .button:last-child { justify-self: right; }
-    
+
+    #view-rdp.topleft { }
+    #view-rdp.topright { }
+    #view-rdp.bottomleft #footer .button:nth-child(1) { visibility: hidden; }
+    #view-rdp.bottomright #footer .button:nth-child(2) { visibility: hidden; }
     
 </style>
 
