@@ -20,18 +20,22 @@
     // binds the image element
     function bindImage(img) {
 
-        // enabling the pan and zoom
-        enablePanZoom(img, onClick, onViewChanged);
+        if (!img.bound) {
 
-        // using primarily the data-src attribute as the 'src'
-        // attribute would cause automatic load even when the image isn't visible
-        if (img.src)
-            img.setAttribute('data-src', img.src);
+            // enabling the pan and zoom
+            enablePanZoom(img, onClick, onViewChanged);
 
-        // automatic loading of the image
-        window.addEventListener('resize', function () { reloadImage(img); });
-        img.addEventListener('load', onLoad);
-        img.addEventListener('error', onError);
+            // using primarily the data-src attribute as the 'src'
+            // attribute would cause automatic load even when the image isn't visible
+            if (img.src)
+                img.setAttribute('data-src', img.src);
+
+            // automatic loading of the image
+            window.addEventListener('resize', function () { reloadImage(img); });
+            img.addEventListener('load', onLoad);
+            img.addEventListener('error', onError);
+            img.bound = true;
+        }
 
         reloadImage(img);
     };
@@ -76,6 +80,7 @@
     // onclick handler definition
     function onClick(e, x, y, b) {
         sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + (b ? b : '')));
+        reloadImage(e.currentTarget);
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
     };
 

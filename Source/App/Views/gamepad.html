@@ -2,6 +2,7 @@
     #view-gamepad.grid { grid-template-rows: auto 3fr 1fr auto; }
     #view-gamepad.grid > div { display: grid; height: 100%; }
     #view-gamepad #center { display: none; }
+    #view-gamepad .button.string { font-size: .6em; justify-self: center; }
 
     #view-gamepad .cross { display: grid; grid-template-columns: auto auto; width: 70vmin; height: 70vmin; max-width: 45vh; max-height: 45vh; margin: auto; transform: rotate(45deg); }
     #view-gamepad .cross:last-of-type { display: none; }
@@ -21,7 +22,6 @@
     #view-gamepad #top .button:nth-child(1) { display: grid; justify-self: left; }
 
     #view-gamepad #bottom .button.long { width: 70vmin; }
-    #view-gamepad #bottom .button.string { font-size: .6em; justify-self: center; }
     #view-gamepad #bottom .button:first-of-type { display: none; }
     #view-gamepad #bottom .button:last-of-type { display: none; }
 
@@ -34,13 +34,13 @@
         #view-gamepad #center { display: grid; align-self: start; }
 
         #view-gamepad .cross { max-width: 33vw; max-height: 33vw; }
-        #view-gamepad .cross:last-of-type { display: grid; font-size: 70%; }
+        #view-gamepad .cross:last-of-type { display: grid; }
+        #view-gamepad .cross:last-of-type .button:not(.icon) { font-size: 70%; }
 
         #view-gamepad #top { visibility: visible; align-items: start; }
         #view-gamepad #top .button.string { font-size: .6em; }
-        #view-gamepad #top .button:nth-child(1) { display: none; }
-        #view-gamepad #top .button:nth-child(2) { display: grid; justify-self: left; }
-        #view-gamepad #top .button:nth-child(3) { display: grid; justify-self: right; }
+        #view-gamepad #top .button:nth-child(1) { min-height: 0px; height: .4in; }
+        #view-gamepad #top .button:nth-child(2) { display: grid; justify-self: right; }
 
         #view-gamepad #bottom { grid-template-columns: 1fr 50vmin 1fr; align-items: end; }
         #view-gamepad #bottom .button.long { width: 50vmin; }
@@ -55,9 +55,8 @@
 <div id="view-gamepad" class="grid">
 
     <div id="top">
-        <a class="button icon" href="#menu">&#xe5c3;</a>
-        <a rel="down" class="button bottom small string" href="?c=key&v=27&a=">ESC</a>
-        <a rel="script" class="button bottom small selected string" href="#" onclick="switchScanMode(this);">SCAN</a>
+        <a class="button icon dimmed wide-small" href="#menu">&#xe5c3;</a>
+        <a rel="down" class="button bottom small string" href="?c=key&v=27&a=">ESC</a>        
     </div>
 
     <div id="middle">
@@ -70,10 +69,10 @@
         </div>
         <div id="center">
             <a rel="down" class="icon button small" href="?c=key&v=8"></a>
-            <a rel="down" class="icon button small" href="?c=key&v=13"></a>
+            <a rel="script" class="button bottom small selected string" href="#" onclick="switchScanMode(this);">SCN</a>
         </div>
         <div class="cross">
-            <a rel="down" class="button outline" href="?c=key&v=88&a="><span>X</span></a>
+            <a rel="down" class="button outline icon" href="?c=key&v=13&a="><span></span></a>
             <a rel="down" class="button outline" href="?c=key&v=163&a="><span>CTRL</span></a>
             <a rel="down" class="button outline" href="?c=key&v=165&a="><span>ALT</span></a>
             <a rel="down" class="button outline" href="?c=key&v=160&a="><span>SHIFT</span></a>
@@ -83,18 +82,18 @@
 
     <div id="bottom">
 
-        <a class="button icon small" href="#main">&#xe500;</a>
+        <a class="button icon small dimmed" href="#main">&#xe500;</a>
         <!--<a rel="down" class="button small string" href="?c=key&v=160&a=">SHIFT</a>-->
 
         <a rel="down" class="button outline small long string" href="?c=key&v=32&a=">SPACE</a>
 
-        <a rel="js" class="button icon small" href="javascript:focusKeyboard();">&#xe312;</a>
+        <a rel="js" class="button icon small dimmed" href="javascript:focusKeyboard();">&#xe312;</a>
         <!--<a rel="down" class="button small string" href="?c=key&v=163&a=">CTRL</a>-->
     </div>
 
     <div id="footer">
-        <a class="button icon small" href="#main">&#xe500;</a>
-        <a rel="js" class="button icon small" href="javascript:focusKeyboard();">&#xe312;</a>
+        <a class="button icon small dimmed" href="#main">&#xe500;</a>
+        <a rel="js" class="button icon small dimmed" href="javascript:focusKeyboard();">&#xe312;</a>
     </div>
 
 </div>

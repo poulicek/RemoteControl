@@ -6,14 +6,16 @@
     #view-menu .menu-item { width: 64px; height: 64px; background-position: center; background-repeat: no-repeat; margin: 2vmin; margin-bottom: 4vmin; display: inline-block; }
 
     @media screen and (min-width: 480px) and (orientation: landscape) {
+        #view-menu.grid { padding: 2vmin; }
         #view-menu .menu-items { display: block; }
+        #view-menu .wide-small { min-height: 0px; height: .4in; }
     }
 
 </style>
 
 <div id="view-menu" class="grid">
 
-    <a rel="js" class="button icon" href="javascript:history.back()">&#58820;</a>
+    <a rel="js" class="button icon dimmed wide-small" href="javascript:history.back()">&#xe5e0;</a>
 
     <div class="menu-items">
         <a rel="click" class="menu-item button outline" href="?c=menu&v=0" style="background-image: url('?c=menu&v=0&r=icon')">&nbsp;</a>
