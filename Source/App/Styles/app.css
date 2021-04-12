@@ -1,4 +1,4 @@
-﻿@font-face { font-family: 'Material Icons'; src: url('../Res/MaterialIcons-Regular.woff2') format('woff2'); }
+﻿@font-face { font-family: 'Material Icons'; src: url('../Res/MaterialIcons-Regular.woff') format('woff'); }
 @font-face { font-family: 'Roboto'; src: url('../Res/Roboto-Bold.woff') format('woff'); }
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -13,6 +13,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .icon { font-family: 'Material Icons'; white-space: nowrap; font-weight: bold; }
 .grid { display: grid; box-sizing: border-box; width: 100%; height: 100%; align-items: center; padding: 5vmin; }
 .hidden { display: none !important; }
+.loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6D93AE; font-size: 200%; font-weight: normal; }
 
 .button { display: grid; min-width: .6in; min-height: .6in; padding: 5px; border-radius: 10px; margin: 5px; align-items: center; }
 .button { color: #ffb100; text-decoration: none; justify-content: center; }
@@ -29,6 +30,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .status#status-normal { visibility: visible; max-width: 50vw; left: 50%; margin-left: -25vw; }
 .status-error #status-error { visibility: visible; }
 .status-error #status-normal { visibility: hidden; }
+.status-error .loading { display: none; }
 .status-error .reload { visibility: visible; }
 
 #status-error { color: #AD4141; z-index: 9999; }

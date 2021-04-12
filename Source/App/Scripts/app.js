@@ -53,9 +53,8 @@ function setBaseUrl(url) {
 
 // checks the app version
 function connect(url) {
+    setAppStatus();
     setBaseUrl(url);
-    setStatusText('Connecting...');
-
     console.log('Connecting to url: ' + url);
     sendRequest(url + '?c=app&v=getversion', function (data) { onConnectSuccess(data, url); }, function (data) { onConnectError(data, url); });
 };
@@ -99,6 +98,7 @@ function loadView(id) {
 
 // sets the view with the given html
 function onLoadViewSuccess(html) {
+    setAppStatus();
     var viewEl = document.getElementById('view');
     viewEl.style.animationName = '';
     void viewEl.offsetWidth;
@@ -113,4 +113,19 @@ function onLoadViewSuccess(html) {
 function onLoadViewError(error) {
     console.log('View loading error: ' + error);
     setAppStatus('status-error', error);
+};
+
+
+// copies the text into clip board
+function copyText(str) {
+    var el = document.createElement('textarea');
+    el.style.position = 'absolute';
+    el.style.opacity = '0';
+    el.value = str;
+
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    
 };

@@ -138,7 +138,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="App\Res\MaterialIcons-Regular.woff2" />
+    <EmbeddedResource Include="App\Res\MaterialIcons-Regular.woff" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
