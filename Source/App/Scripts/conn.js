@@ -2,8 +2,6 @@
 function sendRequest(query, onSuccess, onError, timeout) {
     try {
         var xhttp = new XMLHttpRequest();
-        document.xhttp = xhttp;
-
         xhttp.query = query;
         xhttp.onreadystatechange = function () { handleResponse(this, onSuccess, onError) };
         xhttp.open('GET', query, true);
@@ -35,13 +33,8 @@ function handleResponse(xhttp, onSuccess, onError) {
 
             if (onError)
                 onError(errorText);
-            else {
-                setAppStatus('status-error', errorText);
-                setTimeout(function () {
-                    if (document.xhttp == xhttp)
-                        setAppStatus();
-                }, 1000);
-            }
+            else
+                setError(errorText);
         }
     }
 };

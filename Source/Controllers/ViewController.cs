@@ -43,7 +43,7 @@ namespace RemoteControl.Controllers
             switch (view)
             {
                 case "main":
-                    context.Response.Write(FilesController.FillTemplate(s, new Dictionary<string, string>()
+                    context.Response.Write(FilesController.FillTemplate(s.ReadString(), new Dictionary<string, string>()
                     {
                         { "{View-Portrait}", this.getResource("media").ReadString() },
                         { "{View-Landscape}", this.getResource("rdp").ReadString() },
@@ -51,7 +51,7 @@ namespace RemoteControl.Controllers
                     break;
 
                 case "link":
-                    context.Response.Write(FilesController.FillTemplate(s, new Dictionary<string, string>()
+                    context.Response.Write(FilesController.FillTemplate(s.ReadString(), new Dictionary<string, string>()
                     {
                         { "{Link}", this.serverUrlCallback?.Invoke() },
                     }));

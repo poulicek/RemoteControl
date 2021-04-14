@@ -70,7 +70,7 @@
 
     // handles the image error event
     function onError(e) {
-        setAppStatus('status-error');
+        setError(null, true);
         el.classList.remove('loaded');
         var img = e.currentTarget;
         setTimeout(function () { reloadImage(img); }, 500);

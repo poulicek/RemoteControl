@@ -48,7 +48,7 @@ namespace RemoteControl.Controllers
         /// </summary>
         private string readFormattedHtml(Stream s)
         {
-            return FillTemplate(s, new Dictionary<string, string>()
+            return FillTemplate(s.ReadString(), new Dictionary<string, string>()
             {
                 { "{Version}", this.appVersion },
                 { "{HostUrl}", this.hostUrl },
@@ -60,16 +60,12 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Fills the template with variables
         /// </summary>
-        internal static string FillTemplate(Stream s, Dictionary<string, string> variables)
+        internal static string FillTemplate(string str, Dictionary<string, string> variables)
         {
-            using (var r = new StreamReader(s))
-            {
-                var str = r.ReadToEnd();
-                foreach (var v in variables)
-                    str = str.Replace(v.Key, v.Value);
+            foreach (var v in variables)
+                str = str.Replace(v.Key, v.Value);
 
-                return str;
-            }
+            return str;
         }
 
 

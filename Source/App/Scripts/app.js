@@ -1,6 +1,7 @@
 ﻿var APP_URL = document.getElementById('app-url').content;
 var APP_VERSION = document.getElementById('app-version').content;
 var DEFAULT_VIEW = 'main';
+var CURRENT_VIEW = '';
 var DEBUG_MODE = false;
 var DEFAULT_HEIGHT = 0;
 
@@ -41,7 +42,9 @@ function init() {
 // handles the change of the hash in the url
 function onHashChange() {
     var view = window.location.hash.length > 1 ? window.location.hash.substring(1) : DEFAULT_VIEW;
-    loadView(view);
+
+    if (view != CURRENT_VIEW)
+        loadView(view);
 };
 
 
@@ -85,19 +88,22 @@ function onConnectError(error, url) {
     if (url && url.length)
         connect('');
     else
-        setAppStatus('status-error', error);
+        setError(error, true);
 };
 
 
 // loads a view with given id
 function loadView(id) {
     console.log('Loading view: ' + id);
-    sendRequest('?c=view&v=' + id + '&_' + APP_VERSION, onLoadViewSuccess, onLoadViewError, 1000);
+    sendRequest('?c=view&v=' + id + '&_' + APP_VERSION, function (r) { onLoadViewSuccess(id, r); }, onLoadViewError, 1000);
 };
 
 
 // sets the view with the given html
-function onLoadViewSuccess(html) {
+function onLoadViewSuccess(id, html) {
+
+    CURRENT_VIEW = id;
+
     setAppStatus();
     var viewEl = document.getElementById('view');
     viewEl.style.animationName = '';
@@ -111,8 +117,10 @@ function onLoadViewSuccess(html) {
 
 // handles error during view loading
 function onLoadViewError(error) {
+
     console.log('View loading error: ' + error);
-    setAppStatus('status-error', error);
+    setError(error);
+    window.location.hash = CURRENT_VIEW;
 };
 
 

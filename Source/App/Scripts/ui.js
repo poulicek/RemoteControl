@@ -1,4 +1,5 @@
 ﻿var SCAN_MODE = 1;
+var ERROR_ID = 0;
 
 // binds the events on links
 function bindEvents() {
@@ -49,7 +50,7 @@ function bindEvents() {
 
 // binds default events for the link
 function bindDefaultEvents(el) {
-    el.ontouchend = el.onmouseup = function () { window.location.href = el.href; };
+    el.ontouchend = el.onmouseup = function (e) { window.location.href = el.href; cancelPress(e); };
     el.ontouchstart = el.onmousedown = initPress;
     el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
     el.ontouchmove = function (e) {
@@ -285,8 +286,10 @@ function setClass(el, className, set) {
 // connection status
 function setAppStatus(className, errorText) {
 
-    if (!className)
+    if (!className) {
         className = '';
+        ERROR_ID = 0;
+    }
 
     // setting the class name if changed
     var el = document.getElementById('app-state');
@@ -303,6 +306,26 @@ function setAppStatus(className, errorText) {
             el.innerText = errorText;
     }
 };
+
+
+// sets the error status with timeout
+function setError(errorText, permanent) {    
+
+    if (permanent) {
+        ERROR_ID = -1;
+        setAppStatus('status-error', errorText);
+    }
+    else if (ERROR_ID != -1) {
+
+        var errorId = ERROR_ID = new Date().getTime();
+        setAppStatus('status-error', errorText);
+
+        setTimeout(function () {
+            if (ERROR_ID == errorId)
+                setAppStatus();
+        }, 1000);
+    }
+}
 
 
 // sets the status
