@@ -113,11 +113,9 @@ namespace RemoteControl.Logic
         /// </summary>
         private void initControllers()
         {
-            var serverUrl = this.ServerUrl;
-
             this.controllers.Add("file", new FilesController(this.AppVersion, this.server.GetUrl(Environment.MachineName)));
-            this.controllers.Add("app", new AppController(this.AppVersion, serverUrl));
-            this.controllers.Add("view", new ViewController(serverUrl));
+            this.controllers.Add("app", new AppController(this.AppVersion, () => this.ServerUrl));
+            this.controllers.Add("view", new ViewController(() => this.ServerUrl));
             this.controllers.Add("key", new KeysController());
             this.controllers.Add("media", new MediaController());
             this.controllers.Add("grip", new GripController());

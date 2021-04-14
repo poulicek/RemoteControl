@@ -9,13 +9,13 @@ namespace RemoteControl.Controllers
 {
     public class AppController : IController
     {
-        private readonly string serverUrl;
         private readonly string appVersion;
+        private readonly Func<string> serverUrlCallback;
 
-        public AppController(string appVersion, string serverUrl)
+        public AppController(string appVersion, Func<string> serverUrlCallback)
         {
-            this.serverUrl = serverUrl;
             this.appVersion = appVersion;
+            this.serverUrlCallback = serverUrlCallback;
         }
 
         public void ProcessRequest(HttpContext context)
@@ -31,7 +31,7 @@ namespace RemoteControl.Controllers
                     break;
 
                 case "qr":
-                    context.Response.Write(this.getQRCode(this.serverUrl), System.Web.MimeMapping.GetMimeMapping(".png"));
+                    context.Response.Write(this.getQRCode(this.serverUrlCallback?.Invoke()), System.Web.MimeMapping.GetMimeMapping(".png"));
                     break;
             }
         }

@@ -9,11 +9,11 @@ namespace RemoteControl.Controllers
 {
     public class ViewController : IController
     {
-        private readonly string serverUrl;
+        private readonly Func<string> serverUrlCallback;
 
-        public ViewController(string serverUrl)
+        public ViewController(Func<string> serverUrlCallback)
         {
-            this.serverUrl = serverUrl;
+            this.serverUrlCallback = serverUrlCallback;
         }
 
 
@@ -53,7 +53,7 @@ namespace RemoteControl.Controllers
                 case "link":
                     context.Response.Write(FilesController.FillTemplate(s, new Dictionary<string, string>()
                     {
-                        { "{Link}", this.serverUrl },
+                        { "{Link}", this.serverUrlCallback?.Invoke() },
                     }));
                     break;
 
