@@ -16,10 +16,12 @@ namespace RemoteControl.UI
 
         public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
         {
+            this.listener.NotificationRaised += this.onNotificationRaised;
             this.listener.ConnectedChanged += this.onConnectedChanged;
             this.listener.ConnectionError += this.onConnectionError;
             SystemEvents.SessionSwitch += this.onSessionSwitch;
         }
+
 
         protected override string getIconName(bool lightMode)
         {
@@ -43,6 +45,11 @@ namespace RemoteControl.UI
         {
             if (!this.listener.IsConnected && (e.Reason == SessionSwitchReason.SessionLogon || e.Reason == SessionSwitchReason.SessionUnlock))
                 this.listener.StartServer();
+        }
+
+        private void onNotificationRaised(string msg)
+        {
+            BalloonTooltip.Show(msg, this.tooltipIcon, null, 5000);
         }
 
         protected override void OnLoad(EventArgs e)

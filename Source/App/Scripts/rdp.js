@@ -1,6 +1,9 @@
 ﻿function enableRemoteControl(el) {
 
     var cutout = '';
+    var img = null;
+    var session = 0;
+    var isEmpty = true;
 
     // binds the actions
     function bindActions() {
@@ -13,7 +16,7 @@
     function bindFirstImage() {
         var imgEls = el.getElementsByTagName('img');
         if (imgEls.length > 0)
-            bindImage(imgEls[0]);
+            bindImage(img = imgEls[0]);
     }
 
 
@@ -23,7 +26,7 @@
         if (!img.bound) {
 
             // enabling the pan and zoom
-            enablePanZoom(img, onClick, onViewChanged);
+            enablePanZoom(img, onClick, onViewPortChanged);
 
             // using primarily the data-src attribute as the 'src'
             // attribute would cause automatic load even when the image isn't visible
@@ -31,62 +34,54 @@
                 img.setAttribute('data-src', img.src);
 
             // automatic loading of the image
-            window.addEventListener('resize', function () { reloadImage(img); });
+            window.addEventListener('resize', onResize);
             img.addEventListener('load', onLoad);
             img.addEventListener('error', onError);
             img.bound = true;
         }
 
-        reloadImage(img);
+        reloadImage();
     };
 
 
-    // reloading the image if necessary
-    function reloadImage(img) {
-        if (window.getComputedStyle(img).visibility == 'visible') {
-            el.isEmpty = false;
-            img.src = img.getAttribute('data-src') + '&w=' + cutout;
-        }
-        else if (!el.isEmpty) {
-            el.isEmpty = true;
-            img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';
-        }
+    // windows resize handler
+    function onResize(e) {
+        reloadImage();
     };
 
 
     // handles the image load event
     function onLoad(e) {
 
-        if (el.isEmpty) {
+        if (isEmpty) {
             el.classList.remove('loaded');
         }
         else {
             setAppStatus();
             el.classList.add('loaded');
-            reloadImage(e.currentTarget);
+            reloadImage();
         }
-    }
+    };
 
 
     // handles the image error event
     function onError(e) {
         setError(null, true);
         el.classList.remove('loaded');
-        var img = e.currentTarget;
-        setTimeout(function () { reloadImage(img); }, 500);
-    }
+        setTimeout(function () { reloadImage(); }, 500);
+    };
 
 
     // onclick handler definition
     function onClick(e, x, y, b) {
         sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + (b ? b : '')));
-        reloadImage(e.currentTarget);
+        reloadImage();
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
     };
 
 
     // onviewchanged handler definition
-    function onViewChanged(vp) {
+    function onViewPortChanged(vp) {
         cutout = vp.cutout.join();
 
         var className = '';
@@ -104,6 +99,28 @@
 
         if (el.parentNode.className != className)
             el.parentNode.className = className;
+    };
+
+
+    // reloading the image if necessary
+    function reloadImage() {
+
+        if (!img)
+            return;
+
+        if (window.getComputedStyle(img).visibility == 'visible') {
+
+            if (isEmpty) {
+                isEmpty = false;
+                session = getSessionId();
+            }
+
+            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session;
+        }
+        else if (!isEmpty) {
+            isEmpty = true;
+            img.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=';
+        }
     };
 
 

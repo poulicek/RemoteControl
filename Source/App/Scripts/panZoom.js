@@ -87,7 +87,6 @@
             el.addEventListener('wheel', this.onWheel);
             el.addEventListener('click', this.onClick);
 
-            viewport.setPosition(0, 0);
             this.onLoad();
         },
 
@@ -228,7 +227,6 @@
                 clientX: Math.floor(t.pageX),
                 clientY: Math.floor(t.pageY),
                 id: t.identifier,
-                time: new Date().getTime(),
                 touchesCount: touches.length,
                 currentTarget: t.target
             };
@@ -240,7 +238,6 @@
             clientX: Math.floor((t1.pageX + t2.pageX) / 2),
             clientY: Math.floor((t1.pageY + t2.pageY) / 2),
             id: t1.identifier + t2.identifier,
-            time: new Date().getTime(),
             touchesCount: touches.length,
             currentTarget: t1.target,
             dist: Math.hypot(t1.pageX - t2.pageX, t1.pageY - t2.pageY)
@@ -279,6 +276,8 @@
         var size = getImageSize(el);
         viewport.rangeX = Math.floor(size.width / 2);
         viewport.rangeY = Math.floor(size.height / 2);
+
+        viewport.setPosition(viewport.x, viewport.y);
     };
 
 
@@ -329,6 +328,9 @@
 
     // returns the size of the image on the screen
     function getImageSize(el) {
+
+        if (!imgSize.height)
+            return { width: 0, height: 0 };
 
         var ratio = imgSize.width / imgSize.height;
 

@@ -11,7 +11,10 @@ namespace RemoteControl.Controllers
 {
     public class RdpController : IController
     {
+        public event Action SessionChanged;
+
         private const float r = 100000; // relative values resolution
+        private string lastSession = string.Empty;
 
 
         public void ProcessRequest(HttpContext context)
@@ -20,6 +23,13 @@ namespace RemoteControl.Controllers
             {
                 case "screen":
                     {
+                        var session = context.Request.Query["s"] ?? string.Empty;
+                        if (session != this.lastSession)
+                        {
+                            this.SessionChanged?.Invoke();
+                            this.lastSession = session;
+                        }
+
                         var cutout = context.Request.Query["w"]?.Split(',');
                         var data = this.getScreenShot(this.readRelativeCutout(cutout), out var codec);
                         context.Response.Write(data, codec.MimeType);
@@ -152,42 +162,6 @@ namespace RemoteControl.Controllers
                     return codec;
 
             return null;
-        }
-
-
-        /// <summary>
-        /// Resamples the image if its size exceeds on of the maximums
-        /// </summary>
-        /// <returns></returns>
-        private Bitmap resample(Bitmap src, int maxWidth, int maxHeight, bool highQuality)
-        {
-            if (src.Width <= maxWidth && src.Height <= maxHeight)
-                return src;
-
-            var w = src.Width;
-            var h = src.Height;
-
-            if (w > maxWidth)
-            {
-                w = maxWidth;
-                h = src.Height * maxWidth / src.Width;
-            }
-
-            if (h > maxHeight)
-            {
-                w = src.Width * maxHeight / src.Height;
-                h = maxHeight;
-            }
-
-            var dst = new Bitmap(w, h, PixelFormat.Format24bppRgb);
-            using (var g = Graphics.FromImage(dst))
-            {
-                if (highQuality)
-                    g.SetHighQuality();
-                g.DrawImage(src, new Rectangle(0, 0, w, h), 0, 0, src.Width, src.Height, GraphicsUnit.Pixel);
-            }
-
-            return dst;
         }
     }
 }

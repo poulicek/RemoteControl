@@ -20,6 +20,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .button.dimmed { color: rgba(255, 255, 255, .3); color: white; }
 .button.large { font-size: 2em; min-width: .9in; min-height: .9in; }
 .button.small { min-height: 0px; height: .4in; }
+.button.long { min-width: 50vmin; justify-self: center; border-radius: 16px; }
 .button.outline { border: 1px solid white; background-color: rgba(0, 0, 0, .2); }
 .button.plastic { background-color: #6D93AE; color: #1b2d34; border: 1px solid black; border-radius: 15px; }
 .button.reload { visibility: hidden; align-self: center; justify-self: center; }
@@ -30,7 +31,6 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 .status#status-normal { visibility: visible; max-width: 50vw; left: 50%; margin-left: -25vw; }
 .status-error #status-error { visibility: visible; }
 .status-error #status-normal { visibility: hidden; }
-.status-error .loading { display: none; }
 .status-error .reload { visibility: visible; }
 
 #status-error { color: #AD4141; z-index: 9999; }

@@ -23,6 +23,7 @@ namespace RemoteControl.Logic
         public string AppVersion { get; } = ResourceHelper.GetLastWriteTime().GetHashCode().ToString("x");
 
         public event Action<bool> ConnectedChanged;
+        public event Action<string> NotificationRaised;
         public event Action<Exception> ConnectionError;
 
 
@@ -113,6 +114,9 @@ namespace RemoteControl.Logic
         /// </summary>
         private void initControllers()
         {
+            var rdp = new RdpController();
+            rdp.SessionChanged += () => this.NotificationRaised?.Invoke("Screen sharing started...");
+
             this.controllers.Add("file", new FilesController(this.AppVersion, this.server.GetUrl(Environment.MachineName)));
             this.controllers.Add("app", new AppController(this.AppVersion, () => this.ServerUrl));
             this.controllers.Add("view", new ViewController(() => this.ServerUrl));
@@ -120,7 +124,7 @@ namespace RemoteControl.Logic
             this.controllers.Add("media", new MediaController());
             this.controllers.Add("grip", new GripController());
             this.controllers.Add("menu", new MenuController());
-            this.controllers.Add("rdp", new RdpController());
+            this.controllers.Add("rdp", rdp);
         }
 
 

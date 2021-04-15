@@ -317,7 +317,7 @@ function setError(errorText, permanent) {
     }
     else if (ERROR_ID != -1) {
 
-        var errorId = ERROR_ID = new Date().getTime();
+        var errorId = ERROR_ID = getSessionId();
         setAppStatus('status-error', errorText);
 
         setTimeout(function () {

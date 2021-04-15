@@ -137,3 +137,9 @@ function copyText(str) {
     document.body.removeChild(el);
     
 };
+
+
+// generates a session id
+function getSessionId() {
+    return new Date().getTime().toString(32);
+};

@@ -1,4 +1,6 @@
 ﻿<style>
+    .status-error .loading { display: none; }
+
     #view-link h1 { font-size: 100%; text-align: center; }
     #view-link ol { color: white; margin: auto; padding: 0px; font-size: 50%; list-style-position: inside; display: inline-block; text-align: left; line-height: 140%; margin-bottom: 10px; }
     #view-link p { margin: 0px; color: #6D93AE; font-size: 50%; }
@@ -25,7 +27,7 @@
             <td id="qr">&nbsp;</td>
         </tr>
         <tr style="height: 10%">
-            <td><p><a rel="js" class="button outline small" onclick="copyText('{Link}'); return false;" href="#">{Link}<span class="icon">&#xe14d;</span></a></p></td>
+            <td><p><a rel="js" class="button outline small long" onclick="copyText('{Link}'); return false;" href="#">{Link}<span class="icon">&#xe14d;</span></a></p></td>
         </tr>
     </table>
 </div>
