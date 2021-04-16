@@ -6,31 +6,40 @@ namespace RemoteControl.Controllers
 {
     public class KeysController : IController
     {
-        private bool shiftKeyPressed;
-
         public void ProcessRequest(HttpContext context)
         {
+            var realChar = context.Request.Query["h"];
+            if (realChar?.Length > 0)
+            {
+                InputHelper.SendUnicodeChar(realChar[0]);
+                return;
+            }
+
+            // reading the keyCode
             if (!int.TryParse(context.Request.Query["v"], out var keyCode))
+                return;
+
+            // skipping caps lock and modifier keys
+            if (keyCode == (int)Keys.CapsLock || keyCode == (int)Keys.ShiftKey)
                 return;
 
             // executing the key pressing
             var scanMode = context.Request.Query["a"] == "1";
+            var released = int.TryParse(context.Request.Query["s"], out var keyState) && keyState == 0;
 
-            // skipping caps lock as its release is not reported reliable by iOS
-            if (keyCode == (int)Keys.CapsLock)
-                return;
+            this.pressKey((Keys)keyCode, released, scanMode);
+        }
 
-            if (int.TryParse(context.Request.Query["s"], out var keyState) && keyState == 0)
-                ((Keys)keyCode).Up(scanMode);
+
+        /// <summary>
+        /// Key pressing actions
+        /// </summary>
+        private void pressKey(Keys key, bool release, bool scanMode)
+        {
+            if (release)
+                key.Up(scanMode);
             else
-                ((Keys)keyCode).Down(scanMode);
-
-            // releasing the shift key if previously pressed
-            if (this.shiftKeyPressed)
-                (Keys.ShiftKey).Up();
-
-            this.shiftKeyPressed = keyCode == (int)Keys.ShiftKey;
-            
+                key.Down(scanMode);
         }
     }
 }

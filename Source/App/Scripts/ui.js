@@ -352,7 +352,12 @@ function focusKeyboard() {
 
 // handles the key change event
 function onKeyChanged(e) {
-    if (e.keyCode)
-        sendRequest('?c=key&v=' + e.keyCode);
-    e.currentTarget.value = '  '; // these whitespaces ensure the holding of the backspace repeates the key strokes
+    try {
+        var value = e.currentTarget.value;
+        e.currentTarget.value = '  '; // these whitespaces ensure the holding of the backspace repeates the key strokes
+
+        var h = value.length > 2 ? encodeURIComponent(value.substr(2, 1)) : '';
+        sendRequest('?c=key&v=' + e.keyCode + '&h=' + h);
+    }
+    catch { }
 };
