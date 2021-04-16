@@ -359,5 +359,5 @@ function onKeyChanged(e) {
         var h = value.length > 2 ? encodeURIComponent(value.substr(2, 1)) : '';
         sendRequest('?c=key&v=' + e.keyCode + '&h=' + h);
     }
-    catch { }
+    catch (e) { }
 };
