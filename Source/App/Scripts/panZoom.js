@@ -1,6 +1,6 @@
 ﻿function enablePanZoom(el, onClickHandler, onViewChangedHandler) {
 
-    var imgSize = { width: el.clientWidth, height: el.clientHeight }; 
+    var imgSize = { width: 0, height: 0 };
 
     // viewport object
     var viewport = {
@@ -251,6 +251,9 @@
         // getting the virtual size of the image if it was stretched to the whole screen
         var s = getViewportSize(el);
 
+        if (!z || !s.height || !s.height)
+            return [];
+
         // relative width of the cutout 0-1 (size of the screen vs. size of the image)
         var w = (s.width / z) / imgSize.width;
         var h = (s.height / z) / imgSize.height
@@ -262,11 +265,11 @@
         // multiplier to ensure correct resolution of numbers
         var r = 100000;
 
-        return new Array(
+        return [
             Math.floor(r * ratioX),
             Math.floor(r * ratioY),
             Math.ceil(r * w),
-            Math.ceil(r * h));
+            Math.ceil(r * h)];
     };
 
 
@@ -345,6 +348,9 @@
 
     // returns the resolution of the viewport depending on the image size
     function getViewportSize(el) {
+
+        if (!imgSize.height)
+            return { width: 0, height: 0 };
 
         var ratio = el.clientWidth / el.clientHeight;
 

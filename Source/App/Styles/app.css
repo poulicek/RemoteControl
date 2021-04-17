@@ -29,15 +29,16 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #0C1F2B
 
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; max-width: 50vw; left: 50%; margin-left: -25vw; }
-.status-error #status-error { visibility: visible; }
-.status-error #status-normal { visibility: hidden; }
-.status-error .reload { visibility: visible; }
+.status#status-error { color: #AD4141; z-index: 9999; }
+.status#status-error * { background: rgba(12, 31, 43, .85); }
+.status#status-error .icon { padding: 12px; border-radius: 20%; }
+.status#status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; width: 100%; box-sizing: border-box; }
+.status#status-error-text:empty { display: none; }
 
-#status-error { color: #AD4141; z-index: 9999; }
-#status-error * { background: rgba(12, 31, 43, .85); }
-#status-error .icon { padding: 12px; border-radius: 20%; }
-#status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; width: 100%; box-sizing: border-box; }
-#status-error-text:empty { display: none; }
+#app-state.status-error #status-error { visibility: visible; }
+#app-state.status-error #status-normal { visibility: hidden; }
+#app-state.status-error .reload { visibility: visible; }
+#app-state.status-error .loading { display: none; }
 
 #keyboard { position: absolute; opacity: 0; }
 
