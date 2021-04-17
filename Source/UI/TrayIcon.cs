@@ -14,7 +14,7 @@ namespace RemoteControl.UI
         private readonly Bitmap tooltipIcon = ResourceHelper.GetResourceImage("Resources.IconDark.png");
         private readonly RequestHandler listener = new RequestHandler();
 
-        public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl")
+        public TrayIcon() : base("Remote Control", "https://github.com/poulicek/RemoteControl", false)
         {
             this.listener.NotificationRaised += this.onNotificationRaised;
             this.listener.ConnectedChanged += this.onConnectedChanged;
