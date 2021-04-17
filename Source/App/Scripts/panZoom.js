@@ -14,6 +14,9 @@
         rangeX: 0,
         rangeY: 0,
 
+        overflowX: 0,
+        overflowY: 0,
+
         cutout: [],
 
         // resets the viewport's position
@@ -50,6 +53,9 @@
 
             this.x = Math.max(-this.maxX, Math.min(this.maxX, x));
             this.y = Math.max(-this.maxY, Math.min(this.maxY, y));
+
+            this.overflowX = Math.sign(x) * Math.max(0, Math.abs(x) - this.maxX);
+            this.overflowY = Math.sign(y) * Math.max(0, Math.abs(y) - this.maxY);
 
             this.cutout = getCutout(this.x, this.y, this.z, this.maxX, this.maxY);
 

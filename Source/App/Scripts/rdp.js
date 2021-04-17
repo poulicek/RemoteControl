@@ -80,12 +80,18 @@
     };
 
 
+    // performs scrolling
+    function onScroll(overflowX, overflowY) {
+        sendRequest(getUrl(el.href, '&x=' + overflowX + "&y=" + overflowY + "&b=2"));
+    };
+
+
     // onviewchanged handler definition
     function onViewPortChanged(vp) {
+
         cutout = vp.cutout.join();
 
         var className = '';
-
         if (vp.z == 1)
             className = '';
         else if (vp.x == -vp.maxX && vp.y == -vp.maxY)
@@ -99,6 +105,9 @@
 
         if (el.parentNode.className != className)
             el.parentNode.className = className;
+
+        if (vp.overflowX || vp.overflowY)
+            onScroll(vp.overflowX / vp.rangeX, vp.overflowY / vp.rangeY);
     };
 
 

@@ -74,11 +74,20 @@ namespace RemoteControl.Controllers
 
 
         /// <summary>
+        /// Returns the scale of the screen
+        /// </summary>
+        private float getScreenScale(Size screenSize)
+        {
+            return (float)screenSize.Width / Screen.PrimaryScreen.Bounds.Width;
+        }
+
+
+        /// <summary>
         /// Projects the cutout of the screen considering the scale
         /// </summary>
         private Bitmap projectCoutout(Bitmap screenImg, Size screenSize, Rectangle cutoutRect, bool highQuality)
         {
-            var scale = (float)screenSize.Width / Screen.PrimaryScreen.Bounds.Width;
+            var scale = this.getScreenScale(screenSize);
             if (scale <= 1)
                 return screenImg;
 
@@ -133,13 +142,15 @@ namespace RemoteControl.Controllers
         private void perfromMouseClick(float xRatio, float yRatio, int btn)
         {
             var s = ScreenHelper.GetScaledScreenSize();
-
-            var scale = (float)s.Width / Screen.PrimaryScreen.Bounds.Width;
+            var scale = this.getScreenScale(s);
 
             var x = (int)(xRatio * s.Width / scale);
             var y = (int)(yRatio * s.Height / scale);
 
-            InputHelper.MouseClick(x, y, (InputHelper.MouseButton)btn);
+            if (btn == (int)InputHelper.MouseButton.Middle)
+                InputHelper.MouseScroll(x, y);
+            else
+                InputHelper.MouseClick(x, y, (InputHelper.MouseButton)btn);
         }
 
 
