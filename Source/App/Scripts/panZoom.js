@@ -397,7 +397,15 @@
         el.style.transform = viewport.getTransformation();
     };
 
+
+    // resets the view
+    function resetView() {
+        viewport.resetPosition();
+        update(el);
+    };
+
     // EXECUTION
 
+    el.resetView = resetView;
     eventHandlers.bind(el);
 };

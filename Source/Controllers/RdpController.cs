@@ -58,7 +58,7 @@ namespace RemoteControl.Controllers
             // setting the cursor position to cutout's center
             if (lastCursor != center)
             {
-                InputHelper.SetCursorPosition(center.X, center.Y);
+                //InputHelper.SetCursorPosition(center.X, center.Y);
                 lastCursor = center;
             }
 

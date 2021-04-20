@@ -103,12 +103,10 @@
         cutout = vp.cutout.join();
 
         var className = isPanning ? 'panning' : '';
-        if (vp.z == 1)
-            className += '';
+        if (vp.z == 1 || vp.x == -vp.maxX && vp.y == vp.maxY)
+            className += ' topright';
         else if (vp.x == -vp.maxX && vp.y == -vp.maxY)
             className += ' bottomright';
-        else if (vp.x == -vp.maxX && vp.y == vp.maxY)
-            className += ' topright';
         else if (vp.x == vp.maxX && vp.y == -vp.maxY)
             className += ' bottomleft';
         else if (vp.x == vp.maxX && vp.y == vp.maxY)
