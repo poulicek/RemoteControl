@@ -123,7 +123,7 @@
             eventHandlers.touchMoved = touch.touchesCount > 1;
 
             if (touch.touchesCount == 1) {
-                setTimeout(function () { eventHandlers.onLongTouch(touch); }, 800);
+                setTimeout(function () { eventHandlers.onLongTouch(touch); }, 400);
             }
         },
 
@@ -217,7 +217,7 @@
 
             var coords = getRelativeCoords(e.clientX, e.clientY);
             if (coords)
-                onClickHandler(e, coords.x, coords.y, e.which);
+                onClickHandler(e, coords.x, coords.y, viewport.z, e.which);
         },
 
         onWheel: function (e) {
@@ -404,8 +404,15 @@
         update(el);
     };
 
+
+    // zooms in
+    function zoomIn(e, z) {
+        viewport.zoom(z, getOffset(e));
+    };
+
     // EXECUTION
 
     el.resetView = resetView;
+    el.zoomIn = zoomIn;
     eventHandlers.bind(el);
 };

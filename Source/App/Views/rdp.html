@@ -2,6 +2,7 @@
     #view-rdp { width: 100%; height: 100%; }
     #view-rdp > a { cursor: default; background: #0C1F2B; }
     #view-rdp #canvas { width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; z-index: 999; opacity: 0; background: #0C1F2B; }
+    #view-rdp #canvas.zooming { transition: transform .3s; }
 
     #view-rdp #click-spot { visibility: hidden; display: block; position: absolute; border-radius: 50%; background: #6D93AE; border: 1px solid #0C1F2B; z-index: 999; transform: translate(-50%, -50%); pointer-events: none; }
     #view-rdp #click-spot.animate { transition: opacity .5s, width .5s, height .5s; }
@@ -40,7 +41,7 @@
 
     <div id="controls" class="grid">
         <a class="button icon small dimmed dark" href="#menu">&#xe5c3;</a>
-        <a class="button icon small dimmed dark" href="javascript:document.getElementById('canvas').resetView();" rel="js">&#xea10;</a>
+        <a class="button icon small dimmed dark" href="javascript:document.getElementById('canvas').zoomOut();" rel="js">&#xea10;</a>
         <a class="button icon small dimmed dark" href="#gamepad">&#xe338;</a>
         <a class="button icon small dimmed dark" href="javascript:focusKeyboard();" rel="js">&#xe312;</a>
         <div id="crosshair" class="button outline"></div>

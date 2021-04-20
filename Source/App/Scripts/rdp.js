@@ -40,7 +40,9 @@
             window.addEventListener('resize', onResize);
             img.addEventListener('load', onLoad);
             img.addEventListener('error', onError);
+            img.addEventListener('transitionend', onTransitionEnd);
             img.bound = true;
+            img.zoomOut = zoomOut;
         }
 
         reloadImage();
@@ -75,19 +77,30 @@
     };
 
 
+    // handles transition end event
+    function onTransitionEnd(e) {
+        img.classList.remove('zooming');
+    };
+
+
     // onclick handler definition
-    function onClick(e, x, y, b) {
+    function onClick(e, x, y, z, b) {
         var time = new Date().getTime();
         if (time - lastClick.time < 500 && lastClick.b == b) {
             x = lastClick.x;
             y = lastClick.y;
         }
 
-        if (isLandScape())
-            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '')));
+        if (isLandScape()) {
 
-        reloadImage();
-        showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
+            if (b == 3 && z == 1)
+                zoomIn(e);
+            else {
+                sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '')));
+                reloadImage();
+                showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
+            }
+        }
 
         lastClick = { x: x, y: y, b: b, time: time };
     };
@@ -105,7 +118,7 @@
     function onViewPortChanged(vp, isPanning) {
 
         cutout = vp.cutout.join();
-        cursorOn = INSTALLED && isPanning;
+        cursorOn = false; // INSTALLED && isPanning;
 
         var className = isPanning ? 'panning' : '';
 
@@ -124,13 +137,20 @@
         if (el.parentNode.className != className)
             el.parentNode.className = className;
 
+        tryScroll(vp, isPanning);
+    };
+
+
+    // tries to perform scrolling depending on viewport parameters
+    function tryScroll(vp, isPanning) {
+
         // recording the allowed scrolling direction when the panning stops
         // this is to avoid unexpected scrolling (still may happen during zooming)
         if (!isPanning) {
             scrollDir.x = vp.maxX == Math.abs(vp.x) ? Math.sign(vp.x) : NaN;
             scrollDir.y = vp.maxY == Math.abs(vp.y) ? Math.sign(vp.y) : NaN;
         }
-        
+
         if (vp.overflowX || vp.overflowY) {
 
             // detecting the scrolling distance if the overflow matches the alled scrolling position
@@ -177,6 +197,20 @@
         void el.offsetWidth;
         el.classList.add('animate');
         el.classList.add(secondary ? 'fadeOutBig' : 'fadeOutSmall');
+    };
+
+
+    // zooms in the canvas
+    function zoomIn(e) {
+        img.classList.add('zooming');
+        img.zoomIn(e, 5);
+    };
+
+
+    // zooms in the canvas
+    function zoomOut(e) {
+        img.classList.add('zooming');
+        img.resetView();
     };
 
     // binding the actions
