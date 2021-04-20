@@ -4,6 +4,7 @@
     var img = null;
     var session = 0;
     var isEmpty = true;
+    var scrollDir = { x: 0, y: 0 };
     var lastClick = { x: 0, y: 0, b: 0, time: 0 };
 
     // binds the actions
@@ -115,8 +116,22 @@
         if (el.parentNode.className != className)
             el.parentNode.className = className;
 
-        if (vp.overflowX || vp.overflowY) 
-            onScroll(vp.overflowX / vp.rangeX, vp.overflowY / vp.rangeY);
+        // recording the allowed scrolling direction when the panning stops
+        // this is to avoid unexpected scrolling (still may happen during zooming)
+        if (!isPanning) {
+            scrollDir.x = vp.maxX == Math.abs(vp.x) ? Math.sign(vp.x) : NaN;
+            scrollDir.y = vp.maxY == Math.abs(vp.y) ? Math.sign(vp.y) : NaN;
+        }
+        
+        if (vp.overflowX || vp.overflowY) {
+
+            // detecting the scrolling distance if the overflow matches the alled scrolling position
+            var scrollX = scrollDir.x == 0 || Math.sign(vp.overflowX) == scrollDir.x ? vp.overflowX / vp.rangeX : 0;
+            var scrollY = scrollDir.y == 0 || Math.sign(vp.overflowY) == scrollDir.y ? vp.overflowY / vp.rangeY : 0;
+
+            if (scrollX || scrollY)
+                onScroll(scrollX, scrollY);
+        }
     };
 
 

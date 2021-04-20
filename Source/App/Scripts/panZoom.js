@@ -8,6 +8,9 @@
         y: 0,
         z: 1,
 
+        rawX: -1,
+        rawY: -1,
+
         maxX: 0,
         maxY: 0,
 
@@ -21,6 +24,8 @@
 
         // resets the viewport's position
         resetPosition: function () {
+            this.rawX = -1;
+            this.rawY = -1;
             this.z = 1;
             this.setPosition(0, 0);
         },
@@ -47,6 +52,12 @@
 
         // set the given position
         setPosition: function (x, y) {
+
+            if (this.rawX == x && this.rawY == y)
+                return;
+
+            this.rawX = x;
+            this.rawY = y;
 
             this.maxX = Math.max(0, Math.floor(this.z * this.rangeX - window.innerWidth / 2));
             this.maxY = Math.max(0, Math.floor(this.z * this.rangeY - window.innerHeight / 2));
