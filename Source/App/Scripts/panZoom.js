@@ -59,8 +59,7 @@
 
             this.cutout = getCutout(this.x, this.y, this.z, this.maxX, this.maxY);
 
-            if (onViewChangedHandler)
-                onViewChangedHandler(this);
+            this.report(true);
         },
 
         // sets the translation by given offset
@@ -71,6 +70,12 @@
         // returns the css transformation value
         getTransformation: function () {
             return 'matrix(' + this.z + ', 0, 0, ' + this.z + ', ' + this.x + ', ' + this.y + ')';
+        },
+
+        // propagates the current state of the viewpoirt
+        report: function (panning) {
+            if (onViewChangedHandler)
+                onViewChangedHandler(this, panning);
         }
     };
 
@@ -123,6 +128,8 @@
 
         onTouchEnd: function () {
 
+            viewport.report(false);
+
             if (!eventHandlers.touchMoved)
                 eventHandlers.onClick(eventHandlers.firstTouch);
 
@@ -145,7 +152,6 @@
                         eventHandlers.touchMoved = true;
                 }
                 else {
-
                     // panning and zooming
                     // on iOS it can be handled by gestureMove event providing scale directly but it doesn't support Android
                     if (touch.dist && eventHandlers.firstTouch.dist)

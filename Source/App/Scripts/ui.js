@@ -135,8 +135,8 @@ function bindGripEvents(el) {
 // switches the scan mode
 function switchScanMode(el) {
     SCAN_MODE = !SCAN_MODE;
-    setClass(el, 'active', SCAN_MODE);
-    setClass(el, 'selected', SCAN_MODE);
+    el.classList.toggle('active', SCAN_MODE);
+    el.classList.toggle('selected', SCAN_MODE);
     return false;
 };
 
@@ -222,7 +222,7 @@ function keepPressing(el, applyDelay) {
 
 // initializes the button press
 function initPress(e) {
-    setClass(e.currentTarget, 'active', true);
+    e.currentTarget.classList.toggle('active', true);
     e.currentTarget.pressedEvent = e;
     return false;
 };
@@ -230,7 +230,7 @@ function initPress(e) {
 
 // cancels the button press
 function cancelPress(e) {
-    setClass(e.currentTarget, 'active', false);
+    e.currentTarget.classList.toggle('active', false);
     e.currentTarget.pressedEvent = null;
     return false;
 };
@@ -271,15 +271,6 @@ function isTouched(e) {
 
     var el = document.elementFromPoint(touch.pageX, touch.pageY);
     return e.currentTarget == el || e.currentTarget.contains(el);
-};
-
-
-// sets the class to the given element
-function setClass(el, className, set) {
-    if (set)
-        el.classList.add(className);
-    else
-        el.classList.remove(className);
 };
 
 

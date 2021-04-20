@@ -74,7 +74,7 @@
 
     // onclick handler definition
     function onClick(e, x, y, b) {
-        sendRequest(getUrl(el.href, '&x=' + x + "&y=" + y + "&b=" + (b ? b : '')));
+        sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '')));
         reloadImage();
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
     };
@@ -82,31 +82,31 @@
 
     // performs scrolling
     function onScroll(overflowX, overflowY) {
-        sendRequest(getUrl(el.href, '&x=' + overflowX + "&y=" + overflowY + "&b=2"));
+        sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + "&b=2"));
     };
 
 
     // onviewchanged handler definition
-    function onViewPortChanged(vp) {
+    function onViewPortChanged(vp, isPanning) {
 
         cutout = vp.cutout.join();
 
-        var className = '';
+        var className = isPanning ? 'panning' : '';
         if (vp.z == 1)
-            className = '';
+            className += '';
         else if (vp.x == -vp.maxX && vp.y == -vp.maxY)
-            className = 'bottomright';
+            className += ' bottomright';
         else if (vp.x == -vp.maxX && vp.y == vp.maxY)
-            className = 'topright';
+            className += ' topright';
         else if (vp.x == vp.maxX && vp.y == -vp.maxY)
-            className = 'bottomleft';
+            className += ' bottomleft';
         else if (vp.x == vp.maxX && vp.y == vp.maxY)
-            className = 'topleft';
+            className += ' topleft';
 
         if (el.parentNode.className != className)
             el.parentNode.className = className;
 
-        if (vp.overflowX || vp.overflowY)
+        if (vp.overflowX || vp.overflowY) 
             onScroll(vp.overflowX / vp.rangeX, vp.overflowY / vp.rangeY);
     };
 

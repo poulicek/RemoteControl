@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 using RemoteControl.Server;
@@ -14,6 +13,7 @@ namespace RemoteControl.Controllers
         public event Action SessionChanged;
 
         private const float r = 100000; // relative values resolution
+        private Point lastCursor;
         private string lastSession = string.Empty;
 
 
@@ -23,23 +23,15 @@ namespace RemoteControl.Controllers
             {
                 case "screen":
                     {
-                        var session = context.Request.Query["s"] ?? string.Empty;
-                        if (session != this.lastSession)
-                        {
-                            this.SessionChanged?.Invoke();
-                            this.lastSession = session;
-                        }
-
-                        var cutout = context.Request.Query["w"]?.Split(',');
-                        var data = this.getScreenShot(this.readRelativeCutout(cutout), out var codec);
+                        var data = this.handleScreenRequest(context.Request.Query["s"] ?? string.Empty, context.Request.Query["w"]?.Split(','), out var codec);
                         context.Response.Write(data, codec.MimeType);
                         break;
                     }
 
                 case "click":
                     {
-                        if (float.TryParse(context.Request.Query["x"], NumberStyles.Any, CultureInfo.InvariantCulture, out var xRatio) && float.TryParse(context.Request.Query["y"], NumberStyles.Any, CultureInfo.InvariantCulture, out var yRatio))
-                            this.perfromMouseClick(xRatio, yRatio, int.TryParse(context.Request.Query["b"], out var btn) ? btn : 1);
+                        if (int.TryParse(context.Request.Query["x"], out var xRatio) && int.TryParse(context.Request.Query["y"], out var yRatio))
+                            this.perfromMouseClick(xRatio / r, yRatio / r, int.TryParse(context.Request.Query["b"], out var btn) ? btn : 1);
                         break;
                     }
             }
@@ -47,29 +39,65 @@ namespace RemoteControl.Controllers
 
 
         /// <summary>
-        /// Returns a screenshot
+        /// Handles the screenshot request
         /// </summary>
-        private byte[] getScreenShot(RectangleF cutout, out ImageCodecInfo codec)
+        private byte[] handleScreenRequest(string session, string[] cutout, out ImageCodecInfo codec)
         {
-            const float inflation = 0.3f;
+            // detection of new session so the user can be notified
+            if (session != this.lastSession)
+            {
+                this.SessionChanged?.Invoke();
+                this.lastSession = session;
+            }
 
+            // projecting the cutout to the screen
             var screenSize = ScreenHelper.GetScaledScreenSize();
-            var cutoutRect = this.projectCutout(cutout, screenSize);
+            var cutoutRect = this.projectCutout(this.readRelativeCutout(cutout), screenSize);
+            var center = this.projectPoint(cutoutRect.X + cutoutRect.Width / 2, cutoutRect.Y + cutoutRect.Height / 2, screenSize);
+
+            // setting the cursor position to cutout's center
+            if (lastCursor != center)
+            {
+                InputHelper.SetCursorPosition(center.X, center.Y);
+                lastCursor = center;
+            }
+
+            // inflating the cutout so the panning is more smooth
+            const float inflation = 0.3f;
             cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
 
+            return this.getScreenShot(cutoutRect, screenSize, out codec);
+        }
+
+
+        /// <summary>
+        /// Returns a screenshot
+        /// </summary>
+        private byte[] getScreenShot(Rectangle cutout, Size screenSize, out ImageCodecInfo codec)
+        {
             // setting the PNG format for smaller sizes
-            var format = 2 * cutoutRect.Width * cutoutRect.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
+            var format = 2 * cutout.Width * cutout.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
 
             using (var screenImg = new Bitmap(screenSize.Width, screenSize.Height))
             using (var screenG = Graphics.FromImage(screenImg))
             using (var ms = new MemoryStream())
             {
-                screenG.CopyFromScreen(cutoutRect.X, cutoutRect.Y, cutoutRect.X, cutoutRect.Y, cutoutRect.Size);
-                using (var canvasImg = this.projectCoutout(screenImg, screenSize, cutoutRect, format == ImageFormat.Png))
+                screenG.CopyFromScreen(cutout.X, cutout.Y, cutout.X, cutout.Y, cutout.Size);
+                using (var canvasImg = this.projectCoutout(screenImg, screenSize, cutout, format == ImageFormat.Png))
                     canvasImg.Save(ms, codec = this.getEncoder(format), this.getQualityParams(25));
 
                 return ms.ToArray();
             }
+        }
+
+
+        /// <summary>
+        /// Projects the point to screen coordinates
+        /// </summary>
+        private Point projectPoint(float x, float y, Size screenSize)
+        {
+            var scale = this.getScreenScale(screenSize);
+            return new Point((int)(x / scale), (int)(y / scale));
         }
 
 
@@ -142,15 +170,12 @@ namespace RemoteControl.Controllers
         private void perfromMouseClick(float xRatio, float yRatio, int btn)
         {
             var s = ScreenHelper.GetScaledScreenSize();
-            var scale = this.getScreenScale(s);
-
-            var x = (int)(xRatio * s.Width / scale);
-            var y = (int)(yRatio * s.Height / scale);
+            var pt = this.projectPoint(xRatio * s.Width, yRatio * s.Height, s);;
 
             if (btn == (int)InputHelper.MouseButton.Middle)
-                InputHelper.MouseScroll(x, y);
+                InputHelper.MouseScroll(pt.X, pt.Y);
             else
-                InputHelper.MouseClick(x, y, (InputHelper.MouseButton)btn);
+                InputHelper.MouseClick(pt.X, pt.Y, (InputHelper.MouseButton)btn);
         }
 
 
