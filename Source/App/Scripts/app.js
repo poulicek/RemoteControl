@@ -4,6 +4,7 @@ var DEFAULT_VIEW = 'main';
 var CURRENT_VIEW = '';
 var DEBUG_MODE = false;
 var DEFAULT_HEIGHT = 0;
+var LANDSCAPE_EL = null;
 
 window.onload = onLoad;
 window.onhashchange = onHashChange;
@@ -15,6 +16,7 @@ function onLoad() {
 
     if (window.innerHeight > window.innerWidth)
         DEFAULT_HEIGHT = document.body.offsetHeight;
+    LANDSCAPE_EL = document.getElementById('landscape');
 
     preventDoubleTap();
     bindEvents();
@@ -142,4 +144,10 @@ function copyText(str) {
 // generates a session id
 function getSessionId() {
     return new Date().getTime().toString(32);
+};
+
+
+// returns true if the device is in landscape mode
+function isLandScape() {
+    return LANDSCAPE_EL && window.getComputedStyle(LANDSCAPE_EL).visibility == 'visible';
 };

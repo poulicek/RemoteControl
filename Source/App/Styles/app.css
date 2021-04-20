@@ -14,6 +14,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #002332
 .grid { display: grid; box-sizing: border-box; width: 100%; height: 100%; align-items: center; padding: 5vmin; }
 .hidden { display: none !important; }
 .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #6D93AE; font-size: 200%; font-weight: normal; }
+.dark { background: #002332d9; }
 
 .button { display: grid; min-width: .6in; min-height: .6in; padding: 5px; border-radius: 10px; margin: 5px; align-items: center; }
 .button { color: #dc9600; text-decoration: none; justify-content: center; }
@@ -30,7 +31,6 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #002332
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; max-width: 50vw; left: 50%; margin-left: -25vw; }
 .status#status-error { color: #AD4141; z-index: 9999; }
-.status#status-error * { background: rgba(12, 31, 43, .85); }
 .status#status-error .icon { padding: 12px; border-radius: 20%; }
 .status#status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; width: 100%; box-sizing: border-box; }
 .status#status-error-text:empty { display: none; }
@@ -41,6 +41,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #002332
 #app-state.status-error .loading { display: none; }
 
 #keyboard { position: absolute; opacity: 0; }
+#landscape { position: absolute; display: none; visibility: hidden; }
 
 @supports (-webkit-touch-callout: none) {
     @media (orientation: portrait) {
@@ -48,4 +49,6 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #002332
     }
 }
 
-
+@media screen and (min-width: 480px) and (orientation: landscape) {
+    #landscape { visibility: visible; }
+}

@@ -93,6 +93,7 @@
     // performs scrolling
     function onScroll(overflowX, overflowY) {
         sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + "&b=2"));
+        reloadImage();
     };
 
 
@@ -141,7 +142,7 @@
         if (!img)
             return;
 
-        if (window.getComputedStyle(img).visibility == 'visible') {
+        if (isLandScape()) {
 
             if (isEmpty) {
                 isEmpty = false;

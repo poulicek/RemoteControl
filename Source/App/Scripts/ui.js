@@ -1,4 +1,4 @@
-﻿var SCAN_MODE = 1;
+﻿var SCAN_MODE = 0;
 var ERROR_ID = 0;
 
 // binds the events on links
@@ -144,7 +144,7 @@ function switchScanMode(el) {
 // constructs the url
 function getUrl(url, params) {
     if (url.includes('&a='))
-        url = url.replace('&a=', '&a=' + (SCAN_MODE ? 1 : 0));
+        url = url.replace('&a=', '&a=' + (SCAN_MODE && isLandScape() ? 1 : 0));
     return url + (params ? params : '');
 };
 
