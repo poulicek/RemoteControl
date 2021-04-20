@@ -4,6 +4,7 @@
     var img = null;
     var session = 0;
     var isEmpty = true;
+    var lastClick = { x: 0, y: 0, b: 0, time: 0 };
 
     // binds the actions
     function bindActions() {
@@ -74,9 +75,17 @@
 
     // onclick handler definition
     function onClick(e, x, y, b) {
+        var time = new Date().getTime();
+        if (time - lastClick.time < 500 && lastClick.b == b) {
+            x = lastClick.x;
+            y = lastClick.y;
+        }
+
         sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '')));
         reloadImage();
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
+
+        lastClick = { x: x, y: y, b: b, time: time };
     };
 
 
