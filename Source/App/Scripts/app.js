@@ -5,6 +5,7 @@ var CURRENT_VIEW = '';
 var DEBUG_MODE = false;
 var DEFAULT_HEIGHT = 0;
 var LANDSCAPE_EL = null;
+var INSTALLED = isAppInstalled();
 
 window.onload = onLoad;
 window.onhashchange = onHashChange;
@@ -150,4 +151,10 @@ function getSessionId() {
 // returns true if the device is in landscape mode
 function isLandScape() {
     return LANDSCAPE_EL && window.getComputedStyle(LANDSCAPE_EL).visibility == 'visible';
+};
+
+
+// returns true if the app is installed as a PWA
+function isAppInstalled() {
+    return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
 };

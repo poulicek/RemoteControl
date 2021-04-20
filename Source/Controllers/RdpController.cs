@@ -23,7 +23,11 @@ namespace RemoteControl.Controllers
             {
                 case "screen":
                     {
-                        var data = this.handleScreenRequest(context.Request.Query["s"] ?? string.Empty, context.Request.Query["w"]?.Split(','), out var codec);
+                        var session = context.Request.Query["s"] ?? string.Empty;
+                        var cutout = context.Request.Query["w"]?.Split(',');
+                        var setCursor = int.TryParse(context.Request.Query["u"], out var u) && u == 1;
+
+                        var data = this.handleScreenRequest(session, cutout, setCursor, out var codec);
                         context.Response.Write(data, codec.MimeType);
                         break;
                     }
@@ -41,7 +45,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Handles the screenshot request
         /// </summary>
-        private byte[] handleScreenRequest(string session, string[] cutout, out ImageCodecInfo codec)
+        private byte[] handleScreenRequest(string session, string[] cutout, bool setCursor, out ImageCodecInfo codec)
         {
             // detection of new session so the user can be notified
             if (session != this.lastSession)
@@ -56,9 +60,9 @@ namespace RemoteControl.Controllers
             var center = this.projectPoint(cutoutRect.X + cutoutRect.Width / 2, cutoutRect.Y + cutoutRect.Height / 2, screenSize);
 
             // setting the cursor position to cutout's center
-            if (lastCursor != center)
+            if (setCursor && lastCursor != center)
             {
-                //InputHelper.SetCursorPosition(center.X, center.Y);
+                InputHelper.SetCursorPosition(center.X, center.Y);
                 lastCursor = center;
             }
 

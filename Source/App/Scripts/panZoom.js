@@ -27,7 +27,7 @@
             this.rawX = -1;
             this.rawY = -1;
             this.z = 1;
-            this.setPosition(0, 0);
+            this.setPosition(0, 0, false);
         },
 
         // sets the given zoom
@@ -47,11 +47,11 @@
             var shiftX = Math.round(this.x * ratio - offset.x * (ratio - 1));
             var shiftY = Math.round(this.y * ratio - offset.y * (ratio - 1));
 
-            this.setPosition(shiftX, shiftY);
+            this.setPosition(shiftX, shiftY, true);
         },
 
         // set the given position
-        setPosition: function (x, y) {
+        setPosition: function (x, y, panning) {
 
             if (this.rawX == x && this.rawY == y)
                 return;
@@ -70,12 +70,12 @@
 
             this.cutout = getCutout(this.x, this.y, this.z, this.maxX, this.maxY);
 
-            this.report(true);
+            this.report(panning);
         },
 
         // sets the translation by given offset
         pan: function (offsetX, offsetY) {
-            this.setPosition(this.x + offsetX, this.y + offsetY);
+            this.setPosition(this.x + offsetX, this.y + offsetY, true);
         },
 
         // returns the css transformation value
@@ -85,7 +85,7 @@
 
         // propagates the current state of the viewpoirt
         report: function (panning) {
-            if (onViewChangedHandler)
+            if (onViewChangedHandler && isLandScape())
                 onViewChangedHandler(this, panning);
         }
     };
@@ -303,7 +303,7 @@
         viewport.rangeX = Math.floor(size.width / 2);
         viewport.rangeY = Math.floor(size.height / 2);
 
-        viewport.setPosition(viewport.x, viewport.y);
+        viewport.setPosition(viewport.x, viewport.y, false);
     };
 
 

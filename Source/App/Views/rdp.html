@@ -20,6 +20,10 @@
     #view-rdp #controls .button:nth-child(3) { justify-self: left; align-self: end; grid-row: 2; }
     #view-rdp #controls .button:nth-child(4) { justify-self: right; align-self: end; grid-row: 2; }
 
+    #view-rdp #controls #crosshair { position: absolute;  visibility: hidden; z-index: 999; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+    #view-rdp #controls #crosshair.button { width: .05in; height: .05in; min-width: 0px; min-height: 0px; border-radius: 50%; }
+    #view-rdp.cursor #controls #crosshair { visibility: visible; }
+
     #view-rdp.topleft #controls .button:nth-child(1) { visibility: hidden; }
     #view-rdp.topright #controls .button:nth-child(2) { visibility: hidden;}
     #view-rdp.bottomleft #controls .button:nth-child(3) { visibility: hidden; }
@@ -39,5 +43,6 @@
         <a class="button icon small dimmed dark" href="javascript:document.getElementById('canvas').resetView();" rel="js">&#xea10;</a>
         <a class="button icon small dimmed dark" href="#gamepad">&#xe338;</a>
         <a class="button icon small dimmed dark" href="javascript:focusKeyboard();" rel="js">&#xe312;</a>
+        <div id="crosshair" class="button outline"></div>
     </div>
 </div>

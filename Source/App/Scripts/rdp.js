@@ -6,6 +6,7 @@
     var isEmpty = true;
     var scrollDir = { x: 0, y: 0 };
     var lastClick = { x: 0, y: 0, b: 0, time: 0 };
+    var cursorOn = false;
 
     // binds the actions
     function bindActions() {
@@ -82,7 +83,9 @@
             y = lastClick.y;
         }
 
-        sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '')));
+        if (isLandScape())
+            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '')));
+
         reloadImage();
         showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
 
@@ -92,7 +95,8 @@
 
     // performs scrolling
     function onScroll(overflowX, overflowY) {
-        sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + "&b=2"));
+        if (isLandScape())
+            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + "&b=2"));
         reloadImage();
     };
 
@@ -101,8 +105,13 @@
     function onViewPortChanged(vp, isPanning) {
 
         cutout = vp.cutout.join();
+        cursorOn = INSTALLED && isPanning;
 
         var className = isPanning ? 'panning' : '';
+
+        if (cursorOn)
+            className += ' cursor';
+
         if (vp.z == 1 || vp.x == -vp.maxX && vp.y == vp.maxY)
             className += ' topright';
         else if (vp.x == -vp.maxX && vp.y == -vp.maxY)
@@ -147,7 +156,7 @@
                 session = getSessionId();
             }
 
-            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session;
+            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&u=' + (cursorOn ? 1 : 0);
         }
         else if (!isEmpty) {
             isEmpty = true;
