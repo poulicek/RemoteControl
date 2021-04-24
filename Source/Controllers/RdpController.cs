@@ -41,7 +41,9 @@ namespace RemoteControl.Controllers
 
                         if (int.TryParse(context.Request.Query["x"], out var xRatio) && int.TryParse(context.Request.Query["y"], out var yRatio))
                         {
-                            if (btn != (int)InputHelper.MouseButton.Middle)
+                            if (btn == 0)
+                                this.perfromMouseMove(screen, xRatio / r, yRatio / r);
+                            else if (btn != (int)InputHelper.MouseButton.Middle)
                                 this.perfromMouseClick(screen, xRatio / r, yRatio / r, btn);
                             else if (int.TryParse(context.Request.Query["mx"], out var mxRatio) && int.TryParse(context.Request.Query["my"], out var myRatio))
                                 this.perfromWheelScroll(screen, xRatio / r, yRatio / r, mxRatio / r, myRatio / r);
@@ -160,6 +162,16 @@ namespace RemoteControl.Controllers
 
 
         /// <summary>
+        /// Performs a mouse move on the provided location
+        /// </summary>
+        private void perfromMouseMove(ScreenModel screen, float xRatio, float yRatio)
+        {
+            var pt = screen.Project(new Point((int)(screen.X + xRatio * screen.Width), (int)(screen.Y + yRatio * screen.Height)));
+            this.updateCursor(pt);
+        }
+
+
+        /// <summary>
         /// Performs a mouse click on the provided location
         /// </summary>
         private void perfromMouseClick(ScreenModel screen, float xRatio, float yRatio, int btn)
@@ -174,9 +186,7 @@ namespace RemoteControl.Controllers
         /// </summary>
         private void perfromWheelScroll(ScreenModel screen, float xRatio, float yRatio, float mxRatio, float myRatio)
         {
-            var pt = screen.Project(new Point((int)(screen.X + mxRatio * screen.Width), (int)(screen.Y + myRatio * screen.Height)));
-            this.updateCursor(pt);
-
+            this.perfromMouseMove(screen, mxRatio, myRatio);
             var scroll = screen.Project(new Point((int)(xRatio * screen.Width), (int)(yRatio * screen.Height)));
             InputHelper.MouseScroll(scroll.X, scroll.Y);
         }

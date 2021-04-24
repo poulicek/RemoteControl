@@ -7,6 +7,7 @@
     var isEmpty = true;
     var scrollDir = { x: 0, y: 0 };
     var lastClick = { x: 0, y: 0, b: 0, time: 0 };
+    var lastCoords = { x: 0, y: 0 };
     var cursorOn = false;
 
     // binds the actions
@@ -116,6 +117,12 @@
     };
 
 
+    // moves the mose to the given position
+    function onMouseMove(x, y) {
+        sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=0" + '&e=' + screen));
+    };
+
+
     // onviewchanged handler definition
     function onViewPortChanged(vp, isPanning) {
 
@@ -143,6 +150,11 @@
             el.parentNode.className = className;
 
         tryScroll(vp, isPanning);
+
+        if (vp.coords && (lastCoords.x != vp.coords.x || lastCoords.y != vp.coords.y)) {
+            onMouseMove(vp.coords.x, vp.coords.y);
+            lastCoords = vp.coords;
+        }
     };
 
 

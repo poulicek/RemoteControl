@@ -161,6 +161,7 @@
                 if (!eventHandlers.lastTouch || touch.id != eventHandlers.lastTouch.id) {
                     eventHandlers.lastZoom = viewport.z;
                     eventHandlers.firstTouch = touch;
+                    viewport.coords = getRelativeCoords(touch.clientX, touch.clientY);
 
                     // consider the scene moved if multiple touches are detected
                     if (touch.touchesCount > 1)
