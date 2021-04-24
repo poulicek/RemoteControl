@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Windows.Forms;
 using RemoteControl.Server;
 using static TrayToolkit.Helpers.ResourceHelper;
 
@@ -47,6 +48,7 @@ namespace RemoteControl.Controllers
                     {
                         { "{View-Portrait}", this.getResource("media").ReadString() },
                         { "{View-Landscape}", this.getResource("rdp").ReadString() },
+                        { "{Multi-Screen-Style}", Screen.AllScreens.Length > 1 ? "multi-screen" : null },
                     }));
                     break;
 
@@ -55,7 +57,7 @@ namespace RemoteControl.Controllers
                     {
                         { "{Link}", this.serverUrlCallback?.Invoke() },
                     }));
-                    break;
+                    break;               
 
                 default:
                     context.Response.Write(s);

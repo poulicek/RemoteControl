@@ -1,5 +1,5 @@
 ﻿<style>
-    #view-rdp { width: 100%; height: 100%; }
+    #view-rdp { width: 100%; height: 100%; visibility: hidden; }
     #view-rdp > a { cursor: default; background: #0C1F2B; }
     #view-rdp #canvas { width: 100%; height: 100%; object-fit: contain; position: absolute; top: 0; left: 0; z-index: 999; opacity: 0; background: #0C1F2B; }
     #view-rdp #canvas.zooming { transition: transform .3s; }
@@ -13,23 +13,33 @@
     #view-rdp .loaded #canvas { opacity: 1; }
     #view-rdp .loaded .loading { display: none; }
 
-    #view-rdp #controls.grid { grid-template-columns: 1fr 1fr; padding: 2vmin; }
-    #view-rdp #controls .button { position: relative; z-index: 999; }
-    #view-rdp #controls .button.dark.active { background: #4D6570; }
-    #view-rdp #controls .button:nth-child(1) { justify-self: left; align-self: start; }
-    #view-rdp #controls .button:nth-child(2) { justify-self: right; align-self: start; }
-    #view-rdp #controls .button:nth-child(3) { justify-self: left; align-self: end; grid-row: 2; }
-    #view-rdp #controls .button:nth-child(4) { justify-self: right; align-self: end; grid-row: 2; }
-
-    #view-rdp #controls #crosshair { position: absolute;  visibility: hidden; z-index: 999; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+    #view-rdp #controls #crosshair { position: absolute; visibility: hidden; z-index: 999; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
     #view-rdp #controls #crosshair.button { width: .05in; height: .05in; min-width: 0px; min-height: 0px; border-radius: 50%; }
     #view-rdp.cursor #controls #crosshair { visibility: visible; }
 
-    #view-rdp.topleft #controls .button:nth-child(1) { visibility: hidden; }
-    #view-rdp.topright #controls .button:nth-child(2) { visibility: hidden;}
-    #view-rdp.bottomleft #controls .button:nth-child(3) { visibility: hidden; }
-    #view-rdp.bottomright #controls .button:nth-child(4) { visibility: hidden; }
-    
+    #view-rdp #controls.grid { grid-template-columns: 1fr 1fr; padding: 2vmin; }
+    #view-rdp #controls .button { position: relative; z-index: 999; }
+    #view-rdp #controls .button.dark.active { background: #4D6570; }
+
+    #view-rdp #controls .corner.topleft { justify-self: left; align-self: start; }
+    #view-rdp #controls .corner.topright { justify-self: right; align-self: start; }
+    #view-rdp #controls .corner.bottomleft { justify-self: left; align-self: end; grid-row: 2; }
+    #view-rdp #controls .corner.bottomright { justify-self: right; align-self: end; grid-row: 2; }
+
+    #view-rdp.topleft #controls .corner.topleft { visibility: hidden; }
+    #view-rdp.topright #controls .corner.topright { visibility: hidden; }
+    #view-rdp.bottomleft #controls .corner.bottomleft { visibility: hidden; }
+    #view-rdp.bottomright #controls .corner.bottomright { visibility: hidden; }
+
+    #view-rdp #controls #switch-screen { visibility: hidden; }
+    #view-rdp #controls:not(.multi-screen) #switch-screen { display: none; }
+
+    #view-rdp.zoomed-out #controls .corner.topright #zoom-out { display: none; }
+    #view-rdp.zoomed-out #controls .corner.topright #switch-screen { visibility: visible; }
+
+    @media screen and (min-width: 480px) and (orientation: landscape) {
+        #view-rdp { visibility: visible; }
+    }
 </style>
 
 <div id="view-rdp">
@@ -39,11 +49,16 @@
         <span id="click-spot"></span>
     </a>
 
-    <div id="controls" class="grid">
-        <a class="button icon small dimmed dark" href="#menu">&#xe5c3;</a>
-        <a class="button icon small dimmed dark" href="javascript:document.getElementById('canvas').zoomOut();" rel="js">&#xea10;</a>
-        <a class="button icon small dimmed dark" href="#gamepad">&#xe338;</a>
-        <a class="button icon small dimmed dark" href="javascript:focusKeyboard();" rel="js">&#xe312;</a>
+    <div id="controls" class="grid {Multi-Screen-Style}">
+        <a class="corner topleft button icon small dimmed dark" href="#menu">&#xe5c3;</a>
+
+        <div class="corner topright">
+            <a id="zoom-out" class="button icon small dimmed dark" href="javascript:document.getElementById('canvas').zoomOut();" rel="js">&#xea10;</a>
+            <a id="switch-screen" class="button icon small dimmed dark" href="javascript:document.getElementById('canvas').switchScreen();" rel="js">&#xf1b9;</a>
+        </div>
+
+        <a class="corner bottomleft button icon small dimmed dark" href="#gamepad">&#xe338;</a>
+        <a class="corner bottomright button icon small dimmed dark" href="javascript:focusKeyboard();" rel="js">&#xe312;</a>
         <div id="crosshair" class="button outline"></div>
     </div>
 </div>

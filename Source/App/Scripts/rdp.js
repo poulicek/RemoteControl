@@ -3,6 +3,7 @@
     var cutout = '';
     var img = null;
     var session = 0;
+    var screen = 0;
     var isEmpty = true;
     var scrollDir = { x: 0, y: 0 };
     var lastClick = { x: 0, y: 0, b: 0, time: 0 };
@@ -43,6 +44,7 @@
             img.addEventListener('transitionend', onTransitionEnd);
             img.bound = true;
             img.zoomOut = zoomOut;
+            img.switchScreen = switchScreen;
         }
 
         reloadImage();
@@ -96,7 +98,7 @@
             if (b == 3 && z == 1)
                 zoomIn(e);
             else {
-                sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '')));
+                sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '') + '&e=' + screen));
                 reloadImage();
                 showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
             }
@@ -109,7 +111,7 @@
     // performs scrolling
     function onScroll(overflowX, overflowY) {
         if (isLandScape())
-            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + "&b=2"));
+            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + "&b=2" + '&e=' + screen));
         reloadImage();
     };
 
@@ -125,7 +127,10 @@
         if (cursorOn)
             className += ' cursor';
 
-        if (vp.z == 1 || vp.x == -vp.maxX && vp.y == vp.maxY)
+        if (vp.z == 1)
+            className += ' zoomed-out';
+        
+        if (vp.x == -vp.maxX && vp.y == vp.maxY)
             className += ' topright';
         else if (vp.x == -vp.maxX && vp.y == -vp.maxY)
             className += ' bottomright';
@@ -176,7 +181,7 @@
                 session = getSessionId();
             }
 
-            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&u=' + (cursorOn ? 1 : 0);
+            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&e=' + screen +'&u=' + (cursorOn ? 1 : 0);
         }
         else if (!isEmpty) {
             isEmpty = true;
@@ -211,6 +216,12 @@
     function zoomOut(e) {
         img.classList.add('zooming');
         img.resetView();
+    };
+
+    // switches the screens
+    function switchScreen(e) {
+        img.resetView();
+        screen++;
     };
 
     // binding the actions

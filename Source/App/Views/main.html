@@ -1,15 +1,12 @@
 ﻿<style>
     #view-landscape { display: none; }
-    #view-landscape * { visibility: hidden; }
 
-    @media screen and (min-width: 320px) and (orientation: landscape) {
+    @media screen and (min-width: 480px) and (orientation: landscape) {
         #view-portrait { display: none; }
-        #view-portrait * { visibility: hidden; }
-
         #view-landscape { display: block; }
-        #view-landscape * { visibility: initial; }
     }
 </style>
+
 <div id="view-portrait">
     {View-Portrait}
 </div>
