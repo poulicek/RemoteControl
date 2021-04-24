@@ -1,5 +1,7 @@
 ﻿var SCAN_MODE = 0;
 var ERROR_ID = 0;
+var LAST_INPUT_VALUE = '';
+
 
 // binds the events on links
 function bindEvents() {
@@ -335,20 +337,37 @@ function preventDoubleTap() {
 
 
 // focuses the input causing appearance of the virtual keyboard
-function focusKeyboard() {
+function focusKeyboard(el) {
+
+    LAST_INPUT_VALUE = '  ';
     var f = document.getElementById('keyboard');
+    f.triggerElement = el;
+    f.value = LAST_INPUT_VALUE;
     f.focus();
+
+    return false;
 };
+
 
 
 // handles the key change event
 function onKeyChanged(e) {
     try {
+        
         var value = e.currentTarget.value;
-        e.currentTarget.value = '  '; // these whitespaces ensure the holding of the backspace repeates the key strokes
+        var keyCode = e.keyCode || e.charCode || e.which;
+        var h = value.length > LAST_INPUT_VALUE.length ? encodeURIComponent(value.substr(value.length - 1, 1)) : '';
 
-        var h = value.length > 2 ? encodeURIComponent(value.substr(2, 1)) : '';
-        sendRequest('?c=key&v=' + e.keyCode + '&h=' + h);
+        // known Android issue
+        if (keyCode == 229 && value.length <= LAST_INPUT_VALUE.length)
+            keyCode = 8; 
+
+        LAST_INPUT_VALUE = value;
+        
+        if (value.length < 2)
+            e.currentTarget.value = '  '; // these whitespaces ensure the holding of the backspace repeates the key strokes   
+
+        sendRequest('?c=key&v=' + keyCode + '&h=' + h);
     }
-    catch (e) { }
+    catch (e) { setError(e.toString()); }
 };

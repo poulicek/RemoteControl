@@ -22,6 +22,8 @@
 
         cutout: [],
 
+        coords: null,
+
         // resets the viewport's position
         resetPosition: function () {
             this.rawX = -1;
@@ -116,6 +118,8 @@
 
             // reset is needed because Android (new touch may have same Id as previous one)
             var touch = getTouch(e.touches);
+
+            viewport.coords = getRelativeCoords(touch.clientX, touch.clientY);
 
             eventHandlers.lastZoom = viewport.z;
             eventHandlers.firstTouch = touch;

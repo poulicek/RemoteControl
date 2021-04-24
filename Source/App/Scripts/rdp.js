@@ -109,9 +109,9 @@
 
 
     // performs scrolling
-    function onScroll(overflowX, overflowY) {
+    function onScroll(overflowX, overflowY, x, y) {
         if (isLandScape())
-            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + "&b=2" + '&e=' + screen));
+            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + '&mx=' + Math.floor(100000 * x) + "&my=" + Math.floor(100000 * y) + "&b=2" + '&e=' + screen));
         reloadImage();
     };
 
@@ -163,7 +163,7 @@
             var scrollY = scrollDir.y == 0 || Math.sign(vp.overflowY) == scrollDir.y ? vp.overflowY / vp.rangeY : 0;
 
             if (scrollX || scrollY)
-                onScroll(scrollX, scrollY);
+                onScroll(scrollX, scrollY, vp.coords ? vp.coords.x : 0, vp.coords ? vp.coords.y : 0);
         }
     };
 
@@ -216,12 +216,14 @@
     function zoomOut(e) {
         img.classList.add('zooming');
         img.resetView();
+        reloadImage();
     };
 
     // switches the screens
     function switchScreen(e) {
         img.resetView();
         screen++;
+        reloadImage();
     };
 
     // binding the actions

@@ -20,7 +20,7 @@ namespace RemoteControl.Controllers
                 return;
 
             // skipping caps lock and modifier keys
-            if (keyCode == (int)Keys.CapsLock || keyCode == (int)Keys.ShiftKey)
+            if (keyCode == (int)Keys.ProcessKey || keyCode == (int)Keys.CapsLock || keyCode == (int)Keys.ShiftKey)
                 return;
 
             // executing the key pressing

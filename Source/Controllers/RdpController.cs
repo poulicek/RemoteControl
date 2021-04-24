@@ -24,10 +24,10 @@ namespace RemoteControl.Controllers
             {
                 case "screen":
                     {
-                        var session = context.Request.Query["s"] ?? string.Empty;
-                        var cutout = context.Request.Query["w"]?.Split(',');
+                        var session = context.Request.Query["s"] ?? string.Empty;                        
                         var setCursor = int.TryParse(context.Request.Query["u"], out var u) && u == 1;
                         var screen = this.readScreen(context.Request.Query["e"]);
+                        var cutout = this.projectCutout(this.readRelativeCutout(context.Request.Query["w"]?.Split(',')), screen.Bounds);
 
                         var data = this.handleScreenRequest(session, screen, cutout, setCursor, out var codec);
                         context.Response.Write(data, codec.MimeType);
@@ -37,8 +37,15 @@ namespace RemoteControl.Controllers
                 case "click":
                     {
                         var screen = this.readScreen(context.Request.Query["e"]);
+                        var btn = int.TryParse(context.Request.Query["b"], out var b) ? b : 1;
+
                         if (int.TryParse(context.Request.Query["x"], out var xRatio) && int.TryParse(context.Request.Query["y"], out var yRatio))
-                            this.perfromMouseClick(screen, xRatio / r, yRatio / r, int.TryParse(context.Request.Query["b"], out var btn) ? btn : 1);
+                        {
+                            if (btn != (int)InputHelper.MouseButton.Middle)
+                                this.perfromMouseClick(screen, xRatio / r, yRatio / r, btn);
+                            else if (int.TryParse(context.Request.Query["mx"], out var mxRatio) && int.TryParse(context.Request.Query["my"], out var myRatio))
+                                this.perfromWheelScroll(screen, xRatio / r, yRatio / r, mxRatio / r, myRatio / r);
+                        }
                         break;
                     }
             }
@@ -57,7 +64,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Handles the screenshot request
         /// </summary>
-        private byte[] handleScreenRequest(string session, ScreenModel screen, string[] cutout, bool setCursor, out ImageCodecInfo codec)
+        private byte[] handleScreenRequest(string session, ScreenModel screen, Rectangle cutout, bool setCursor, out ImageCodecInfo codec)
         {
             // detection of new session so the user can be notified
             if (session != this.lastSession)
@@ -66,23 +73,15 @@ namespace RemoteControl.Controllers
                 this.lastSession = session;
             }
 
-            // projecting the cutout to the screen
-            var cutoutRect = this.projectCutout(this.readRelativeCutout(cutout), screen.Bounds);            
-
             // setting the cursor position to cutout's center
             if (setCursor)
-            {
-                var center = screen.Project(new Point(cutoutRect.X + cutoutRect.Width / 2, cutoutRect.Y + cutoutRect.Height / 2));
-                if (lastCursor != center)
-                    InputHelper.SetCursorPosition(center.X, center.Y);
-                lastCursor = center;
-            }
+                this.updateCursor(screen.Project(cutout.GetCenter()));
 
             // inflating the cutout so the panning is more smooth
             const float inflation = 0.3f;
-            cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
+            cutout.Inflate((int)(cutout.Width * inflation), (int)(cutout.Height * inflation));
 
-            return this.getScreenShot(screen, cutoutRect, out codec);
+            return this.getScreenShot(screen, cutout, out codec);
         }
 
 
@@ -166,11 +165,34 @@ namespace RemoteControl.Controllers
         private void perfromMouseClick(ScreenModel screen, float xRatio, float yRatio, int btn)
         {
             var pt = screen.Project(new Point((int)(screen.X + xRatio * screen.Width), (int)(screen.Y + yRatio * screen.Height)));
+            InputHelper.MouseClick(pt.X, pt.Y, (InputHelper.MouseButton)btn);
+        }
 
-            if (btn == (int)InputHelper.MouseButton.Middle)
-                InputHelper.MouseScroll(pt.X, pt.Y);
-            else
-                InputHelper.MouseClick(pt.X, pt.Y, (InputHelper.MouseButton)btn);
+
+        /// <summary>
+        /// Performs a wheel scroll on the provided location
+        /// </summary>
+        private void perfromWheelScroll(ScreenModel screen, float xRatio, float yRatio, float mxRatio, float myRatio)
+        {
+            var pt = screen.Project(new Point((int)(screen.X + mxRatio * screen.Width), (int)(screen.Y + myRatio * screen.Height)));
+            this.updateCursor(pt);
+
+            var scroll = screen.Project(new Point((int)(xRatio * screen.Width), (int)(yRatio * screen.Height)));
+            InputHelper.MouseScroll(scroll.X, scroll.Y);
+        }
+
+
+        /// <summary>
+        /// Updates cursor position if changed
+        /// </summary>
+        private void updateCursor(Point pt)
+        {
+            if (pt.IsEmpty)
+                return;
+
+            if (this.lastCursor != pt)
+                InputHelper.SetCursorPosition(pt.X, pt.Y);
+            this.lastCursor = pt;
         }
 
 
