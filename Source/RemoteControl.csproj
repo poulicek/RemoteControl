@@ -71,6 +71,7 @@
     <Compile Include="Logic\TimedWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Model\ScreenModel.cs" />
     <Compile Include="Server\HttpContext.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponse.cs" />

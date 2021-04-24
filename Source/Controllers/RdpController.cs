@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
+using RemoteControl.Model;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
@@ -26,16 +27,18 @@ namespace RemoteControl.Controllers
                         var session = context.Request.Query["s"] ?? string.Empty;
                         var cutout = context.Request.Query["w"]?.Split(',');
                         var setCursor = int.TryParse(context.Request.Query["u"], out var u) && u == 1;
+                        var screen = this.readScreen(context.Request.Query["e"]);
 
-                        var data = this.handleScreenRequest(session, cutout, setCursor, out var codec);
+                        var data = this.handleScreenRequest(session, screen, cutout, setCursor, out var codec);
                         context.Response.Write(data, codec.MimeType);
                         break;
                     }
 
                 case "click":
                     {
+                        var screen = this.readScreen(context.Request.Query["e"]);
                         if (int.TryParse(context.Request.Query["x"], out var xRatio) && int.TryParse(context.Request.Query["y"], out var yRatio))
-                            this.perfromMouseClick(xRatio / r, yRatio / r, int.TryParse(context.Request.Query["b"], out var btn) ? btn : 1);
+                            this.perfromMouseClick(screen, xRatio / r, yRatio / r, int.TryParse(context.Request.Query["b"], out var btn) ? btn : 1);
                         break;
                     }
             }
@@ -43,9 +46,19 @@ namespace RemoteControl.Controllers
 
 
         /// <summary>
+        /// Reads the screen parameter
+        /// </summary>
+        private ScreenModel readScreen(string value)
+        {
+            return new ScreenModel(Screen.AllScreens[1]);
+            return new ScreenModel(int.TryParse(value, out var screenIdx) ? Screen.AllScreens[screenIdx % Screen.AllScreens.Length] : Screen.PrimaryScreen);
+        }
+
+
+        /// <summary>
         /// Handles the screenshot request
         /// </summary>
-        private byte[] handleScreenRequest(string session, string[] cutout, bool setCursor, out ImageCodecInfo codec)
+        private byte[] handleScreenRequest(string session, ScreenModel screen, string[] cutout, bool setCursor, out ImageCodecInfo codec)
         {
             // detection of new session so the user can be notified
             if (session != this.lastSession)
@@ -55,14 +68,14 @@ namespace RemoteControl.Controllers
             }
 
             // projecting the cutout to the screen
-            var screenSize = ScreenHelper.GetScaledScreenSize();
-            var cutoutRect = this.projectCutout(this.readRelativeCutout(cutout), screenSize);
-            var center = this.projectPoint(cutoutRect.X + cutoutRect.Width / 2, cutoutRect.Y + cutoutRect.Height / 2, screenSize);
+            var cutoutRect = this.projectCutout(this.readRelativeCutout(cutout), screen.Bounds);            
 
             // setting the cursor position to cutout's center
-            if (setCursor && lastCursor != center)
+            if (setCursor)
             {
-                InputHelper.SetCursorPosition(center.X, center.Y);
+                var center = screen.Project(new Point(cutoutRect.X + cutoutRect.Width / 2, cutoutRect.Y + cutoutRect.Height / 2));
+                if (lastCursor != center)
+                    InputHelper.SetCursorPosition(center.X, center.Y);
                 lastCursor = center;
             }
 
@@ -70,24 +83,24 @@ namespace RemoteControl.Controllers
             const float inflation = 0.3f;
             cutoutRect.Inflate((int)(cutoutRect.Width * inflation), (int)(cutoutRect.Height * inflation));
 
-            return this.getScreenShot(cutoutRect, screenSize, out codec);
+            return this.getScreenShot(screen, cutoutRect, out codec);
         }
 
 
         /// <summary>
         /// Returns a screenshot
         /// </summary>
-        private byte[] getScreenShot(Rectangle cutout, Size screenSize, out ImageCodecInfo codec)
+        private byte[] getScreenShot(ScreenModel screen, Rectangle cutout, out ImageCodecInfo codec)
         {
             // setting the PNG format for smaller sizes
-            var format = 2 * cutout.Width * cutout.Height > screenSize.Width * screenSize.Height ? ImageFormat.Jpeg : ImageFormat.Png;
+            var format = 2 * cutout.Width * cutout.Height > screen.Width * screen.Height ? ImageFormat.Jpeg : ImageFormat.Png;
 
-            using (var screenImg = new Bitmap(screenSize.Width, screenSize.Height))
+            using (var screenImg = new Bitmap(screen.Width, screen.Height))
             using (var screenG = Graphics.FromImage(screenImg))
             using (var ms = new MemoryStream())
             {
-                screenG.CopyFromScreen(cutout.X, cutout.Y, cutout.X, cutout.Y, cutout.Size);
-                using (var canvasImg = this.projectCoutout(screenImg, screenSize, cutout, format == ImageFormat.Png))
+                screenG.CopyFromScreen(cutout.X, cutout.Y, cutout.X - screen.X, cutout.Y - screen.Y, cutout.Size);
+                using (var canvasImg = this.projectCoutout(screen, screenImg, cutout, format == ImageFormat.Png))
                     canvasImg.Save(ms, codec = this.getEncoder(format), this.getQualityParams(25));
 
                 return ms.ToArray();
@@ -95,40 +108,20 @@ namespace RemoteControl.Controllers
         }
 
 
-        /// <summary>
-        /// Projects the point to screen coordinates
-        /// </summary>
-        private Point projectPoint(float x, float y, Size screenSize)
-        {
-            var scale = this.getScreenScale(screenSize);
-            return new Point((int)(x / scale), (int)(y / scale));
-        }
-
-
-        /// <summary>
-        /// Returns the scale of the screen
-        /// </summary>
-        private float getScreenScale(Size screenSize)
-        {
-            return (float)screenSize.Width / Screen.PrimaryScreen.Bounds.Width;
-        }
-
 
         /// <summary>
         /// Projects the cutout of the screen considering the scale
         /// </summary>
-        private Bitmap projectCoutout(Bitmap screenImg, Size screenSize, Rectangle cutoutRect, bool highQuality)
+        private Bitmap projectCoutout(ScreenModel screen, Bitmap screenImg, Rectangle cutoutRect, bool highQuality)
         {
-            var scale = this.getScreenScale(screenSize);
-            if (scale <= 1)
+            if (screen.Scale <= 1)
                 return screenImg;
 
-            var canvasSize = new Size((int)Math.Ceiling(screenSize.Width / scale), (int)Math.Ceiling(screenSize.Height / scale));
-            var canvasImg = new Bitmap(canvasSize.Width, canvasSize.Height);
+            var canvasImg = new Bitmap(screen.ProjectedWidth, screen.ProjectedHeight);
             using (var canvasG = Graphics.FromImage(canvasImg))
             {
                 canvasG.SetQuality(highQuality);
-                canvasG.DrawImage(screenImg, new RectangleF(cutoutRect.X / scale, cutoutRect.Y / scale, cutoutRect.Width / scale, cutoutRect.Height / scale), cutoutRect, GraphicsUnit.Pixel);
+                canvasG.DrawImage(screenImg, screen.Project(cutoutRect), cutoutRect, GraphicsUnit.Pixel);
             }
 
             return canvasImg;
@@ -154,15 +147,15 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Projects the relative cutout to screen coordinates
         /// </summary>
-        private Rectangle projectCutout(RectangleF relativeCutout, Size screenSize)
+        private Rectangle projectCutout(RectangleF relativeCutout, Rectangle screen)
         {
             if (relativeCutout.IsEmpty)
-                return new Rectangle(Point.Empty, screenSize);
+                return screen;
 
-            var rangeW = (int)Math.Ceiling(relativeCutout.Width * screenSize.Width);
-            var rangeH = (int)Math.Ceiling(relativeCutout.Height * screenSize.Height);
-            var rangeX = (int)(relativeCutout.X * (screenSize.Width - rangeW));
-            var rangeY = (int)(relativeCutout.Y * (screenSize.Height - rangeH));
+            var rangeW = (int)Math.Ceiling(relativeCutout.Width * screen.Width);
+            var rangeH = (int)Math.Ceiling(relativeCutout.Height * screen.Height);
+            var rangeX = screen.X + (int)(relativeCutout.X * (screen.Width - rangeW));
+            var rangeY = screen.Y + (int)(relativeCutout.Y * (screen.Height - rangeH));
 
             return new Rectangle(rangeX, rangeY, rangeW, rangeH);
         }
@@ -171,10 +164,9 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Performs a mouse click on the provided location
         /// </summary>
-        private void perfromMouseClick(float xRatio, float yRatio, int btn)
+        private void perfromMouseClick(ScreenModel screen, float xRatio, float yRatio, int btn)
         {
-            var s = ScreenHelper.GetScaledScreenSize();
-            var pt = this.projectPoint(xRatio * s.Width, yRatio * s.Height, s);;
+            var pt = screen.Project(new Point((int)(screen.X + xRatio * screen.Width), (int)(screen.Y + yRatio * screen.Height)));
 
             if (btn == (int)InputHelper.MouseButton.Middle)
                 InputHelper.MouseScroll(pt.X, pt.Y);
