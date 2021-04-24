@@ -183,8 +183,10 @@
     // reloading the image if necessary
     function reloadImage() {
 
-        if (!img)
+        if (!img || !document.getElementById(img.id)) {
+            img = null;
             return;
+        }
 
         if (isLandScape()) {
 
