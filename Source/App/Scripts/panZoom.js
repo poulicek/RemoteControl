@@ -86,9 +86,9 @@
         },
 
         // propagates the current state of the viewpoirt
-        report: function (panning) {
+        report: function (panning, viewMoved) {
             if (onViewChangedHandler && isLandScape())
-                onViewChangedHandler(this, panning);
+                onViewChangedHandler(this, panning, viewMoved);
         }
     };
 
@@ -121,6 +121,7 @@
 
             viewport.coords = getRelativeCoords(touch.clientX, touch.clientY);
 
+            eventHandlers.clicked = false;
             eventHandlers.lastZoom = viewport.z;
             eventHandlers.firstTouch = touch;
             eventHandlers.lastTouch = touch;
@@ -131,21 +132,21 @@
             }
         },
 
-
         onLongTouch: function (t) {
 
-            if (eventHandlers.touchMoved || eventHandlers.firstTouch !== t)
+            if (eventHandlers.firstTouch !== t || eventHandlers.touchMoved)
                 return;
 
-            t.which = 3; // setting the secondary button
+            t.which = 3;
             eventHandlers.onClick(t);
+            eventHandlers.clicked = true;
         },
 
         onTouchEnd: function () {
 
-            viewport.report(false);
+            viewport.report(false, eventHandlers.touchMoved);
 
-            if (!eventHandlers.touchMoved)
+            if (eventHandlers.firstTouch && !eventHandlers.touchMoved)
                 eventHandlers.onClick(eventHandlers.firstTouch);
 
             eventHandlers.firstTouch = null;
@@ -211,18 +212,14 @@
 
         onClick: function (e) {
 
-            if (eventHandlers.touchMoved)
-                return;
-
-            // preventing the onClick to be called twice
-            eventHandlers.touchMoved = true;
-
-            if (!onClickHandler)
-                return;
+            if (eventHandlers.clicked || eventHandlers.touchMoved)
+                return;            
 
             var coords = getRelativeCoords(e.clientX, e.clientY);
             if (coords)
                 onClickHandler(e, coords.x, coords.y, viewport.z, e.which);
+
+            eventHandlers.clicked = true;
         },
 
         onWheel: function (e) {

@@ -6,7 +6,7 @@
     var screen = 0;
     var isEmpty = true;
     var scrollDir = { x: 0, y: 0 };
-    var lastClick = { x: 0, y: 0, b: 0, time: 0 };
+    var lastClick = null;
     var lastCoords = { x: 0, y: 0 };
     var cursorOn = false;
 
@@ -89,7 +89,7 @@
     // onclick handler definition
     function onClick(e, x, y, z, b) {
         var time = new Date().getTime();
-        if (time - lastClick.time < 500 && lastClick.b == b) {
+        if (lastClick && time - lastClick.time < 500 && lastClick.b == b) {
             x = lastClick.x;
             y = lastClick.y;
         }
@@ -102,10 +102,9 @@
                 sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '') + '&e=' + screen));
                 reloadImage();
                 showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
+                lastClick = { x: x, y: y, b: b, time: time };
             }
         }
-
-        lastClick = { x: x, y: y, b: b, time: time };
     };
 
 
@@ -123,11 +122,38 @@
     };
 
 
-    // onviewchanged handler definition
-    function onViewPortChanged(vp, isPanning) {
+    // handles the alternative mouse event
+    function onAlternativeMouse(e, holding, moved) {
 
+        if (!holding && !moved) {
+            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * e.x) + "&y=" + Math.floor(100000 * e.y) + "&b=" + e.b + '&e=' + screen));
+            reloadImage();
+            lastClick = null;
+        }        
+    };
+
+
+    // onviewchanged handler definition
+    function onViewPortChanged(vp, isPanning, moved) {
+
+        // updating the view
         cutout = vp.cutout.join();
         cursorOn = false; // INSTALLED && isPanning;
+        updateView(el, vp, isPanning);
+
+        // handling scorlling
+        tryScroll(vp, isPanning);
+
+        // moving the mouse of the viewport coordinates got updated
+        if (vp.coords && (lastCoords.x != vp.coords.x || lastCoords.y != vp.coords.y)) {
+            onMouseMove(vp.coords.x, vp.coords.y);
+            lastCoords = vp.coords;
+        }
+    };
+
+
+    // updates the UI of the view
+    function updateView(el, vp, isPanning) {
 
         var className = isPanning ? 'panning' : '';
 
@@ -136,7 +162,7 @@
 
         if (vp.z == 1)
             className += ' zoomed-out';
-        
+
         if (vp.x == -vp.maxX && vp.y == vp.maxY)
             className += ' topright';
         else if (vp.x == -vp.maxX && vp.y == -vp.maxY)
@@ -149,12 +175,6 @@
         if (el.parentNode.className != className)
             el.parentNode.className = className;
 
-        tryScroll(vp, isPanning);
-
-        if (vp.coords && (lastCoords.x != vp.coords.x || lastCoords.y != vp.coords.y)) {
-            onMouseMove(vp.coords.x, vp.coords.y);
-            lastCoords = vp.coords;
-        }
     };
 
 
