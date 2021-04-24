@@ -50,7 +50,6 @@ namespace RemoteControl.Controllers
         /// </summary>
         private ScreenModel readScreen(string value)
         {
-            return new ScreenModel(Screen.AllScreens[1]);
             return new ScreenModel(int.TryParse(value, out var screenIdx) ? Screen.AllScreens[screenIdx % Screen.AllScreens.Length] : Screen.PrimaryScreen);
         }
 
