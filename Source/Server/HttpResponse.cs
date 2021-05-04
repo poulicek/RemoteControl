@@ -12,6 +12,8 @@ namespace RemoteControl.Server
         private readonly Stream stream;
         private bool headerWritten;
 
+        public bool CloseConnection { get; private set; }
+        public Stream Stream { get { return this.stream; } }
         public TimeSpan? CacheAge { get; set; }
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
@@ -27,10 +29,14 @@ namespace RemoteControl.Server
         /// <summary>
         /// Writes the response to the stream
         /// </summary>
-        private void writeHeader(string mime, int length)
+        public void WriteHeader(string mime, int length)
         {
+            this.CloseConnection = length == 0;
+
             this.Headers["Content-Type"] = mime;
-            this.Headers["Content-Length"] = length.ToString();
+
+            if (length > 0)
+                this.Headers["Content-Length"] = length.ToString();
 
             if (this.CacheAge.HasValue && !this.Headers.ContainsKey("Cache-Control"))
                 this.Headers["Cache-Control"] = this.CacheAge == TimeSpan.Zero ? "no-cache, no-store, must-revalidate" : "public, max-age=" + (long)this.CacheAge.Value.TotalSeconds;
@@ -46,6 +52,7 @@ namespace RemoteControl.Server
             this.Write(sb.ToString());            
         }
 
+
         /// <summary>
         /// Returns the MIME type
         /// </summary>
@@ -58,7 +65,7 @@ namespace RemoteControl.Server
         public void Write()
         {
             if (!this.headerWritten)
-                this.writeHeader(null, 0);
+                this.WriteHeader(null, 0);
         }
 
 
@@ -71,7 +78,7 @@ namespace RemoteControl.Server
         public void Write(byte[] bytes, string mime = "text/html")
         {
             if (!this.headerWritten)
-                this.writeHeader(mime, bytes?.Length ?? 0);
+                this.WriteHeader(mime, bytes?.Length ?? 0);
 
             if (bytes?.Length > 0)
                 this.stream.Write(bytes, 0, bytes.Length);
@@ -81,7 +88,7 @@ namespace RemoteControl.Server
         public void Write(Stream s, string mime = "text/html")
         {
             if (!this.headerWritten)
-                this.writeHeader(mime, (int)(s?.Length ?? 0));
+                this.WriteHeader(mime, (int)(s?.Length ?? 0));
 
             s?.CopyTo(this.stream);
         }

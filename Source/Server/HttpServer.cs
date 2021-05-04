@@ -158,8 +158,14 @@ namespace RemoteControl.Server
                 using (var stream = this.getStream(o as TcpClient))
                 {
                     while (this.IsListening)
+                    {
                         using (var context = new HttpContext(stream, this.AllowOrigin))
+                        {
                             this.processContext(context);
+                            if (context.Response.CloseConnection)
+                                break;
+                        }
+                    }
                 }
             }
             catch (IOException) { }
