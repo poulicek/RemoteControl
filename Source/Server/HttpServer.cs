@@ -21,7 +21,6 @@ namespace RemoteControl.Server
 
         public int Port { get; }
         public bool IsListening { get; private set; }
-        public string AllowOrigin { get; set; }       
         public X509Certificate Certificate { get; }
 
 
@@ -154,12 +153,19 @@ namespace RemoteControl.Server
         {
             try
             {
+                var keepAlive = true;
+
                 // The stream gets reused indefinitely so the connection is kept alive
                 using (var stream = this.getStream(o as TcpClient))
                 {
-                    while (this.IsListening)
-                        using (var context = new HttpContext(stream, this.AllowOrigin))
+                    while (this.IsListening && keepAlive)
+                    {
+                        using (var context = HttpContext.Read(stream))
+                        {
                             this.processContext(context);
+                            keepAlive = !context.Response.Infinite;
+                        }
+                    }
                 }
             }
             catch (IOException) { }
