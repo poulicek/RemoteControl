@@ -12,17 +12,16 @@ namespace RemoteControl.Server
         private readonly Stream stream;
         private bool headerWritten;
 
-        public bool CloseConnection { get; private set; }
+        public bool Infinite { get; private set; }
         public Stream Stream { get { return this.stream; } }
         public TimeSpan? CacheAge { get; set; }
         public HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
 
 
-        public HttpResponse(Stream stream, string allowOrigin)
+        public HttpResponse(Stream stream)
         {
             this.stream = stream;
-            this.Headers["Access-Control-Allow-Origin"] = allowOrigin;
         }
 
 
@@ -31,7 +30,7 @@ namespace RemoteControl.Server
         /// </summary>
         public void WriteHeader(string mime, int length)
         {
-            this.CloseConnection = length == 0;
+            this.Infinite = length == 0;
 
             this.Headers["Content-Type"] = mime;
 
@@ -90,7 +89,8 @@ namespace RemoteControl.Server
             if (!this.headerWritten)
                 this.WriteHeader(mime, (int)(s?.Length ?? 0));
 
-            s?.CopyTo(this.stream);
+            s.Seek(0, SeekOrigin.Begin);
+            s.CopyTo(this.stream);
         }
     }
 }

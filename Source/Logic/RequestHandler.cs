@@ -12,7 +12,7 @@ namespace RemoteControl.Logic
         private const int SERVER_PORT = 7211;
         private const int RETRY_CONN_AFTER_MS = 5000;
 
-        private readonly HttpServer server = new HttpServer(SERVER_PORT, false) { AllowOrigin = "*" };
+        private readonly HttpServer server = new HttpServer(SERVER_PORT, false);
         private readonly Dictionary<string, IController> controllers = new Dictionary<string, IController>();
 
         private bool disposed;
@@ -71,6 +71,7 @@ namespace RemoteControl.Logic
             else
             {
                 context.Response.CacheAge = TimeSpan.Zero;
+                context.Response.Headers["Access-Control-Allow-Origin"] = "*";
                 ctrl.ProcessRequest(context);
             }
         }

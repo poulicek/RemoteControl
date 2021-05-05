@@ -9,12 +9,17 @@ namespace RemoteControl.Server
         public HttpResponse Response { get; }
 
 
-        public HttpContext(Stream stream, string allowOrigin = null)
+        private HttpContext(Stream stream)
         {
             this.Request = new HttpRequest(stream);
-            this.Response = new HttpResponse(stream, allowOrigin);
+            this.Response = new HttpResponse(stream);
         }
 
+
+        public static HttpContext Read(Stream stream)
+        {
+            return new HttpContext(stream);
+        }
 
         public void Dispose()
         {

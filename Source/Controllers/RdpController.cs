@@ -101,8 +101,12 @@ namespace RemoteControl.Controllers
                 g.CopyFromScreen(cutout.X, cutout.Y, cutout.X - screen.X, cutout.Y - screen.Y, cutout.Size);
                 r.WriteHeader(codec.MimeType, 0);
 
+                using (var ms = new MemoryStream())
                 using (var canvasImg = this.projectCoutout(screen, screenImg, cutout, format == ImageFormat.Png))
-                    canvasImg.Save(r.Stream, codec, this.getQualityParams(25));
+                {
+                    canvasImg.Save(ms, codec, this.getQualityParams(25));
+                    r.Write(ms);
+                }
             }
         }
 
