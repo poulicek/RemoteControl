@@ -100,9 +100,9 @@
                 zoomIn(e);
             else {
                 sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '') + '&e=' + screen));
-                reloadImage();
                 showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
                 lastClick = { x: x, y: y, b: b, time: time };
+                reloadImage();
             }
         }
     };

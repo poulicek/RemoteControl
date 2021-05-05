@@ -34,7 +34,7 @@ namespace RemoteControl.Server
             var line = reader.ReadLine();
             var tokens = line?.Split(' ');
             if (tokens?.Length != 3)
-                throw new IOException("Invalid http request header");
+                throw new FormatException("Invalid http request header: " + line);
 
             this.Method = tokens[0].ToUpper();
             this.Url = tokens[1];

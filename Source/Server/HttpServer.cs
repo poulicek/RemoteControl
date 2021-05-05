@@ -169,6 +169,7 @@ namespace RemoteControl.Server
                 }
             }
             catch (IOException) { }
+            catch (FormatException) { }
             catch (AuthenticationException) { }
             catch (Exception ex) { this.raiseError(ex); }
         }

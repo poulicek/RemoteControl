@@ -11,6 +11,8 @@ namespace RemoteControl.Controllers
 {
     public class RdpController : IController
     {
+        private const bool USE_MJPEG = false;
+
         public event Action SessionChanged;
 
         private const float r = 100000; // relative values resolution
@@ -82,30 +84,46 @@ namespace RemoteControl.Controllers
             const float inflation = 0.3f;
             cutout.Inflate((int)(cutout.Width * inflation), (int)(cutout.Height * inflation));
 
-            this.writeScreenShot(r, screen, cutout);
+            // setting the PNG format for smaller sizes
+            var codec = this.getEncoder(2 * cutout.Width * cutout.Height > screen.Width * screen.Height ? ImageFormat.Jpeg : ImageFormat.Png);
+
+            if (USE_MJPEG)
+                this.writeMJPEG(r, screen, cutout, codec);
+            else
+                this.writeScreenShot(r, screen, cutout, codec);
         }
 
 
         /// <summary>
-        /// Returns a screenshot
+        /// Writes the screen picture as an MJPEG stream
         /// </summary>
-        private void writeScreenShot(HttpResponse r, ScreenModel screen, Rectangle cutout)
+        private void writeMJPEG(HttpResponse r, ScreenModel screen, Rectangle cutout, ImageCodecInfo codec)
         {
-            // setting the PNG format for smaller sizes
-            var format = 2 * cutout.Width * cutout.Height > screen.Width * screen.Height ? ImageFormat.Jpeg : ImageFormat.Png;
-            var codec = this.getEncoder(format);
+            r.WriteHeader("multipart/x-mixed-replace; boundary=\"RDP_MJPEG\"");
+            while (true)
+            {
+                r.Write($"--RDP_MJPEG\r\n");
+                r.Write($"Content-Type: {codec.MimeType}\r\n\r\n");
+                this.writeScreenShot(r, screen, cutout, codec);
+            }
+        }
 
+
+        /// <summary>
+        /// Writes a screenshot
+        /// </summary>
+        private void writeScreenShot(HttpResponse r, ScreenModel screen, Rectangle cutout, ImageCodecInfo codec)
+        {
             using (var screenImg = new Bitmap(screen.Width, screen.Height))
             using (var g = Graphics.FromImage(screenImg))
             {
-                g.CopyFromScreen(cutout.X, cutout.Y, cutout.X - screen.X, cutout.Y - screen.Y, cutout.Size);
-                r.WriteHeader(codec.MimeType, 0);
+                g.CopyFromScreen(cutout.X, cutout.Y, cutout.X - screen.X, cutout.Y - screen.Y, cutout.Size);                
 
                 using (var ms = new MemoryStream())
-                using (var canvasImg = this.projectCoutout(screen, screenImg, cutout, format == ImageFormat.Png))
+                using (var canvasImg = this.projectCoutout(screen, screenImg, cutout, codec.FormatID == ImageFormat.Png.Guid))
                 {
                     canvasImg.Save(ms, codec, this.getQualityParams(25));
-                    r.Write(ms);
+                    r.Write(ms, codec.MimeType);
                 }
             }
         }

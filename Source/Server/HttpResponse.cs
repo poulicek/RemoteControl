@@ -28,13 +28,14 @@ namespace RemoteControl.Server
         /// <summary>
         /// Writes the response to the stream
         /// </summary>
-        public void WriteHeader(string mime, int length)
+        public void WriteHeader(string mime, int? length = null)
         {
-            this.Infinite = length == 0;
+            this.Infinite = !length.HasValue;
 
-            this.Headers["Content-Type"] = mime;
+            if (!string.IsNullOrEmpty(mime))
+                this.Headers["Content-Type"] = mime;
 
-            if (length > 0)
+            if (length.HasValue)
                 this.Headers["Content-Length"] = length.ToString();
 
             if (this.CacheAge.HasValue && !this.Headers.ContainsKey("Cache-Control"))
@@ -89,8 +90,11 @@ namespace RemoteControl.Server
             if (!this.headerWritten)
                 this.WriteHeader(mime, (int)(s?.Length ?? 0));
 
-            s.Seek(0, SeekOrigin.Begin);
-            s.CopyTo(this.stream);
+            if (s != null)
+            {
+                s.Seek(0, SeekOrigin.Begin);
+                s.CopyTo(this.stream);
+            }
         }
     }
 }
