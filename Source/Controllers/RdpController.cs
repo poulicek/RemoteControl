@@ -11,8 +11,6 @@ namespace RemoteControl.Controllers
 {
     public class RdpController : IController
     {
-        private const bool USE_MJPEG = false;
-
         public event Action SessionChanged;
 
         private const float r = 100000; // relative values resolution
@@ -32,6 +30,12 @@ namespace RemoteControl.Controllers
                         var cutout = this.projectCutout(this.readRelativeCutout(context.Request.Query["w"]?.Split(',')), screen.Bounds);
 
                         this.handleScreenRequest(context.Response, session, screen, cutout, setCursor);
+                        break;
+                    }
+
+                case "stream":
+                    {
+                        this.writeMJPEG(context.Response, this.readScreen(context.Request.Query["e"]));
                         break;
                     }
 
@@ -86,25 +90,25 @@ namespace RemoteControl.Controllers
 
             // setting the PNG format for smaller sizes
             var codec = this.getEncoder(2 * cutout.Width * cutout.Height > screen.Width * screen.Height ? ImageFormat.Jpeg : ImageFormat.Png);
-
-            if (USE_MJPEG)
-                this.writeMJPEG(r, screen, cutout, codec);
-            else
-                this.writeScreenShot(r, screen, cutout, codec);
+            this.writeScreenShot(r, screen, cutout, codec);
         }
 
 
         /// <summary>
         /// Writes the screen picture as an MJPEG stream
         /// </summary>
-        private void writeMJPEG(HttpResponse r, ScreenModel screen, Rectangle cutout, ImageCodecInfo codec)
+        private void writeMJPEG(HttpResponse r, ScreenModel screen)
         {
+            this.SessionChanged?.Invoke();
+
+            var codec = this.getEncoder(ImageFormat.Jpeg);
+
             r.WriteHeader("multipart/x-mixed-replace; boundary=\"RDP_MJPEG\"");
             while (true)
             {
                 r.Write($"--RDP_MJPEG\r\n");
                 r.Write($"Content-Type: {codec.MimeType}\r\n\r\n");
-                this.writeScreenShot(r, screen, cutout, codec);
+                this.writeScreenShot(r, screen, screen.Bounds, codec);
             }
         }
 
