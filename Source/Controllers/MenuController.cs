@@ -17,13 +17,9 @@ namespace RemoteControl.Controllers
 
         public void ProcessRequest(HttpContext context)
         {
-            if (int.TryParse(context.Request.Query["v"], out var linkId))
-                this.writeLink(context, linkId);
-        }
+            if (!int.TryParse(context.Request.Query["v"], out var linkId))
+                return;
 
-
-        private void writeLink(HttpContext context, int linkId)
-        {
             var link = linkId >= 0 && linkId < this.links.Length ? this.links[linkId] : null;
             if (string.IsNullOrEmpty(link))
                 return;
@@ -31,11 +27,15 @@ namespace RemoteControl.Controllers
             if (context.Request.Query["r"] == "icon")
                 this.writeIcon(context, link);
             else
-                this.startProcess(linkId, link);
+                this.gotoLink(linkId, link);
         }
 
+        #region Link Execution
 
-        private void startProcess(int id, string link)
+        /// <summary>
+        /// Starts the process
+        /// </summary>
+        private void gotoLink(int id, string link)
         {
             if (link.StartsWith("http"))
                 Process.Start(link);
@@ -43,30 +43,27 @@ namespace RemoteControl.Controllers
                 runningProcesses[id] = Process.Start(link);
         }
 
+        #endregion
 
-        private void writeIcon(HttpContext context, string url)
-        {            
-            var icon = this.getIconUrl(url);
-            if (!string.IsNullOrEmpty(icon))
-            {
-                context.Response.CacheAge = TimeSpan.FromDays(365);
-                context.Response.Write(this.downloadResource(icon), context.Response.GetMime(Path.GetExtension(icon)));
-            }
-        }
+        #region Icon Processing
 
-
-        private string getIconUrl(string url, int preferedSize = 32)
+        /// <summary>
+        /// Returns the icon URL parsed from HTML document
+        /// </summary>
+        private string parseIconFromHtml(string url, int preferedSize = 32)
         {
             string html;
             var lastSize = 0;
             var lastIcon = string.Empty;
 
+            // downloading the HTML
             using (var wc = new WebClient())
             {
                 wc.Headers.Add("User-Agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Mobile Safari/537.36 Edg/86.0.622.69");
                 html = wc.DownloadString(url).ToLower();
             }
 
+            // finding the icons
             foreach (var m in Regex.Matches(html, "<link[^>]+rel=\"icon\"[^>]+>"))
             {
                 var link = m.ToString();
@@ -86,7 +83,25 @@ namespace RemoteControl.Controllers
         }
 
 
-        private byte[] downloadResource(string url)
+
+        /// <summary>
+        /// Writes the icon to response stream
+        /// </summary>
+        private void writeIcon(HttpContext context, string url)
+        {
+            var icon = this.parseIconFromHtml(url);
+            if (!string.IsNullOrEmpty(icon))
+            {
+                context.Response.CacheAge = TimeSpan.FromDays(365);
+                context.Response.Write(this.downloadIcon(icon), context.Response.GetMime(Path.GetExtension(icon)));
+            }
+        }
+
+
+        /// <summary>
+        /// Downloads the icon
+        /// </summary>
+        private byte[] downloadIcon(string url)
         {
             using (var wc = new WebClient())
             {
@@ -94,5 +109,7 @@ namespace RemoteControl.Controllers
                 return wc.DownloadData(url);
             }
         }
+
+        #endregion
     }
 }

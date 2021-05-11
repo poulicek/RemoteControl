@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -89,7 +90,32 @@ namespace RemoteControl.UI
             }
         }
 
+        private void onCreateShortcut(object sender, EventArgs e)
+        {
+
+        }
+
+        private void onEditShortcuts(object sender, EventArgs e)
+        {
+
+        }
+
         #endregion
+
+        protected override List<MenuItem> getContextMenuItems()
+        {
+            var items = new List<MenuItem>();
+
+            //items.Add(new MenuItem("Create shortcut...", this.onCreateShortcut));
+            //items.Add(new MenuItem("Edit shortcuts...", this.onEditShortcuts));
+            //items.Add(new MenuItem("-"));
+
+            items.AddRange(base.getContextMenuItems());
+
+            return items;
+        }
+
+
 
         protected override void Dispose(bool disposing)
         {
