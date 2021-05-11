@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.Media
 {
     public class MediaController : IController, IDisposable
     {

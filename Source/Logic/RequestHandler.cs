@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 using RemoteControl.Controllers;
+using RemoteControl.Controllers.App;
+using RemoteControl.Controllers.Files;
+using RemoteControl.Controllers.Grip;
+using RemoteControl.Controllers.Keyboard;
+using RemoteControl.Controllers.Media;
+using RemoteControl.Controllers.Menu;
+using RemoteControl.Controllers.Rdp;
+using RemoteControl.Controllers.View;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
@@ -121,7 +129,7 @@ namespace RemoteControl.Logic
             this.controllers.Add("file", new FilesController(this.AppVersion, this.server.GetUrl(Environment.MachineName)));
             this.controllers.Add("app", new AppController(this.AppVersion, () => this.ServerUrl));
             this.controllers.Add("view", new ViewController(() => this.ServerUrl));
-            this.controllers.Add("key", new KeysController());
+            this.controllers.Add("key", new KeyboardController());
             this.controllers.Add("media", new MediaController());
             this.controllers.Add("grip", new GripController());
             this.controllers.Add("menu", new MenuController());

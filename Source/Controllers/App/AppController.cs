@@ -5,7 +5,7 @@ using System.IO;
 using QRCoder;
 using RemoteControl.Server;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.App
 {
     public class AppController : IController
     {

@@ -2,9 +2,9 @@
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.Keyboard
 {
-    public class KeysController : IController
+    public class KeyboardController : IController
     {
         public void ProcessRequest(HttpContext context)
         {

@@ -2,9 +2,9 @@
 using System.Windows.Forms;
 using TrayToolkit.Helpers;
 
-namespace RemoteControl.Model
+namespace RemoteControl.Controllers.Rdp
 {
-    public class ScreenModel
+    public class ScreenBounds
     {
         public int ProjectedWidth { get; }
         public int ProjectedHeight { get; }
@@ -18,7 +18,7 @@ namespace RemoteControl.Model
         public Rectangle Bounds { get; }
 
 
-        public ScreenModel(Screen screen)
+        public ScreenBounds(Screen screen)
         {
             this.Bounds = screen.GetScaledBounds();
             this.Scale = (float)this.Bounds.Width / screen.Bounds.Width;

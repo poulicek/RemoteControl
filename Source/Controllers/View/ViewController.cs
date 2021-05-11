@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Windows.Forms;
+using RemoteControl.Controllers.Files;
 using RemoteControl.Server;
 using static TrayToolkit.Helpers.ResourceHelper;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.View
 {
     public class ViewController : IController
     {

@@ -3,11 +3,10 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
-using RemoteControl.Model;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.Rdp
 {
     public class RdpController : IController
     {
@@ -62,16 +61,16 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Reads the screen parameter
         /// </summary>
-        private ScreenModel readScreen(string value)
+        private ScreenBounds readScreen(string value)
         {
-            return new ScreenModel(int.TryParse(value, out var screenIdx) ? Screen.AllScreens[screenIdx % Screen.AllScreens.Length] : Screen.PrimaryScreen);
+            return new ScreenBounds(int.TryParse(value, out var screenIdx) ? Screen.AllScreens[screenIdx % Screen.AllScreens.Length] : Screen.PrimaryScreen);
         }
 
 
         /// <summary>
         /// Handles the screenshot request
         /// </summary>
-        private void handleScreenRequest(HttpResponse r, string session, ScreenModel screen, Rectangle cutout, bool setCursor)
+        private void handleScreenRequest(HttpResponse r, string session, ScreenBounds screen, Rectangle cutout, bool setCursor)
         {
             // detection of new session so the user can be notified
             if (session != this.lastSession)
@@ -97,7 +96,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Writes the screen picture as an MJPEG stream
         /// </summary>
-        private void writeMJPEG(HttpResponse r, ScreenModel screen)
+        private void writeMJPEG(HttpResponse r, ScreenBounds screen)
         {
             this.SessionChanged?.Invoke();
 
@@ -116,7 +115,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Writes a screenshot
         /// </summary>
-        private void writeScreenShot(HttpResponse r, ScreenModel screen, Rectangle cutout, ImageCodecInfo codec)
+        private void writeScreenShot(HttpResponse r, ScreenBounds screen, Rectangle cutout, ImageCodecInfo codec)
         {
             using (var screenImg = new Bitmap(screen.Width, screen.Height))
             using (var g = Graphics.FromImage(screenImg))
@@ -137,7 +136,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Projects the cutout of the screen considering the scale
         /// </summary>
-        private Bitmap projectCoutout(ScreenModel screen, Bitmap screenImg, Rectangle cutoutRect, bool highQuality)
+        private Bitmap projectCoutout(ScreenBounds screen, Bitmap screenImg, Rectangle cutoutRect, bool highQuality)
         {
             if (screen.Scale <= 1)
                 return screenImg;
@@ -189,7 +188,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Performs a mouse move on the provided location
         /// </summary>
-        private void perfromMouseMove(ScreenModel screen, float xRatio, float yRatio)
+        private void perfromMouseMove(ScreenBounds screen, float xRatio, float yRatio)
         {
             var pt = screen.Project(new Point((int)(screen.X + xRatio * screen.Width), (int)(screen.Y + yRatio * screen.Height)));
             this.updateCursor(pt);
@@ -199,7 +198,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Performs a mouse click on the provided location
         /// </summary>
-        private void perfromMouseClick(ScreenModel screen, float xRatio, float yRatio, int btn)
+        private void perfromMouseClick(ScreenBounds screen, float xRatio, float yRatio, int btn)
         {
             var pt = screen.Project(new Point((int)(screen.X + xRatio * screen.Width), (int)(screen.Y + yRatio * screen.Height)));
             InputHelper.MouseClick(pt.X, pt.Y, (InputHelper.MouseButton)btn);
@@ -209,7 +208,7 @@ namespace RemoteControl.Controllers
         /// <summary>
         /// Performs a wheel scroll on the provided location
         /// </summary>
-        private void perfromWheelScroll(ScreenModel screen, float xRatio, float yRatio, float mxRatio, float myRatio)
+        private void perfromWheelScroll(ScreenBounds screen, float xRatio, float yRatio, float mxRatio, float myRatio)
         {
             this.perfromMouseMove(screen, mxRatio, myRatio);
             var scroll = screen.Project(new Point((int)(xRatio * screen.Width), (int)(yRatio * screen.Height)));

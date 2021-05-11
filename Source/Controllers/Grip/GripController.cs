@@ -8,7 +8,7 @@ using RemoteControl.Server;
 using TrayToolkit.Helpers;
 using TrayToolkit.UI;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.Grip
 {
     public class GripController : IController
     {
@@ -16,7 +16,7 @@ namespace RemoteControl.Controllers
 
         private class GripButton
         {
-            private readonly Keys[] keys;
+            private readonly System.Windows.Forms.Keys[] keys;
             private readonly List<Keys> pressedKeys = new List<Keys>();
             
 

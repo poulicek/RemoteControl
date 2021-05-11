@@ -59,19 +59,19 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controllers\GripController.cs" />
-    <Compile Include="Controllers\RdpController.cs" />
-    <Compile Include="Controllers\MenuController.cs" />
-    <Compile Include="Controllers\ViewController.cs" />
-    <Compile Include="Controllers\FilesController.cs" />
+    <Compile Include="Controllers\Grip\GripController.cs" />
+    <Compile Include="Controllers\Rdp\RdpController.cs" />
+    <Compile Include="Controllers\Menu\MenuController.cs" />
+    <Compile Include="Controllers\View\ViewController.cs" />
+    <Compile Include="Controllers\Files\FilesController.cs" />
     <Compile Include="Controllers\IController.cs" />
-    <Compile Include="Controllers\MediaController.cs" />
-    <Compile Include="Controllers\AppController.cs" />
-    <Compile Include="Controllers\KeysController.cs" />
+    <Compile Include="Controllers\Media\MediaController.cs" />
+    <Compile Include="Controllers\App\AppController.cs" />
+    <Compile Include="Controllers\Keyboard\KeyboardController.cs" />
     <Compile Include="Logic\TimedWebClient.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Model\ScreenModel.cs" />
+    <Compile Include="Controllers\Rdp\ScreenBounds.cs" />
     <Compile Include="Server\HttpContext.cs" />
     <Compile Include="Server\HttpRequest.cs" />
     <Compile Include="Server\HttpResponse.cs" />
@@ -141,5 +141,6 @@
   <ItemGroup>
     <EmbeddedResource Include="App\Res\MaterialIcons-Regular.woff" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

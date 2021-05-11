@@ -4,7 +4,7 @@ using System.IO;
 using RemoteControl.Server;
 using TrayToolkit.Helpers;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.Files
 {
     public class FilesController : IController
     {

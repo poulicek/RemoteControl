@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using RemoteControl.Server;
 
-namespace RemoteControl.Controllers
+namespace RemoteControl.Controllers.Menu
 {
     public class MenuController : IController
     {
