@@ -32,8 +32,8 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #002332
 .status#status-normal { visibility: visible; max-width: 50vw; left: 50%; margin-left: -25vw; }
 .status#status-error { color: #AD4141; z-index: 9999; }
 .status#status-error .icon { padding: 12px; border-radius: 20%; }
-.status#status-error-text { padding: 5%; position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: normal; width: 100%; box-sizing: border-box; }
-.status#status-error-text:empty { display: none; }
+.status #status-error-text { position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: pre-wrap; width: 100%; padding: 2vmin; box-sizing: border-box; word-break: break-word; text-align: left; font-size: 80%; }
+.status #status-error-text:empty { display: none; }
 
 #app-state.status-error #status-error { visibility: visible; }
 #app-state.status-error #status-normal { visibility: hidden; }

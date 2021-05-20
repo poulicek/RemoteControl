@@ -316,7 +316,7 @@ function setError(errorText, permanent) {
         setTimeout(function () {
             if (ERROR_ID == errorId)
                 setAppStatus();
-        }, 1000);
+        }, 2000);
     }
 }
 
