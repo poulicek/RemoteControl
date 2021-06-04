@@ -3,12 +3,14 @@
     var cutout = '';
     var img = null;
     var session = 0;
+    var requestId = 0;
     var screen = 0;
     var isEmpty = true;
     var scrollDir = { x: 0, y: 0 };
     var lastClick = null;
     var lastCoords = { x: 0, y: 0 };
     var cursorOn = false;
+    
 
     // binds the actions
     function bindActions() {
@@ -215,7 +217,7 @@
                 session = getSessionId();
             }
 
-            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&e=' + screen +'&u=' + (cursorOn ? 1 : 0);
+            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&e=' + screen +'&u=' + (cursorOn ? 1 : 0) + '&' + (++requestId).toString(32);
         }
         else if (!isEmpty) {
             isEmpty = true;
