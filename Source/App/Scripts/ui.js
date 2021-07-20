@@ -337,10 +337,11 @@ function preventDoubleTap() {
 
 
 // focuses the input causing appearance of the virtual keyboard
-function focusKeyboard(el) {
+function focusKeyboard(el, preferKeyCode) {
 
     LAST_INPUT_VALUE = '  ';
     var f = document.getElementById('keyboard');
+    f.preferKeyCode = preferKeyCode;
     f.triggerElement = el;
     f.value = LAST_INPUT_VALUE;
     f.focus();
@@ -353,7 +354,8 @@ function focusKeyboard(el) {
 // handles the key change event
 function onKeyChanged(e) {
     try {
-        
+
+        var preferKeyCode = e.currentTarget.preferKeyCode;
         var value = e.currentTarget.value;
         var keyCode = e.keyCode || e.charCode || e.which;
         var h = value.length > LAST_INPUT_VALUE.length ? encodeURIComponent(value.substr(value.length - 1, 1)) : '';
@@ -367,7 +369,7 @@ function onKeyChanged(e) {
         if (value.length < 2)
             e.currentTarget.value = '  '; // these whitespaces ensure the holding of the backspace repeates the key strokes   
 
-        sendRequest('?c=key&v=' + keyCode + '&h=' + h);
+        sendRequest('?c=key&v=' + keyCode + '&h=' + h + '&p=' + (preferKeyCode ? 1 : 0));
     }
     catch (e) { setError(e.toString()); }
 };

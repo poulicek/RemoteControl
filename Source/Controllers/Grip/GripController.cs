@@ -104,10 +104,6 @@ namespace RemoteControl.Controllers.Grip
                         key.Down(scanMode);
                         this.pressedKeys.Add(key);
                     }
-
-#if DEBUG
-                    BalloonTooltip.Show(string.Join(" + ", this.pressedKeys.Select(k => k.ToString()).ToArray()));
-#endif
                 }
             }
         }
