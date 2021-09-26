@@ -9,18 +9,28 @@ namespace RemoteControl.Server
 {
     public class HttpRequest
     {
+        public bool IsGZipAccepted { get { return this.GetHeader<string>("Accept-Encoding")?.StartsWith("gzip", StringComparison.InvariantCultureIgnoreCase) == true; } }
         public string Method { get; set; }
         public string Url { get; set; }
         public string Path { get; set; }
         public string Content { get; set; }
         public NameValueCollection Query { get; set; }
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
-        public int ContentLength { get { return this.Headers.TryGetValue("Content-Length", out var str) && int.TryParse(str, out var value) ? value : 0; } }
+        public int ContentLength { get { return this.GetHeader<int>("Content-Length"); } }
 
 
         public HttpRequest(Stream stream)
         {
             this.readStream(stream);
+        }
+
+
+        /// <summary>
+        /// Returns the header
+        /// </summary>
+        public T GetHeader<T>(string header)
+        {
+            return this.Headers.TryGetValue(header, out var str) ? (T)Convert.ChangeType(str, typeof(T)) : default(T);
         }
 
 

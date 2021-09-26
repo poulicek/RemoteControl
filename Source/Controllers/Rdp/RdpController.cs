@@ -132,7 +132,6 @@ namespace RemoteControl.Controllers.Rdp
         }
 
 
-
         /// <summary>
         /// Projects the cutout of the screen considering the scale
         /// </summary>

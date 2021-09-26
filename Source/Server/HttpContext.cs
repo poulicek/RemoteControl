@@ -12,7 +12,7 @@ namespace RemoteControl.Server
         private HttpContext(Stream stream)
         {
             this.Request = new HttpRequest(stream);
-            this.Response = new HttpResponse(stream);
+            this.Response = new HttpResponse(stream, this.Request.IsGZipAccepted);
         }
 
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Net;
 using System.Text;
 using System.Web;
@@ -10,6 +11,8 @@ namespace RemoteControl.Server
     public class HttpResponse
     {
         private readonly Stream stream;
+        private readonly bool useGZipEncoding;
+
         private bool headerWritten;
 
         public bool Infinite { get; private set; }
@@ -19,9 +22,10 @@ namespace RemoteControl.Server
         public Dictionary<string, string> Headers { get; } = new Dictionary<string, string>();
 
 
-        public HttpResponse(Stream stream)
+        public HttpResponse(Stream stream, bool useGZipEncoding)
         {
             this.stream = stream;
+            this.useGZipEncoding = useGZipEncoding;
         }
 
 
@@ -31,6 +35,9 @@ namespace RemoteControl.Server
         public void WriteHeader(string mime, int? length = null)
         {
             this.Infinite = !length.HasValue;
+
+            if (this.useGZipEncoding)
+                this.Headers["Content-Encoding"] = "gzip";
 
             if (!string.IsNullOrEmpty(mime))
                 this.Headers["Content-Type"] = mime;
@@ -49,7 +56,9 @@ namespace RemoteControl.Server
             sb.AppendLine();
 
             this.headerWritten = true;
-            this.Write(sb.ToString());            
+
+            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+            this.stream.Write(bytes, 0, bytes.Length);
         }
 
 
@@ -62,10 +71,26 @@ namespace RemoteControl.Server
         }
 
 
+        /// <summary>
+        /// Compreses the stream into GZip
+        /// </summary>
+        private Stream compressStream(Stream input)
+        {
+            var result = new MemoryStream();
+            using (var cs = new GZipStream(result, CompressionMode.Compress, true))
+            {
+                input.Seek(0, SeekOrigin.Begin);
+                input.CopyTo(cs);
+            }
+
+            return result;
+        }
+
+        #region Stream Writing
+
         public void Write()
         {
-            if (!this.headerWritten)
-                this.WriteHeader(null, 0);
+            this.writeStream(null, null);
         }
 
 
@@ -77,15 +102,24 @@ namespace RemoteControl.Server
 
         public void Write(byte[] bytes, string mime = "text/html")
         {
-            if (!this.headerWritten)
-                this.WriteHeader(mime, bytes?.Length ?? 0);
-
-            if (bytes?.Length > 0)
-                this.stream.Write(bytes, 0, bytes.Length);
+            using (var ms = new MemoryStream(bytes))
+                this.Write(ms, mime);
         }
 
 
         public void Write(Stream s, string mime = "text/html")
+        {
+            if (!this.useGZipEncoding)
+                this.writeStream(s, mime);
+            else
+            {
+                using (var cs = this.compressStream(s))
+                    this.writeStream(cs, mime);
+            }
+        }
+
+
+        private void writeStream(Stream s, string mime)
         {
             if (!this.headerWritten)
                 this.WriteHeader(mime, (int)(s?.Length ?? 0));
@@ -96,5 +130,7 @@ namespace RemoteControl.Server
                 s.CopyTo(this.stream);
             }
         }
+
+        #endregion
     }
 }
