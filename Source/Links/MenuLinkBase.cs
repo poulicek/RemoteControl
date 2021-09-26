@@ -1,4 +1,4 @@
-﻿namespace RemoteControl.Controllers.Menu
+﻿namespace RemoteControl.Links
 {
     public abstract class MenuLinkBase
     {

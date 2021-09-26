@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace RemoteControl.Controllers.Menu
+namespace RemoteControl.Links
 {
     public class MenuLinkCollection
     {
         private readonly string path;
-        private readonly List<MenuLinkBase> links;
+        private readonly List<MenuLinkBase> links = new List<MenuLinkBase>();
 
 
         public MenuLinkCollection(string path)

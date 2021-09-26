@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace RemoteControl.Controllers.Menu
+namespace RemoteControl.Links
 {
     public class AppMenuLink : MenuLinkBase
     {

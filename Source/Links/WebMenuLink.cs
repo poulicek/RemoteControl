@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using RemoteControl.Logic;
 
-namespace RemoteControl.Controllers.Menu
+namespace RemoteControl.Links
 {
     public class WebMenuLink : MenuLinkBase
     {

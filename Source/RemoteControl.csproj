@@ -60,10 +60,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\Grip\GripController.cs" />
-    <Compile Include="Controllers\Menu\MenuLinkBase.cs" />
-    <Compile Include="Controllers\Menu\MenuLinkCollection.cs" />
-    <Compile Include="Controllers\Menu\AppMenuLink.cs" />
-    <Compile Include="Controllers\Menu\WebMenuLink.cs" />
+    <Compile Include="Links\MenuLinkBase.cs" />
+    <Compile Include="Links\MenuLinkCollection.cs" />
+    <Compile Include="Links\AppMenuLink.cs" />
+    <Compile Include="Links\WebMenuLink.cs" />
     <Compile Include="Controllers\Rdp\RdpController.cs" />
     <Compile Include="Controllers\Menu\MenuController.cs" />
     <Compile Include="Controllers\View\ViewController.cs" />
