@@ -6,7 +6,7 @@
 }
 
 * { touch-action: none; user-select: none; -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
-body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #002332; color: #6D93AE; position: fixed; font-family: Roboto, Arial, Tahoma; font-size: .3in; }
+body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #001f32; color: #6D93AE; position: fixed; font-family: Roboto, Arial, Tahoma; font-size: .3in; }
 #view { width: 100%; height: 100%; animation-duration: .3s; animation-timing-function: ease-in; display: grid; }
 #app-state { height: 100%; display: flex;}
 
@@ -27,6 +27,7 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #002332
 .button.reload { visibility: hidden; align-self: center; justify-self: center; }
 .button.active { background-color: rgba(255, 255, 255, .3); }
 .button.selected { background-color: rgba(255, 255, 255, .3); }
+.button.hidden { display: grid !important; visibility: hidden; }
 
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; max-width: 50vw; left: 50%; margin-left: -25vw; }
