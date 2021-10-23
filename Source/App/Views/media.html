@@ -7,6 +7,7 @@
 
     #view-media .button.large { min-height: .6in; }
     #view-media .wide-only { visibility: hidden; position: absolute; }
+    #view-media #media-buttons { display: grid; min-height: 20vh; }
     #view-media #media-buttons > div { display: grid; }
     #view-media #media-buttons > div:nth-child(1) { grid-template-columns: auto auto auto auto auto; }
     #view-media #media-buttons > div:nth-child(2) { grid-template-columns: .5fr 1fr 1fr .5fr; }
@@ -15,9 +16,9 @@
     #view-media #footer { display: grid; justify-items: left; grid-auto-flow: column; width: 100%; }
     #view-media #footer .button:last-child { justify-self: right; }
 
-    #view-media .center { display: grid; height: 100%; grid-template-columns: 15% auto 5% auto 15%; align-items: center; grid-gap: 5px; }
-    #view-media .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; padding-top: 2vh; padding-bottom: 2vh; }
-    #view-media .center div .button { width: 100%; }
+    #view-media .center { display: grid; height: 100%; grid-template-columns: 15% auto 5% auto 15%; align-items: center; grid-gap: 5px; max-height: 50vh; }
+    #view-media .center div { direction: rtl; align-self: stretch; display: flex; flex-wrap: wrap; padding-top: 2vh; padding-bottom: 2vh; justify-content: center; }
+    #view-media .center div .button { width: 100%; max-width: 20vw; margin: 5%; }
     #view-media .center span:first-child { justify-self: right; }
     #view-media .center span:last-child { justify-self: left; }
 
