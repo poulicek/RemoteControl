@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web;
 using RemoteControl.Logic;
+using TrayToolkit.Helpers;
 
 namespace RemoteControl.Controllers.Menu
 {
@@ -26,7 +27,13 @@ namespace RemoteControl.Controllers.Menu
         /// </summary>
         protected override bool ReadFile(string file)
         {
-            throw new NotImplementedException();
+            try
+            {
+                this.Link = IniHelper.ReadFile(file)["URL"];
+                return !string.IsNullOrEmpty(this.Link);
+            }
+            catch { return false; }
+            
         }
 
 
