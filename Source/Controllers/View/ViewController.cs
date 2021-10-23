@@ -45,25 +45,41 @@ namespace RemoteControl.Controllers.View
             switch (view)
             {
                 case "main":
-                    context.Response.Write(FilesController.FillTemplate(s.ReadString(), new Dictionary<string, string>()
+                    this.writeParametrizedString(context, s, new Dictionary<string, string>()
                     {
                         { "{View-Portrait}", this.getResource("media").ReadString() },
                         { "{View-Landscape}", this.getResource("rdp").ReadString() },
                         { "{Multi-Screen-Style}", Screen.AllScreens.Length > 1 ? "multi-screen" : null },
-                    }));
+                    });
                     break;
 
                 case "link":
-                    context.Response.Write(FilesController.FillTemplate(s.ReadString(), new Dictionary<string, string>()
+                    this.writeParametrizedString(context, s, new Dictionary<string, string>()
                     {
                         { "{Link}", this.serverUrlCallback?.Invoke() },
-                    }));
-                    break;               
+                    });
+                    break;
+
+                case "menu":
+                    this.writeParametrizedString(context, s, new Dictionary<string, string>()
+                    {
+                        { "{Menu-Items}", "test" },
+                    });
+                    break;
 
                 default:
                     context.Response.Write(s);
                     break;
             }            
+        }
+
+        
+        /// <summary>
+        /// Writes the parametrized string
+        /// </summary>
+        private void writeParametrizedString(HttpContext context, Stream s, Dictionary<string, string> dict)
+        {
+            context.Response.Write(FilesController.FillTemplate(s.ReadString(), dict));
         }
 
 
