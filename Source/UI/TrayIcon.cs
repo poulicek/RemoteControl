@@ -40,6 +40,17 @@ namespace RemoteControl.UI
                 return base.getIconFromBitmap(bmp.MakeGrayscale());
         }
 
+        private void showMainDialog()
+        {
+            if (this.dialog == null || this.dialog.IsDisposed)
+                this.dialog = new MainForm(this.listener);
+
+            this.dialog.Show();
+            this.dialog.WindowState = FormWindowState.Normal;
+            this.dialog.Activate();
+        }
+
+
         #region Event Handlers
 
         private void onSessionSwitch(object sender, SessionSwitchEventArgs e)
@@ -80,41 +91,10 @@ namespace RemoteControl.UI
             if (this.dialog?.Visible == true && this.dialog.WindowState == FormWindowState.Normal)
                 this.dialog.Close();
             else
-            {
-                if (this.dialog == null || this.dialog.IsDisposed)
-                    this.dialog = new MainForm(this.listener);
-
-                this.dialog.Show();
-                this.dialog.WindowState = FormWindowState.Normal;
-                this.dialog.Activate();
-            }
-        }
-
-        private void onCreateShortcut(object sender, EventArgs e)
-        {
-
-        }
-
-        private void onEditShortcuts(object sender, EventArgs e)
-        {
-
+                this.showMainDialog();
         }
 
         #endregion
-
-        protected override List<MenuItem> getContextMenuItems()
-        {
-            var items = new List<MenuItem>();
-
-            //items.Add(new MenuItem("Create shortcut...", this.onCreateShortcut));
-            //items.Add(new MenuItem("Edit shortcuts...", this.onEditShortcuts));
-            //items.Add(new MenuItem("-"));
-
-            items.AddRange(base.getContextMenuItems());
-
-            return items;
-        }
-
 
 
         protected override void Dispose(bool disposing)
