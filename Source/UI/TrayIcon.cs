@@ -51,6 +51,19 @@ namespace RemoteControl.UI
         }
 
 
+        private void handleFirstStart()
+        {
+            try
+            {
+                if (AppConfigHelper.Get<bool>("Initialized"))
+                    return;
+
+                AppConfigHelper.Set("Initialized", true);
+                this.showMainDialog();
+            }
+            catch { }
+        }
+
         #region Event Handlers
 
         private void onSessionSwitch(object sender, SessionSwitchEventArgs e)
@@ -68,6 +81,7 @@ namespace RemoteControl.UI
         {
             base.OnLoad(e);
             this.listener.StartServer();
+            this.handleFirstStart();
         }
 
         private void onConnectedChanged(bool connected)

@@ -8,3 +8,4 @@ Debug
 Release
 /Package/AppPackages
 /Package/BundleArtifacts
+/Build/RemoteControl.ini

@@ -224,7 +224,7 @@ function keepPressing(el, applyDelay) {
 
 // initializes the button press
 function initPress(e) {
-    e.currentTarget.classList.toggle('active', true);
+    e.currentTarget.classList.add('active');
     e.currentTarget.pressedEvent = e;
     return false;
 };
@@ -232,7 +232,7 @@ function initPress(e) {
 
 // cancels the button press
 function cancelPress(e) {
-    e.currentTarget.classList.toggle('active', false);
+    e.currentTarget.classList.remove('active');
     e.currentTarget.pressedEvent = null;
     return false;
 };
