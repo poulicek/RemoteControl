@@ -102,6 +102,7 @@ namespace RemoteControl.Controllers.Rdp
 
             var codec = this.getEncoder(ImageFormat.Jpeg);
 
+            r.ApplyGzipCompression = false;
             r.WriteHeader("multipart/x-mixed-replace; boundary=\"RDP_MJPEG\"");
             while (true)
             {

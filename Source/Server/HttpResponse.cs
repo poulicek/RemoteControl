@@ -11,10 +11,10 @@ namespace RemoteControl.Server
     public class HttpResponse
     {
         private readonly Stream stream;
-        private readonly bool useGZipEncoding;
-
+       
         private bool headerWritten;
 
+        public bool ApplyGzipCompression { get; set; }
         public bool Infinite { get; private set; }
         public Stream Stream { get { return this.stream; } }
         public TimeSpan? CacheAge { get; set; }
@@ -25,7 +25,7 @@ namespace RemoteControl.Server
         public HttpResponse(Stream stream, bool useGZipEncoding)
         {
             this.stream = stream;
-            this.useGZipEncoding = useGZipEncoding;
+            this.ApplyGzipCompression = useGZipEncoding;
         }
 
 
@@ -36,7 +36,7 @@ namespace RemoteControl.Server
         {
             this.Infinite = !length.HasValue;
 
-            if (this.useGZipEncoding)
+            if (this.ApplyGzipCompression)
                 this.Headers["Content-Encoding"] = "gzip";
 
             if (!string.IsNullOrEmpty(mime))
@@ -109,7 +109,7 @@ namespace RemoteControl.Server
 
         public void Write(Stream s, string mime = "text/html")
         {
-            if (!this.useGZipEncoding)
+            if (!this.ApplyGzipCompression)
                 this.writeStream(s, mime);
             else
             {
