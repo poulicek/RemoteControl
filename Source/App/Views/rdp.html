@@ -11,12 +11,6 @@
     #view-rdp #click-spot.fadeOutSmall { opacity: 0; width: 0px; height: 0px; visibility: visible; }
     #view-rdp #click-spot.fadeOutBig { opacity: 0; width: 3in; height: 3in; visibility: visible; }
 
-    #view-rdp #guide { display: grid; opacity: .8; background: black; position: absolute; top: 0; left: 0; z-index: 999; width: 100%; height: 100%; align-content: center; justify-items: center; text-decoration: none; }
-    #view-rdp #guide .hints { color: white; font-size: .2in; line-height: 35px; }
-    #view-rdp #guide .hints .icon { margin-right: 5px; float: left; }
-    #view-rdp #guide .hints .emphasis { color: #ffb100; }
-    #view-rdp #guide .hints .de-emphasis { font-size: 80%; opacity: .8; }
-
     #view-rdp .loaded #canvas { opacity: 1; }
     #view-rdp .loaded .loading { display: none; }
 
@@ -57,8 +51,9 @@
         <span id="click-spot"></span>
     </a>
 
-    <a id="guide" href="#" onclick="this.parentNode.removeChild(this);" rel="js">
+    <a class="guide" href="#" onclick="confirmGuide(this);" rel="js">
         <div class="hints">
+            <span class="icon">&#xe1c1;</span><span class="emphasis">Rotate</span> to switch to media controls<br />
             <span class="icon">&#xe8ff;</span><span class="emphasis">Long-press</span> to fast zoom<span class="de-emphasis"> (when zoomed-out)</span><br />
             <span class="icon">&#xe323;</span><span class="emphasis">Long-press</span> to right-click<span class="de-emphasis"> (when zoomed-in)</span>
         </div>

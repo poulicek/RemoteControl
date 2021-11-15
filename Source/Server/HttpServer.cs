@@ -28,11 +28,7 @@ namespace RemoteControl.Server
         {
             get
             {
-                foreach (var ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
-                    if (ip.AddressFamily == AddressFamily.InterNetwork)
-                        return ip.ToString();
-
-                return "localhost";
+                return this.getLocalIPByUDP() ?? this.getLocalIPByNetworkInterface() ?? "localhost";
             }
         }
 
@@ -49,6 +45,38 @@ namespace RemoteControl.Server
         {
             this.Port = port;
             this.Certificate = cert;
+        }
+
+
+
+        /// <summary>
+        /// Returns the local IP via UDP pocket
+        /// </summary>
+        private string getLocalIPByUDP()
+        {
+            try
+            {
+                using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+                {
+                    socket.Connect("8.8.8.8", 65530);
+                    return (socket.LocalEndPoint as IPEndPoint)?.Address.ToString();
+                }
+            }
+            catch { return null; }
+        }
+
+
+
+        /// <summary>
+        /// Returns the local IP via NetworkInterface
+        /// </summary>
+        private string getLocalIPByNetworkInterface()
+        {
+            foreach (var ip in Dns.GetHostEntry(Dns.GetHostName()).AddressList)
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                    return ip.ToString();
+
+            return null;
         }
 
 

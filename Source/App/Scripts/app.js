@@ -19,6 +19,7 @@ function onLoad() {
         DEFAULT_HEIGHT = document.body.offsetHeight;
     LANDSCAPE_EL = document.getElementById('landscape');
 
+    initGuides();
     preventDoubleTap();
     bindEvents();
     init();
@@ -79,6 +80,10 @@ function onConnectSuccess(data) {
     }
     else {
         console.log('Loading new version');
+
+        if (window.localStorage)
+            window.localStorage.clear();
+
         document.location.reload(true);
     }   
 };

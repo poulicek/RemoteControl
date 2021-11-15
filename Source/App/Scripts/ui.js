@@ -1,6 +1,7 @@
 ﻿var SCAN_MODE = 0;
 var ERROR_ID = 0;
 var LAST_INPUT_VALUE = '';
+var GUIDES = null;
 
 
 // binds the events on links
@@ -350,7 +351,6 @@ function focusKeyboard(el, preferKeyCode) {
 };
 
 
-
 // handles the key change event
 function onKeyChanged(e) {
     try {
@@ -372,4 +372,38 @@ function onKeyChanged(e) {
         sendRequest('?c=key&v=' + keyCode + '&h=' + h + '&p=' + (preferKeyCode ? 1 : 0));
     }
     catch (e) { setError(e.toString()); }
+};
+
+
+// initializes the hidden state of guideline screens
+function initGuides() {
+    if (window.localStorage) {
+
+        // loading the guide ids
+        GUIDES = JSON.parse(window.localStorage.getItem('guides')) || new Array();
+
+        // creating a css
+        var css = '';
+        for (var i = 0; i < GUIDES.length; i++) {
+            css += '#' + GUIDES[0] + ' { display: none !important; }\r\n';
+        }
+
+        // creating the style element
+        var styleEl = document.createElement('style');
+        styleEl.type = 'text/css';
+        styleEl.appendChild(document.createTextNode(css));
+        document.head.appendChild(styleEl);
+    }
+};
+
+
+// hides the guideline screen and remembers the state if element's id is set
+function confirmGuide(el) {
+    el.parentNode.removeChild(el);
+
+    // remembering the choice
+    if (el.id && window.localStorage && GUIDES) {
+        GUIDES.push(el.id);
+        window.localStorage.setItem('guides', JSON.stringify(GUIDES));
+    }
 };
