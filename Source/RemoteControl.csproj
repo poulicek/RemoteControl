@@ -59,6 +59,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\Files\FileTemplate.cs" />
     <Compile Include="Controllers\Grip\GripController.cs" />
     <Compile Include="Links\MenuLinkBase.cs" />
     <Compile Include="Links\MenuLinkCollection.cs" />
