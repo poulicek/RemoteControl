@@ -86,9 +86,9 @@
         },
 
         // propagates the current state of the viewpoirt
-        report: function (panning, viewMoved) {
+        report: function (panning) {
             if (onViewChangedHandler && isLandScape())
-                onViewChangedHandler(this, panning, viewMoved);
+                onViewChangedHandler(this, panning);
         }
     };
 
@@ -144,7 +144,7 @@
 
         onTouchEnd: function () {
 
-            viewport.report(false, eventHandlers.touchMoved);
+            viewport.report(false);
 
             if (eventHandlers.firstTouch && !eventHandlers.touchMoved)
                 eventHandlers.onClick(eventHandlers.firstTouch);

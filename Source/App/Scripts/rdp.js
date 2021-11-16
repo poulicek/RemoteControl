@@ -10,6 +10,7 @@
     var lastClick = null;
     var lastCoords = { x: 0, y: 0 };
     var cursorOn = false;
+    var additionalAttributes = '';
     
 
     // binds the actions
@@ -111,42 +112,32 @@
 
 
     // performs scrolling
-    function onScroll(overflowX, overflowY, x, y) {
-        if (isLandScape())
-            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * overflowX) + "&y=" + Math.floor(100000 * overflowY) + '&mx=' + Math.floor(100000 * x) + "&my=" + Math.floor(100000 * y) + "&b=2" + '&e=' + screen));
-        reloadImage();
+    function onScroll(scrollX, scrollY, x, y) {
+        // the additional attributes are used to avoid lagging of screen updates
+        additionalAttributes = '&x=' + Math.floor(100000 * scrollX) + "&y=" + Math.floor(100000 * scrollY) + '&mx=' + Math.floor(100000 * x) + "&my=" + Math.floor(100000 * y) + "&b=2";
     };
 
 
-    // moves the mose to the given position
+    // moves the mouse to the given position
     function onMouseMove(x, y) {
-        sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=0" + '&e=' + screen));
-    };
-
-
-    // handles the alternative mouse event
-    function onAlternativeMouse(e, holding, moved) {
-
-        if (!holding && !moved) {
-            sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * e.x) + "&y=" + Math.floor(100000 * e.y) + "&b=" + e.b + '&e=' + screen));
-            reloadImage();
-            lastClick = null;
-        }        
+        // the additional attributes are used to avoid lagging of screen updates (as long they aren't set by scrolling yet)
+        if (additionalAttributes == '')
+            additionalAttributes = '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=0";
     };
 
 
     // onviewchanged handler definition
-    function onViewPortChanged(vp, isPanning, moved) {
+    function onViewPortChanged(vp, isPanning) {
 
         // updating the view
         cutout = vp.cutout.join();
         cursorOn = false; // INSTALLED && isPanning;
         updateView(el, vp, isPanning);
 
-        // handling scorlling
+        // handling scrolling
         tryScroll(vp, isPanning);
 
-        // moving the mouse of the viewport coordinates got updated
+        // moving the mouse if the viewport coordinates got updated
         if (vp.coords && (lastCoords.x != vp.coords.x || lastCoords.y != vp.coords.y)) {
             onMouseMove(vp.coords.x, vp.coords.y);
             lastCoords = vp.coords;
@@ -192,7 +183,7 @@
 
         if (vp.overflowX || vp.overflowY) {
 
-            // detecting the scrolling distance if the overflow matches the alled scrolling position
+            // detecting the scrolling distance if the overflow matches the allowed scrolling position
             var scrollX = scrollDir.x == 0 || Math.sign(vp.overflowX) == scrollDir.x ? vp.overflowX / vp.rangeX : 0;
             var scrollY = scrollDir.y == 0 || Math.sign(vp.overflowY) == scrollDir.y ? vp.overflowY / vp.rangeY : 0;
 
@@ -217,7 +208,11 @@
                 session = getSessionId();
             }
 
-            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&e=' + screen +'&u=' + (cursorOn ? 1 : 0) + '&' + (++requestId).toString(32);
+            // adding the additional attributes to the screen request
+            var attr = additionalAttributes;
+            additionalAttributes = '';
+
+            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&e=' + screen + '&u=' + (cursorOn ? 1 : 0) + '&' + (++requestId).toString(32) + attr;
         }
         else if (!isEmpty) {
             isEmpty = true;

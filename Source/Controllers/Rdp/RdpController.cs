@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -16,44 +17,59 @@ namespace RemoteControl.Controllers.Rdp
         private Point lastCursor;
         private string lastSession = string.Empty;
 
-
         public void ProcessRequest(HttpContext context)
         {
             switch (context.Request.Query["v"])
             {
                 case "screen":
-                    {
-                        var session = context.Request.Query["s"] ?? string.Empty;                        
-                        var setCursor = int.TryParse(context.Request.Query["u"], out var u) && u == 1;
-                        var screen = this.readScreen(context.Request.Query["e"]);
-                        var cutout = this.projectCutout(this.readRelativeCutout(context.Request.Query["w"]?.Split(',')), screen.Bounds);
-
-                        this.handleScreenRequest(context.Response, session, screen, cutout, setCursor);
-                        break;
-                    }
+                    this.processScreenRequest(context);
+                    break;
 
                 case "stream":
-                    {
-                        this.writeMJPEG(context.Response, this.readScreen(context.Request.Query["e"]));
-                        break;
-                    }
+                    this.writeMJPEG(context.Response, this.readScreen(context.Request.Query["e"]));
+                    break;
 
                 case "click":
-                    {
-                        var screen = this.readScreen(context.Request.Query["e"]);
-                        var btn = int.TryParse(context.Request.Query["b"], out var b) ? b : 1;
+                    this.processClickRequest(context);
+                    break;
+            }
+        }
 
-                        if (int.TryParse(context.Request.Query["x"], out var xRatio) && int.TryParse(context.Request.Query["y"], out var yRatio))
-                        {
-                            if (btn == 0)
-                                this.perfromMouseMove(screen, xRatio / r, yRatio / r);
-                            else if (btn != (int)InputHelper.MouseButton.Middle)
-                                this.perfromMouseClick(screen, xRatio / r, yRatio / r, btn);
-                            else if (int.TryParse(context.Request.Query["mx"], out var mxRatio) && int.TryParse(context.Request.Query["my"], out var myRatio))
-                                this.perfromWheelScroll(screen, xRatio / r, yRatio / r, mxRatio / r, myRatio / r);
-                        }
-                        break;
-                    }
+
+        /// <summary>
+        /// Processes the screen request
+        /// </summary>
+        private void processScreenRequest(HttpContext context)
+        {
+            // processing the click request provided together with the screen
+            if (context.Request.Query["b"] != null)
+                this.processClickRequest(context);
+
+            var session = context.Request.Query["s"] ?? string.Empty;
+            var setCursor = int.TryParse(context.Request.Query["u"], out var u) && u == 1;
+            var screen = this.readScreen(context.Request.Query["e"]);
+            var cutout = this.projectCutout(this.readRelativeCutout(context.Request.Query["w"]?.Split(',')), screen.Bounds);
+
+            this.handleScreenRequest(context.Response, session, screen, cutout, setCursor);
+        }
+
+
+        /// <summary>
+        /// Processes the click request
+        /// </summary>
+        private void processClickRequest(HttpContext context)
+        {
+            var screen = this.readScreen(context.Request.Query["e"]);
+            var btn = int.TryParse(context.Request.Query["b"], out var b) ? b : 1;
+
+            if (int.TryParse(context.Request.Query["x"], out var xRatio) && int.TryParse(context.Request.Query["y"], out var yRatio))
+            {
+                if (btn == 0)
+                    this.perfromMouseMove(screen, xRatio / r, yRatio / r);
+                else if (btn != (int)InputHelper.MouseButton.Middle)
+                    this.perfromMouseClick(screen, xRatio / r, yRatio / r, btn);
+                else if (int.TryParse(context.Request.Query["mx"], out var mxRatio) && int.TryParse(context.Request.Query["my"], out var myRatio))
+                    this.perfromWheelScroll(screen, xRatio / r, yRatio / r, mxRatio / r, myRatio / r);
             }
         }
 
@@ -212,7 +228,9 @@ namespace RemoteControl.Controllers.Rdp
         {
             this.perfromMouseMove(screen, mxRatio, myRatio);
             var scroll = screen.Project(new Point((int)(xRatio * screen.Width), (int)(yRatio * screen.Height)));
-            InputHelper.MouseScroll(scroll.X, scroll.Y);
+            InputHelper.MouseScroll(Math.Sign(scroll.X) * 160, Math.Sign(scroll.Y) * 160);
+
+            Debug.WriteLine($"{scroll.X} {scroll.Y}");
         }
 
 
