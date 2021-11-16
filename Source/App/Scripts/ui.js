@@ -118,13 +118,8 @@ function bindPressEvents(el) {
 
 // binds the click events
 function bindClickEvents(el) {
-    el.ontouchend = el.onmouseup = sendClick;
-    el.ontouchstart = el.onmousedown = initPress;
-    el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
-    el.ontouchmove = function(e) {
-        if (!isTouched(e))
-            return cancelPress(e);
-    };
+    el.ontouchstart = el.onmousedown = sendKeyDown;
+    el.ontouchend = el.onmouseup = el.ontouchcancel = el.onclick = el.onmouseout = cancelPress;
 };
 
 // binds the grip events
@@ -302,6 +297,12 @@ function setAppStatus(className, errorText) {
 };
 
 
+// sets the loading app status
+function setLoading() {
+    setAppStatus('status-loading');
+};
+
+
 // sets the error status with timeout
 function setError(errorText, permanent) {    
 
@@ -391,7 +392,7 @@ function initGuides() {
         // creating a css
         var css = '';
         for (var i = 0; i < GUIDES.length; i++) {
-            css += '#' + GUIDES[0] + ' { display: none !important; }\r\n';
+            css += '#' + GUIDES[i] + ' { display: none !important; }\r\n';
         }
 
         // creating the style element

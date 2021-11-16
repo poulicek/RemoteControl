@@ -31,6 +31,8 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #001f32
 
 .status { position: absolute; width: 100%; top: 15px; visibility: hidden; font-size: .6em; z-index: 999; text-align: center; }
 .status#status-normal { visibility: visible; max-width: 50vw; left: 50%; margin-left: -25vw; }
+.status#status-loading { z-index: 9999; }
+.status#status-loading .icon { padding: 12px; border-radius: 20%; }
 .status#status-error { color: #AD4141; z-index: 9999; }
 .status#status-error .icon { padding: 12px; border-radius: 20%; }
 .status #status-error-text { position: fixed; z-index: 9999; bottom: 0px; margin: 0px; white-space: pre-wrap; width: 100%; padding: 2vmin; box-sizing: border-box; word-break: break-word; text-align: left; font-size: 80%; }
@@ -42,6 +44,8 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #001f32
 .guide .hints .emphasis { color: #ffb100; }
 .guide .hints .de-emphasis { font-size: 80%; opacity: .8; }
 
+#app-state.status-loading #status-loading { visibility: visible; }
+#app-state.status-loading #status-normal { visibility: hidden; }
 #app-state.status-error #status-error { visibility: visible; }
 #app-state.status-error #status-normal { visibility: hidden; }
 #app-state.status-error .reload { visibility: visible; }

@@ -6,6 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=11" />
 
+    <meta id="app-timestamp" name="app-timestamp" content="{TimeStamp}" />
     <meta id="app-version" name="app-version" content="{Version}" />
     <meta id="app-url" name="app-url" content="{HostUrl}" />
 
@@ -33,7 +34,8 @@
     <input id="keyboard" type="text" onkeyup="onKeyChanged(window.event)" value="" />
     <div id="app-state">
         <div id="status-normal" class="status"></div>
-        <div id="status-error" class="status"><span class="icon dark">&#57818;</span><pre id="status-error-text" class="dark"></pre></div>
+        <div id="status-error" class="status"><span class="icon dark">&#xe1da;</span><pre id="status-error-text" class="dark"></pre></div>
+        <div id="status-loading" class="status"><span class="icon">&#xe1d8;</span></div>
         <div id="view">
             <span class="icon loading">&#xe88b;</span>
             <a rel="js" class="button reload icon outline large" href="javascript:init();">&#58837;</a>

@@ -1,7 +1,13 @@
-﻿// sends an ajax request
+﻿REQUEST_ID = 0;
+
+
+// sends an ajax request
 function sendRequest(query, onSuccess, onError, timeout) {
     try {
+        setLoading();
+
         var xhttp = new XMLHttpRequest();
+        xhttp.requestid = ++REQUEST_ID;
         xhttp.query = query;
         xhttp.onreadystatechange = function () { handleResponse(this, onSuccess, onError) };
         xhttp.open('GET', query, true);
@@ -11,8 +17,7 @@ function sendRequest(query, onSuccess, onError, timeout) {
         return xhttp;
     }
     catch (e) {
-        if (onError)
-            onError(e.toString());
+        raiseError(e.toString(), onError);
 	}
 };
 
@@ -21,7 +26,11 @@ function sendRequest(query, onSuccess, onError, timeout) {
 function handleResponse(xhttp, onSuccess, onError) {
     if (xhttp.readyState == 4) {
         if (xhttp.status == 200) {
-            setAppStatus();
+
+            setTimeout(function () {
+                if (REQUEST_ID == xhttp.requestid)
+                    setAppStatus();
+            }, 200);
 
             if (onSuccess)
                 onSuccess(xhttp.responseText);
@@ -31,10 +40,17 @@ function handleResponse(xhttp, onSuccess, onError) {
                 ? "Server unrecheable: " + xhttp.query
                 : (xhttp.responseText ? xhttp.responseText : xhttp.status);
 
-            if (onError)
-                onError(errorText);
-            else
-                setError(errorText);
+            raiseError(errorText, onError);
         }
     }
+};
+
+
+// raises an error state
+function raiseError(errorText, onError) {
+
+    if (onError)
+        onError(errorText);
+    else
+        setError(errorText);
 };

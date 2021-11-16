@@ -50,6 +50,7 @@ namespace RemoteControl.Controllers.Files
         {
             return FillTemplate(s.ReadString(), new Dictionary<string, string>()
             {
+                { "{TimeStamp}", DateTime.UtcNow.Ticks.ToString() },
                 { "{Version}", this.appVersion },
                 { "{HostUrl}", this.hostUrl },
                 { "{Title}", Environment.MachineName },

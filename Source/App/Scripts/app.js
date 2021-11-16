@@ -1,5 +1,6 @@
 ﻿var APP_URL = document.getElementById('app-url').content;
 var APP_VERSION = document.getElementById('app-version').content;
+var APP_TIMESTAMP = document.getElementById('app-timestamp').content;
 var DEFAULT_VIEW = 'main';
 var CURRENT_VIEW = '';
 var DEBUG_MODE = false;
