@@ -80,10 +80,6 @@ function onConnectSuccess(data) {
     }
     else {
         console.log('Loading new version');
-
-        if (window.localStorage)
-            window.localStorage.clear();
-
         document.location.reload(true);
     }   
 };

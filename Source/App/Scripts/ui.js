@@ -379,8 +379,14 @@ function onKeyChanged(e) {
 function initGuides() {
     if (window.localStorage) {
 
+        // resetting the local storage if the version differes
+        if (APP_VERSION != window.localStorage.getItem('APP_VERSION')) {
+            window.localStorage.clear();
+            window.localStorage.setItem('APP_VERSION', APP_VERSION);
+        }
+
         // loading the guide ids
-        GUIDES = JSON.parse(window.localStorage.getItem('guides')) || new Array();
+        GUIDES = JSON.parse(window.localStorage.getItem('GUIDE_IDS')) || new Array();
 
         // creating a css
         var css = '';
@@ -389,10 +395,7 @@ function initGuides() {
         }
 
         // creating the style element
-        var styleEl = document.createElement('style');
-        styleEl.type = 'text/css';
-        styleEl.appendChild(document.createTextNode(css));
-        document.head.appendChild(styleEl);
+        document.getElementById('guides-style').appendChild(document.createTextNode(css));
     }
 };
 
@@ -404,6 +407,7 @@ function confirmGuide(el) {
     // remembering the choice
     if (el.id && window.localStorage && GUIDES) {
         GUIDES.push(el.id);
-        window.localStorage.setItem('guides', JSON.stringify(GUIDES));
+        window.localStorage.setItem('GUIDE_IDS', JSON.stringify(GUIDES));
+        initGuides();
     }
 };
