@@ -212,7 +212,7 @@
             var attr = additionalAttributes;
             additionalAttributes = '';
 
-            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&e=' + screen + '&u=' + (cursorOn ? 1 : 0) + '&' + (++requestId).toString(32) + attr;
+            img.src = img.getAttribute('data-src') + '&w=' + cutout + '&s=' + session + '&e=' + screen + '&u=' + (cursorOn ? 1 : 0) + attr + '&' + (++requestId).toString(36);
         }
         else if (!isEmpty) {
             isEmpty = true;
