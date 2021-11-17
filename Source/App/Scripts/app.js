@@ -100,7 +100,7 @@ function onConnectError(error, url) {
 // loads a view with given id
 function loadView(id) {
     console.log('Loading view: ' + id);
-    sendRequest('?c=view&v=' + id + '&_' + APP_VERSION, function (r) { onLoadViewSuccess(id, r); }, onLoadViewError, 1000);
+    sendRequest('?c=view&v=' + id + '&_' + APP_VERSION, function (r) { onLoadViewSuccess(id, r); }, onLoadViewError);
 };
 
 
