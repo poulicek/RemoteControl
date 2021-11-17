@@ -41,25 +41,15 @@ namespace RemoteControl.Controllers.Media
 
         private void setSuppendStateAsync()
         {
-            // reliable way to put PC to sleep is by setting the SuspendState 1 which, however, uses hibarnation if it is enabled
             if (Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Power", false).GetValue("HibernateEnabled") as int? == 0)
+            {
+                // reliable way to put PC to sleep is by setting the SuspendState 1 which, however, uses hibarnation if it is enabled
                 Application.SetSuspendState(PowerState.Hibernate, true, true);
+            }
             else
             {
-                var time = DateTime.Now;
-
                 // turning of the display triggers sleep if S0 power state is supported
                 this.display.TurnOff();
-
-                ThreadingHelper.DoAsync(() =>
-                {
-                    // giving a chance the computer to go to sleep
-                    Thread.Sleep(3000);
-
-                    // turning on standby if the computer remained active while the screen was off
-                    if ((DateTime.Now - time).TotalSeconds < 5)
-                        Application.SetSuspendState(PowerState.Suspend, true, true);
-                });
             }
         }
 
