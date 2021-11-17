@@ -42,7 +42,7 @@ namespace RemoteControl.Controllers.Media
         private void setSuppendStateAsync()
         {
             // reliable way to put PC to sleep is by setting the SuspendState 1 which, however, uses hibarnation if it is enabled
-            if (Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Power", false).GetValue("HibernateEnabled") as int? != 1)
+            if (Registry.LocalMachine.OpenSubKey("SYSTEM\\CurrentControlSet\\Control\\Power", false).GetValue("HibernateEnabled") as int? == 0)
                 Application.SetSuspendState(PowerState.Hibernate, true, true);
             else
             {
