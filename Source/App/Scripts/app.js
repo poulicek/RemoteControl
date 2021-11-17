@@ -146,7 +146,7 @@ function copyText(str) {
 
 // generates a session id
 function getSessionId() {
-    return new Date().getTime().toString(32);
+    return Math.floor(1296 * Math.random()).toString(36);
 };
 
 

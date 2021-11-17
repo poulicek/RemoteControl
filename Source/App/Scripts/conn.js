@@ -54,3 +54,9 @@ function raiseError(errorText, onError) {
     else
         setError(errorText);
 };
+
+
+// converts the float number to hexadecimal representation
+function enc(number) {
+    return Math.floor(100000 * number).toString(16);
+};

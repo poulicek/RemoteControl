@@ -102,7 +102,7 @@
             if (b == 3 && z == 1)
                 zoomIn(e);
             else {
-                sendRequest(getUrl(el.href, '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=" + (b ? b : '') + '&e=' + screen));
+                sendRequest(getUrl(el.href, '&x=' + enc(x) + "&y=" + enc(y) + "&b=" + (b ? b : '') + '&e=' + screen));
                 showTouchEffect(document.getElementById('click-spot'), e.clientX, e.clientY, b == 3);
                 lastClick = { x: x, y: y, b: b, time: time };
                 reloadImage();
@@ -114,7 +114,7 @@
     // performs scrolling
     function onScroll(scrollX, scrollY, x, y) {
         // the additional attributes are used to avoid lagging of screen updates
-        additionalAttributes = '&x=' + Math.floor(100000 * scrollX) + "&y=" + Math.floor(100000 * scrollY) + '&mx=' + Math.floor(100000 * x) + "&my=" + Math.floor(100000 * y) + "&b=2";
+        additionalAttributes = '&x=' + enc(scrollX) + "&y=" + enc(scrollY) + '&mx=' + enc(x) + "&my=" + enc(y) + "&b=2";
     };
 
 
@@ -122,7 +122,7 @@
     function onMouseMove(x, y) {
         // the additional attributes are used to avoid lagging of screen updates (as long they aren't set by scrolling yet)
         if (additionalAttributes == '')
-            additionalAttributes = '&x=' + Math.floor(100000 * x) + "&y=" + Math.floor(100000 * y) + "&b=0";
+            additionalAttributes = '&x=' + enc(x) + "&y=" + enc(y) + "&b=0";
     };
 
 

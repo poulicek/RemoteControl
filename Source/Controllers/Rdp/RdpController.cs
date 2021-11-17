@@ -12,7 +12,6 @@ namespace RemoteControl.Controllers.Rdp
     {
         public event Action SessionChanged;
 
-        private const float r = 100000; // relative values resolution
         private Point lastCursor;
         private string lastSession = string.Empty;
 
@@ -32,6 +31,24 @@ namespace RemoteControl.Controllers.Rdp
                     this.processClickRequest(context);
                     break;
             }
+        }
+
+
+        /// <summary>
+        /// Converts the hexa formatted numeric attribute to a float number
+        /// </summary>
+        private float denc(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return float.NaN;
+
+            try
+            {
+                var sign = str[0] == '-' ? -1 : 1;
+                var num = Convert.ToInt32(str.TrimStart('-'), 16);
+                return sign * num / 100000f;
+            }
+            catch { return float.NaN; }
         }
 
 
@@ -58,17 +75,26 @@ namespace RemoteControl.Controllers.Rdp
         /// </summary>
         private void processClickRequest(HttpContext context)
         {
+            var xRatio = this.denc(context.Request.Query["x"]);
+            var yRatio = this.denc(context.Request.Query["y"]);
+
+            if (float.IsNaN(xRatio) || float.IsNaN(yRatio))
+                return;
+
             var screen = this.readScreen(context.Request.Query["e"]);
             var btn = int.TryParse(context.Request.Query["b"], out var b) ? b : 1;
 
-            if (int.TryParse(context.Request.Query["x"], out var xRatio) && int.TryParse(context.Request.Query["y"], out var yRatio))
+            if (btn == 0)
+                this.perfromMouseMove(screen, xRatio, yRatio);
+            else if (btn != (int)InputHelper.MouseButton.Middle)
+                this.perfromMouseClick(screen, xRatio, yRatio, btn);
+            else
             {
-                if (btn == 0)
-                    this.perfromMouseMove(screen, xRatio / r, yRatio / r);
-                else if (btn != (int)InputHelper.MouseButton.Middle)
-                    this.perfromMouseClick(screen, xRatio / r, yRatio / r, btn);
-                else if (int.TryParse(context.Request.Query["mx"], out var mxRatio) && int.TryParse(context.Request.Query["my"], out var myRatio))
-                    this.perfromWheelScroll(screen, xRatio / r, yRatio / r, mxRatio / r, myRatio / r);
+                var mxRatio = this.denc(context.Request.Query["mx"]);
+                var myRatio = this.denc(context.Request.Query["my"]);
+
+                if (!float.IsNaN(mxRatio) && !float.IsNaN(myRatio))
+                    this.perfromWheelScroll(screen, xRatio, yRatio, mxRatio, myRatio);
             }
         }
 
@@ -175,11 +201,7 @@ namespace RemoteControl.Controllers.Rdp
             if (cutout?.Length != 4)
                 return RectangleF.Empty;
 
-            return new RectangleF(
-                int.TryParse(cutout[0], out var x) ? x / r : 0,
-                int.TryParse(cutout[1], out var y) ? y / r : 0,
-                int.TryParse(cutout[2], out var w) ? w / r : 0,
-                int.TryParse(cutout[3], out var h) ? h / r : 0);
+            return new RectangleF(this.denc(cutout[0]), this.denc(cutout[1]), this.denc(cutout[2]), this.denc(cutout[3]));
         }
 
 

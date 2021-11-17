@@ -287,14 +287,7 @@
         var ratioX = maxX == 0 ? 0 : (1 + -x / maxX) / 2;
         var ratioY = maxY == 0 ? 0 : (1 + -y / maxY) / 2;
 
-        // multiplier to ensure correct resolution of numbers
-        var r = 100000;
-
-        return [
-            Math.floor(r * ratioX),
-            Math.floor(r * ratioY),
-            Math.ceil(r * w),
-            Math.ceil(r * h)];
+        return [enc(ratioX), enc(ratioY), enc(w), enc(h)];
     };
 
 
