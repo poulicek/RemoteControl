@@ -392,7 +392,7 @@ function initGuides() {
         // creating a css
         var css = '';
         for (var i = 0; i < GUIDES.length; i++) {
-            css += '#' + GUIDES[i] + ' { display: none !important; }\r\n';
+            css += '#' + GUIDES[i] + ' { visibility: hidden !important; opacity: 0 !important; }\r\n';
         }
 
         // creating the style element
@@ -403,12 +403,14 @@ function initGuides() {
 
 // hides the guideline screen and remembers the state if element's id is set
 function confirmGuide(el) {
-    el.parentNode.removeChild(el);
 
     // remembering the choice
     if (el.id && window.localStorage && GUIDES) {
         GUIDES.push(el.id);
         window.localStorage.setItem('GUIDE_IDS', JSON.stringify(GUIDES));
         initGuides();
+    }
+    else {
+        el.parentNode.removeChild(el);
     }
 };

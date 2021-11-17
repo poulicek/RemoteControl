@@ -137,11 +137,11 @@
         // handling scrolling
         tryScroll(vp, isPanning);
 
-        // moving the mouse if the viewport coordinates got updated
-        if (vp.coords && (lastCoords.x != vp.coords.x || lastCoords.y != vp.coords.y)) {
-            onMouseMove(vp.coords.x, vp.coords.y);
-            lastCoords = vp.coords;
-        }
+        //// moving the mouse if the viewport coordinates got updated - seems less useful
+        //if (vp.coords && (lastCoords.x != vp.coords.x || lastCoords.y != vp.coords.y)) {
+        //    onMouseMove(vp.coords.x, vp.coords.y);
+        //    lastCoords = vp.coords;
+        //}
     };
 
 

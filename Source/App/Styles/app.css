@@ -39,8 +39,9 @@ body { width: 100%; height: 100%; padding: 0px; margin: 0px; background: #001f32
 .status #status-error-text:empty { display: none; }
 
 .guide { display: grid; font-size: .2in; background-color: rgba(0, 0, 0, .8); position: absolute; top: 0; left: 0; z-index: 999; width: 100%; height: 100%; align-content: center; justify-items: center; text-decoration: none; }
-.guide .hints { color: white; line-height: 35px; padding: 5vw; }
-.guide .hints .icon { margin-right: 5px; float: left; }
+.guide { animation-timing-function: ease-out; transition: visibility .3s, opacity .3s; }
+.guide .hints { color: white; line-height: 35px; margin: 5vw; padding-left: 35px; }
+.guide .hints .icon { margin-right: 5px; float: left; margin-left: -35px; }
 .guide .hints .emphasis { color: #ffb100; }
 .guide .hints .de-emphasis { font-size: 80%; opacity: .8; }
 
