@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -227,10 +226,12 @@ namespace RemoteControl.Controllers.Rdp
         private void perfromWheelScroll(ScreenBounds screen, float xRatio, float yRatio, float mxRatio, float myRatio)
         {
             this.perfromMouseMove(screen, mxRatio, myRatio);
-            var scroll = screen.Project(new Point((int)(xRatio * screen.Width), (int)(yRatio * screen.Height)));
-            InputHelper.MouseScroll(Math.Sign(scroll.X) * 160, Math.Sign(scroll.Y) * 160);
 
-            Debug.WriteLine($"{scroll.X} {scroll.Y}");
+            // using the fixed scroll step seems more natural
+            //var scroll = screen.Project(new Point((int)(xRatio * screen.Width), (int)(yRatio * screen.Height)));
+            //InputHelper.MouseScroll(scroll.X, scroll.Y);
+
+            InputHelper.MouseScroll(Math.Sign(xRatio) * 160, Math.Sign(yRatio) * 160);
         }
 
 
