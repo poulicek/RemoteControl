@@ -9,17 +9,18 @@ var LANDSCAPE_EL = null;
 var INSTALLED = isAppInstalled();
 
 window.onload = onLoad;
-window.onhashchange = onHashChange;
-window.onorientationchange = onOrientationChanged;
+window.onfocus = compensatePadding;
+window.onhashchange = onHashChange
+window.onorientationchange = compensatePadding;
+
 
 
 // handles the load event
 function onLoad() {
 
-    if (window.innerHeight > window.innerWidth)
-        DEFAULT_HEIGHT = document.body.offsetHeight;
     LANDSCAPE_EL = document.getElementById('landscape');
 
+    compensatePadding();
     initGuides();
     preventDoubleTap();
     bindEvents();
@@ -27,12 +28,21 @@ function onLoad() {
 };
 
 
-// compensates iOS bug width screen height after rotation
-function onOrientationChanged() {
-    document.body.className =
-        window.innerHeight > window.innerWidth && DEFAULT_HEIGHT && document.body.offsetHeight != DEFAULT_HEIGHT
-            ? 'compensate-ios-padding'
-            : null;
+// compensates iOS bug with screen height after rotation
+function compensatePadding() {
+
+    if (window.innerHeight < window.innerWidth) {
+        document.body.style.top = '0px';
+        document.body.style.height = '100%';
+    }
+    else {
+        if (!DEFAULT_HEIGHT) {
+            DEFAULT_HEIGHT = document.body.offsetHeight;
+        }
+
+        document.body.style.top = (document.body.offsetHeight - DEFAULT_HEIGHT) + 'px';
+        document.body.style.height = DEFAULT_HEIGHT + 'px';
+    }
 };
 
 
