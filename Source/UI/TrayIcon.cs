@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -11,16 +10,25 @@ namespace RemoteControl.UI
 {
     public class TrayIcon : TrayIconBase
     {
+        private static TrayIcon instance;
+
         private MainForm dialog;
         private readonly Bitmap tooltipIcon = ResourceHelper.GetResourceImage("Resources.IconDark.png");
         private readonly RequestHandler listener = new RequestHandler();
 
         public TrayIcon() : base("Simple Remote Control", "https://github.com/poulicek/RemoteControl", false)
         {
+            instance = this;
             this.listener.NotificationRaised += this.onNotificationRaised;
             this.listener.ConnectedChanged += this.onConnectedChanged;
             this.listener.ConnectionError += this.onConnectionError;
             SystemEvents.SessionSwitch += this.onSessionSwitch;
+        }
+
+
+        internal static void Invoke(Action callback)
+        {
+            instance?.BeginInvoke(callback);
         }
 
 

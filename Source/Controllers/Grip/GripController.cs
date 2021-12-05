@@ -27,7 +27,7 @@ namespace RemoteControl.Controllers.Grip
             if (int.TryParse(context.Request.Query["s"], out var keyState) && keyState == 0)
                 button.Release();
             else
-                button.Press(this.parseCoords(context.Request.Query["o"].Split(',')));                
+                button.Press(this.parseCoords(context.Request.Query["o"]?.Split(',')));                
         }
 
 
@@ -60,7 +60,7 @@ namespace RemoteControl.Controllers.Grip
         /// </summary>
         private PointF parseCoords(string[] coords)
         {
-            if (coords.Length != 2 ||
+            if (coords?.Length != 2 ||
                 !float.TryParse(coords[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) ||
                 !float.TryParse(coords[1], NumberStyles.Any, CultureInfo.InvariantCulture, out var y))
                 return PointF.Empty;

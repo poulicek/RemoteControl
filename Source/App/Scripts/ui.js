@@ -124,7 +124,7 @@ function bindClickEvents(el) {
 
 // binds the grip events
 function bindGripEvents(el) {
-    el.ontouchstart = el.onmousedown = initPress;
+    el.ontouchstart = el.onmousedown = sendKeyDown;
     el.ontouchend = el.onclick = el.onmouseup = el.onmouseout = sendKeyUp;
     el.ontouchmove = sendTouchCoords;
 };
@@ -183,9 +183,7 @@ function sendKeyDown(e) {
 function sendTouchCoords(e) {
 
     var el = e.currentTarget;
-    var sensitivity = parseInt(el.dataset.sensitivity);
-
-    var touch = getTouch(e, sensitivity);
+    var touch = getTouch(e, parseInt(el.dataset.sensitivity));
     if (!touch)
         return false;
 
@@ -203,11 +201,7 @@ function sendTouchCoords(e) {
         y = 0;
     }
 
-    if (e.currentTarget.lastX != x || e.currentTarget.lastY != y)
-        sendRequest(getUrl(e.currentTarget.href, '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2)));
-
-    e.currentTarget.lastX = x;
-    e.currentTarget.lastY = y;
+    sendRequest(getUrl(e.currentTarget.href, '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2)));
     return false;
 };
 
@@ -254,7 +248,7 @@ function getTouch(e, minDistance) {
     }
 
     // application of deadzone (minimum distance)
-    if (curTouch && minDistance && lastTouch) {        
+    if (curTouch && minDistance > 0 && lastTouch) {        
         var dist = Math.sqrt(Math.pow(Math.abs(curTouch.pageX - lastTouch.pageX), 2) + Math.pow(Math.abs(curTouch.pageY - lastTouch.pageY), 2));
         if (dist < minDistance)
             return null;

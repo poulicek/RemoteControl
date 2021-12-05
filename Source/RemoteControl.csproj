@@ -84,6 +84,9 @@
     <Compile Include="Server\HttpResponse.cs" />
     <Compile Include="Logic\RequestHandler.cs" />
     <Compile Include="Server\HttpServer.cs" />
+    <Compile Include="UI\Pointer.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UI\TrayIcon.cs">
       <SubType>Form</SubType>
     </Compile>

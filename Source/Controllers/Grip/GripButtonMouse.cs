@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Threading;
+using RemoteControl.UI;
 using TrayToolkit.Helpers;
 
 namespace RemoteControl.Controllers.Grip
@@ -29,7 +30,8 @@ namespace RemoteControl.Controllers.Grip
         /// </summary>
         public void Release()
         {
-            this.stopMoving();
+            lock (this)
+                this.stopMoving();
         }
 
 
@@ -40,10 +42,15 @@ namespace RemoteControl.Controllers.Grip
         {
             this.lastCoords = coords;
             this.coordsTime = DateTime.Now;
-            this.startMoving();
+
+            lock (this)
+                this.startMoving();
         }
 
 
+        /// <summary>
+        /// Starts the cursor movement
+        /// </summary>
         private void startMoving()
         {
             if (this.isMoving)
@@ -54,29 +61,40 @@ namespace RemoteControl.Controllers.Grip
         }
 
 
+        /// <summary>
+        /// Stops the cursor movement
+        /// </summary>
         private void stopMoving()
         {
             this.isMoving = false;
             this.lastCoords = PointF.Empty;
             this.timer?.Change(Timeout.Infinite, Timeout.Infinite);
+            Pointer.HidePointer();
         }
 
 
+        /// <summary>
+        /// Moves the cursosr as per last known coords
+        /// </summary>
         private void move()
         {
-            if (!this.isMoving || this.lastCoords.IsEmpty)
+            if (!this.isMoving)
                 return;
 
+            // aborting the movement if no new coords came in
             if ((DateTime.Now - this.coordsTime).TotalSeconds > MAX_INPUT_DELAY)
-                this.stopMoving();
-            else
             {
-                var pt = InputHelper.GetCursorPosition();
-                var shiftX = Math.Sign(this.lastCoords.X) * (int)Math.Pow(Math.Abs(this.lastCoords.X) * SPEED, ACCELERATION);
-                var shiftY = Math.Sign(this.lastCoords.Y) * (int)Math.Pow(Math.Abs(this.lastCoords.Y) * SPEED, ACCELERATION);
-
-                InputHelper.SetCursorPosition(pt.X + shiftX, pt.Y - shiftY);
+                this.stopMoving();
+                return;
             }
+
+            var pt = InputHelper.GetCursorPosition();
+            var shiftX = Math.Sign(this.lastCoords.X) * (int)Math.Pow(Math.Abs(this.lastCoords.X) * SPEED, ACCELERATION);
+            var shiftY = Math.Sign(this.lastCoords.Y) * (int)Math.Pow(Math.Abs(this.lastCoords.Y) * SPEED, ACCELERATION);
+
+            pt.Offset(shiftX, -shiftY);
+            InputHelper.SetCursorPosition(pt.X, pt.Y);
+            Pointer.ShowPointer(InputHelper.GetCursorPosition());
         }
     }
 }
