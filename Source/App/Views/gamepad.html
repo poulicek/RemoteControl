@@ -1,12 +1,11 @@
 ﻿<style>
-    #view-gamepad.grid { grid-template-rows: auto 3fr 1fr auto; }
-    #view-gamepad.grid > div { display: grid; height: 100%; }
-    #view-gamepad #center { display: none; }
+    #view-gamepad .section { display: grid; height: 100%; }
     #view-gamepad .button.string { font-size: .6em; }
 
-    #view-gamepad .cross { display: grid; grid-template-columns: auto auto; width: 70vmin; height: 70vmin; max-width: 45vh; max-height: 45vh; margin: auto; transform: rotate(45deg); }
-    #view-gamepad .cross:last-of-type { display: none; }
+    #view-gamepad .narrow { display: grid; grid-template-rows: auto 3fr 1fr auto; height: 100%; }
+    #view-gamepad .wide { display: none; height: 100%; }
 
+    #view-gamepad .cross { display: grid; grid-template-columns: auto auto; width: 70vmin; height: 70vmin; margin: auto; transform: rotate(45deg); }
     #view-gamepad .cross .button span { transform: rotate(-45deg); position: relative; z-index: 1; }
     #view-gamepad .cross .button:nth-child(1) { border-radius: 100% 5px 5px 5px; }
     #view-gamepad .cross .button:nth-child(2) { border-radius: 5px 100% 5px 5px; }
@@ -17,76 +16,90 @@
     #view-gamepad .cross .circle { transition: all .15s ease-out; }
     #view-gamepad .cross .circle.active { min-width: 100%; min-height: 100%; }
 
-    #view-gamepad #top { display: grid; grid-template-columns: 1fr 1fr; }
-    #view-gamepad #top .button { display: none; }
-    #view-gamepad #top .button:nth-child(1) { display: grid; justify-self: left; }
+    #view-gamepad .header { display: grid; grid-template-columns: 1fr 1fr; }
+    #view-gamepad .header .button:nth-child(1) { display: grid; justify-self: left; }
+    #view-gamepad .header .button:nth-child(2) { display: grid; justify-self: right; }
 
-    #view-gamepad #bottom .button.long { width: 65vmin; justify-self: center; }
-    #view-gamepad #bottom .button:first-of-type { display: none; }
-    #view-gamepad #bottom .button:last-of-type { display: none; }
+    #view-gamepad .narrow .cross { max-width: 45vh; max-height: 45vh; }
+    #view-gamepad .narrow #narrow-middle .button.long { width: 65vmin; justify-self: center; }
+    #view-gamepad .narrow #narrow-bottom { justify-items: left; grid-auto-flow: column; width: 100%; }
+    #view-gamepad .narrow #narrow-bottom .button:last-child { justify-self: right; }
 
-    #view-gamepad #footer { justify-items: left; grid-auto-flow: column; width: 100%; }
-    #view-gamepad #footer .button:last-child { justify-self: right; }
+    #view-gamepad .wide .cross { max-width: 33vw; max-height: 33vw; }
+    #view-gamepad .wide #wide-middle { grid-template-columns: 1fr auto 1fr; }
+    #view-gamepad .wide #wide-middle .center { display: grid; align-self: start; }
+    #view-gamepad .wide #wide-bottom { grid-template-columns: 1fr 50vmin 1fr; align-items: end; }
+    #view-gamepad .wide #wide-bottom .button.long { width: 50vmin; }
+    #view-gamepad .wide #wide-bottom .button:nth-child(1) { display: grid; justify-self: left; }
+    #view-gamepad .wide #wide-bottom .button:nth-child(3) { display: grid; justify-self: right; }
 
     @media screen and (min-width: 480px) and (orientation: landscape) {
-        #view-gamepad.grid { grid-template-rows: auto auto auto; padding: 2vmin; }
-        #view-gamepad #middle { grid-template-columns: 1fr auto 1fr; }
-        #view-gamepad #center { display: grid; align-self: start; }
 
-        #view-gamepad .cross { max-width: 33vw; max-height: 33vw; }
-        #view-gamepad .cross:last-of-type { display: grid; }
-
-        #view-gamepad #top { visibility: visible; align-items: start; }
-        #view-gamepad #top .button:nth-child(1) { min-height: 0px; height: .4in; }
-        #view-gamepad #top .button:nth-child(2) { display: grid; justify-self: right; }
-
-        #view-gamepad #bottom { grid-template-columns: 1fr 50vmin 1fr; align-items: end; }
-        #view-gamepad #bottom .button.long { width: 50vmin; }
-        #view-gamepad #bottom .button:nth-child(1) { display: grid; justify-self: left; }
-        #view-gamepad #bottom .button:nth-child(3) { display: grid; justify-self: right; }
-
-        #view-gamepad #footer { display: none; }
+        #view-gamepad.grid { padding: 2vmin; }
+        #view-gamepad .narrow { display: none; }
+        #view-gamepad .wide { display: grid; }
+        #view-gamepad .header .button { min-height: 0px; height: .4in; }
     }
 
 </style>
 
 <div id="view-gamepad" class="grid">
 
-    <div id="top">
-        <a class="button icon dimmed wide-small hidden" href="#menu">&#xe5c3;</a>
-        <a rel="down" class="button bottom small string" href="?c=key&v=27&a=">ESC</a>        
-    </div>
+    <div class="narrow">
+        <div class="header section">
+            <a class="button icon dimmed wide-small hidden" href="#menu">&#xe5c3;</a>
+        </div>
 
-    <div id="middle">
-        <div class="cross">
+        <div id="narrow-top" class="cross">
             <a rel="down" class="icon button outline" href="?c=key&v=38&a="><span>&#58134;</span></a>
             <a rel="down" class="icon button outline" href="?c=key&v=39&a="><span>&#58133;</span></a>
             <a rel="down" class="icon button outline" href="?c=key&v=37&a="><span>&#58132;</span></a>
             <a rel="down" class="icon button outline" href="?c=key&v=40&a="><span>&#58131;</span></a>
-            <a rel="grip" class="circle button outline" href="?c=grip&v=38,39,40,37&a="></a>
+            <a rel="grip" class="circle button outline" href="?c=grip&v=mouse" data-deadzone="0" data-sensitivity="0"></a>
         </div>
-        <div id="center">
-            <a rel="down" class="icon button small" href="?c=key&v=8"></a>
-            <a rel="script" class="button bottom small string" href="#" onclick="switchScanMode(this);">SCN</a>
+
+        <div id="narrow-middle" class="section">
+            <a rel="down" class="button outline small long icon" href="?c=key&v=32&a=">&#xe256;</a>
         </div>
-        <div class="cross">
-            <a rel="down" class="button outline string" href="?c=key&v=160&a="><span>SHIFT</span></a>
-            <a rel="down" class="button outline icon" href="?c=key&v=13&a="><span>&#xe31b;</span></a>
-            <a rel="down" class="button outline string" href="?c=key&v=163&a="><span>CTRL</span></a>
-            <a rel="down" class="button outline string" href="?c=key&v=165&a="><span>ALT</span></a>
-            <a rel="grip" class="circle button outline" href="?c=grip&v=89,66,65,88&a="></a>
+
+        <div id="narrow-bottom" class="section">
+            <a class="button icon small dimmed" href="#main">&#xe500;</a>
+            <a rel="js" class="button icon small dimmed" onclick="return focusKeyboard(this, true)" href="#">&#xe312;</a>
         </div>
     </div>
 
-    <div id="bottom">
-        <a class="button icon small dimmed" href="#main">&#xe500;</a>
-        <a rel="down" class="button outline small long icon" href="?c=key&v=32&a=">&#xe256;</a>
-        <a rel="js" class="button icon small dimmed" onclick="return focusKeyboard(this, true)" href="#">&#xe312;</a>
-    </div>
+    <div class="wide">
+        <div class="header section">
+            <a class="button icon dimmed wide-small hidden" href="#menu">&#xe5c3;</a>
+            <a rel="down" class="button bottom small string" href="?c=key&v=27&a=">ESC</a>
+        </div>
 
-    <div id="footer">
-        <a class="button icon small dimmed" href="#main">&#xe500;</a>
-        <a rel="js" class="button icon small dimmed" onclick="return focusKeyboard(this, true)" href="#">&#xe312;</a>
+        <div id="wide-middle" class="section">
+            <div class="cross">
+                <a rel="down" class="icon button outline" href="?c=key&v=38&a="><span>&#58134;</span></a>
+                <a rel="down" class="icon button outline" href="?c=key&v=39&a="><span>&#58133;</span></a>
+                <a rel="down" class="icon button outline" href="?c=key&v=37&a="><span>&#58132;</span></a>
+                <a rel="down" class="icon button outline" href="?c=key&v=40&a="><span>&#58131;</span></a>
+                <a rel="grip" class="circle button outline" href="?c=grip&v=38,39,40,37&a=" data-deadzone="0.2" data-sensitivity="10"></a>
+            </div>
+            <div class="center">
+                <a rel="down" class="icon button small" href="?c=key&v=8"></a>
+                <a rel="script" class="button bottom small string" href="#" onclick="switchScanMode(this);">SCN</a>
+            </div>
+            <div class="cross">
+                <a rel="down" class="button outline string" href="?c=key&v=160&a="><span>SHIFT</span></a>
+                <a rel="down" class="button outline icon" href="?c=key&v=13&a="><span>&#xe31b;</span></a>
+                <a rel="down" class="button outline string" href="?c=key&v=163&a="><span>CTRL</span></a>
+                <a rel="down" class="button outline string" href="?c=key&v=165&a="><span>ALT</span></a>
+                <a rel="grip" class="circle button outline" href="?c=grip&v=89,66,65,88&a=" data-deadzone="0.2" data-sensitivity="10"></a>
+            </div>
+        </div>
+
+        <div id="wide-bottom" class="section">
+            <a class="button icon small dimmed" href="#main">&#xe500;</a>
+            <a rel="down" class="button outline small long icon" href="?c=key&v=32&a=">&#xe256;</a>
+            <a rel="js" class="button icon small dimmed" onclick="return focusKeyboard(this, true)" href="#">&#xe312;</a>
+        </div>
     </div>
 
 </div>

@@ -1,116 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Windows.Forms;
 using RemoteControl.Server;
-using TrayToolkit.Helpers;
-using TrayToolkit.UI;
 
 namespace RemoteControl.Controllers.Grip
 {
     public class GripController : IController
     {
-        #region Grip Button
-
-        private class GripButton
-        {
-            private readonly System.Windows.Forms.Keys[] keys;
-            private readonly List<Keys> pressedKeys = new List<Keys>();
-            
-
-            public GripButton(Keys[] keys)
-            {
-                this.keys = keys;
-            }
-
-
-            /// <summary>
-            /// Returns the pressed keys
-            /// </summary>
-            private Keys[] getPressedKeys(Keys[] keys, PointF coords)
-            {
-                var x = coords.X;
-                var y = coords.Y;
-
-                var slope = x == 0 ? double.PositiveInfinity : Math.Abs(y / x);
-                var isDiagonal = slope > 0.5 && slope < 2;
-
-                if (x == 0 && y == 0)
-                    return new Keys[0];
-
-                if (x >= 0 && y >= 0)
-                    return isDiagonal
-                        ? new Keys[] { keys[0], keys[1] }
-                        : new Keys[] { slope > 1 ? keys[0] : keys[1] };
-
-                if (x >= 0 && y <= 0)
-                    return isDiagonal
-                        ? new Keys[] { keys[1], keys[2] }
-                        : new Keys[] { slope > 1 ? keys[2] : keys[1] };
-
-                if (x <= 0 && y <= 0)
-                    return isDiagonal
-                        ? new Keys[] { keys[2], keys[3] }
-                        : new Keys[] { slope > 1 ? keys[2] : keys[3] };
-
-
-                if (x <= 0 && y >= 0)
-                    return isDiagonal
-                        ? new Keys[] { keys[3], keys[0] }
-                        : new Keys[] { slope > 1 ? keys[0] : keys[3] };
-
-                return new Keys[0];
-            }
-
-
-            /// <summary>
-            /// Releases the button
-            /// </summary>
-            public void Release(bool scanMode)
-            {
-                this.Press(new Keys[0], scanMode);
-            }
-
-
-            /// <summary>
-            /// Presses the keys according to the coordinates
-            /// </summary>
-            public void Press(PointF coords, bool scanMode)
-            {
-                this.Press(this.getPressedKeys(this.keys, coords), scanMode);
-            }
-
-
-            /// <summary>
-            /// Presses the keys
-            /// </summary>
-            public void Press(Keys[] keys, bool scanMode)
-            {
-                lock (this.pressedKeys)
-                {
-                    var unpressKeys = this.pressedKeys.Where(k => !keys.Contains(k)).ToArray();
-                    var pressKeys = keys.Where(k => !this.pressedKeys.Contains(k)).ToArray();
-
-                    foreach (var key in unpressKeys)
-                    {
-                        key.Up(scanMode);
-                        this.pressedKeys.Remove(key);
-                    }
-
-                    foreach (var key in pressKeys)
-                    {
-                        key.Down(scanMode);
-                        this.pressedKeys.Add(key);
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        private readonly Dictionary<string, GripButton> buttons = new Dictionary<string, GripButton>();
+        private readonly Dictionary<string, IGripButton> buttons = new Dictionary<string, IGripButton>();
 
 
         public void ProcessRequest(HttpContext context)
@@ -121,27 +19,38 @@ namespace RemoteControl.Controllers.Grip
             if (button == null)
                 return;
 
-            var scanMode = context.Request.Query["a"] == "1";
+            // setting the scan mode
+            if (button is GripButtonKeys buttonKeys)
+                buttonKeys.ScanMode = context.Request.Query["a"] == "1";
+
+            // pressing or releasing the button
             if (int.TryParse(context.Request.Query["s"], out var keyState) && keyState == 0)
-                button.Release(scanMode);
+                button.Release();
             else
-                button.Press(this.parseCoords(context.Request.Query["o"].Split(',')), scanMode);
-                
+                button.Press(this.parseCoords(context.Request.Query["o"].Split(',')));                
         }
 
 
         /// <summary>
         /// Returns the relevant grip button instance
         /// </summary>
-        private GripButton getButton(string keyCodes)
+        private IGripButton getButton(string keyCodes)
         {
             if (string.IsNullOrEmpty(keyCodes))
                 return null;
 
-            if (!this.buttons.TryGetValue(keyCodes, out var button))
-                this.buttons[keyCodes] = button = new GripButton(this.parseKeys(keyCodes.Split(',')));
+            lock (this.buttons)
+            {
+                if (!this.buttons.TryGetValue(keyCodes, out var button))
+                {
+                    this.buttons[keyCodes] =
+                        button = keyCodes == "mouse"
+                            ? new GripButtonMouse()
+                            : new GripButtonKeys(this.parseKeys(keyCodes.Split(','))) as IGripButton;
+                }
 
-            return button;
+                return button;
+            }
         }
 
         #region Parsing

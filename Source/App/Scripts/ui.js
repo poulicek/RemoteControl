@@ -181,18 +181,22 @@ function sendKeyDown(e) {
 
 // sends the touch coordinates
 function sendTouchCoords(e) {
-    var touch = getTouch(e, 10);
+
+    var el = e.currentTarget;
+    var sensitivity = parseInt(el.dataset.sensitivity);
+
+    var touch = getTouch(e, sensitivity);
     if (!touch)
         return false;
 
-    var rect = e.currentTarget.getBoundingClientRect();
+    var rect = el.getBoundingClientRect();
     var ctrX = rect.left + rect.width / 2;
     var ctrY = rect.top + rect.height / 2;
 
     var s = Math.sqrt(Math.pow(rect.width / 2, 2) / 2);
     var x = (touch.pageX - ctrX) / s;
     var y = (ctrY - touch.pageY) / s;
-    var deadZone = 0.2;
+    var deadZone = parseFloat(el.dataset.deadzone);
 
     if (Math.abs(x) < deadZone && Math.abs(y) < deadZone) {
         x = 0;
