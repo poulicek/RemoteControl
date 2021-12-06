@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using TrayToolkit.Helpers;
 
 namespace RemoteControl.UI
 {
     public partial class Pointer : Form
     {
-        private const int SIZE = 25;
+        private const int SIZE = 50;
+        private const int ANIMATION_TIME = 100;
 
         private static Pointer instance;
+
+        private DateTime firstPaint;
 
         public Pointer()
         {
@@ -21,6 +25,7 @@ namespace RemoteControl.UI
             this.TransparencyKey = this.BackColor;
             this.Opacity = 0.4;
             this.ShowInTaskbar = false;
+            this.DoubleBuffered = true;
 
             this.ResumeLayout(false);
         }
@@ -30,10 +35,25 @@ namespace RemoteControl.UI
             this.Size = new Size(SIZE, SIZE);
         }
 
+
         protected override void OnPaint(PaintEventArgs e)
         {
+            var now = DateTime.Now;
+            if (firstPaint == DateTime.MinValue)
+                firstPaint = now;
+
+            var ratio = Math.Min((now - firstPaint).TotalMilliseconds / ANIMATION_TIME, 1);
+            var w = (int)(ratio * this.Width);
+            var h = (int)(ratio * this.Height);
+            var rect = new Rectangle(this.Width / 2 - w / 2, this.Height / 2 - h / 2, w - 1, h - 1);
+
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            e.Graphics.FillEllipse(Brushes.DeepPink, 0, 0, this.Width - 1, this.Height - 1);
+
+            using (var b = new SolidBrush(Color.DeepPink.SetAlphaChannel((byte)(Math.Ceiling(128 * ratio)))))
+            {
+                e.Graphics.FillEllipse(b, rect);
+                e.Graphics.DrawEllipse(Pens.DeepPink, rect);
+            }
         }
 
 
@@ -54,6 +74,7 @@ namespace RemoteControl.UI
 
                 point.Offset(-instance.Width / 2, -instance.Height / 2);
                 instance.Location = point;
+                instance.Refresh();
             });
         }
 
@@ -65,7 +86,7 @@ namespace RemoteControl.UI
         {
             TrayIcon.Invoke(() =>
             {
-                instance?.Close();
+                instance?.Dispose();
                 instance = null;
             });
         }

@@ -8,7 +8,7 @@ namespace RemoteControl.Controllers.Grip
 {
     public class GripButtonMouse : IGripButton
     {
-        private const int FRAME_DELAY = 16;
+        private const int FRAME_DELAY = 20;
         private const float SPEED = 10;
         private const float ACCELERATION = 2f;
         private const int MAX_INPUT_DELAY = 5;
@@ -89,8 +89,8 @@ namespace RemoteControl.Controllers.Grip
             }
 
             var pt = InputHelper.GetCursorPosition();
-            var shiftX = Math.Sign(this.lastCoords.X) * (int)Math.Pow(Math.Abs(this.lastCoords.X) * SPEED, ACCELERATION);
-            var shiftY = Math.Sign(this.lastCoords.Y) * (int)Math.Pow(Math.Abs(this.lastCoords.Y) * SPEED, ACCELERATION);
+            var shiftX = Math.Sign(this.lastCoords.X) * (int)Math.Ceiling(Math.Pow(Math.Abs(this.lastCoords.X) * SPEED, ACCELERATION));
+            var shiftY = Math.Sign(this.lastCoords.Y) * (int)Math.Ceiling(Math.Pow(Math.Abs(this.lastCoords.Y) * SPEED, ACCELERATION));
 
             pt.Offset(shiftX, -shiftY);
             InputHelper.SetCursorPosition(pt.X, pt.Y);
