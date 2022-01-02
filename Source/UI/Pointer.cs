@@ -47,15 +47,21 @@ namespace RemoteControl.UI
             var h = (int)(ratio * this.Height);
             var rect = new Rectangle(this.Width / 2 - w / 2, this.Height / 2 - h / 2, w - 1, h - 1);
 
-            e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-
-            using (var b = new SolidBrush(Color.DeepPink.SetAlphaChannel((byte)(Math.Ceiling(128 * ratio)))))
-            {
-                e.Graphics.FillEllipse(b, rect);
-                e.Graphics.DrawEllipse(Pens.DeepPink, rect);
-            }
+            this.drawPointer(e.Graphics, Color.DeepPink.SetAlphaChannel((byte)Math.Ceiling(128 * ratio)), rect);
         }
 
+
+        /// <summary>
+        /// Draws the shape of the pointer
+        /// </summary>
+        private void drawPointer(Graphics g, Color c, Rectangle rect)
+        {
+            using (var b = new SolidBrush(c))
+            {
+                g.FillEllipse(b, rect);
+                g.DrawEllipse(Pens.DeepPink, rect);
+            }
+        }
 
         #region Static Interface
 
