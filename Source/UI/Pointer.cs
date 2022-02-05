@@ -7,7 +7,7 @@ namespace RemoteControl.UI
 {
     public partial class Pointer : Form
     {
-        private const int SIZE = 50;
+        private const int SIZE = 40;
         private const int ANIMATION_TIME = 100;
 
         private static Pointer instance;
@@ -47,7 +47,7 @@ namespace RemoteControl.UI
             var h = (int)(ratio * this.Height);
             var rect = new Rectangle(this.Width / 2 - w / 2, this.Height / 2 - h / 2, w - 1, h - 1);
 
-            this.drawPointer(e.Graphics, Color.DeepPink.SetAlphaChannel((byte)Math.Ceiling(128 * ratio)), rect);
+            this.drawPointer(e.Graphics, Color.DeepPink.SetAlphaChannel((byte)Math.Ceiling(160 * ratio)), rect);
         }
 
 
@@ -59,7 +59,7 @@ namespace RemoteControl.UI
             using (var b = new SolidBrush(c))
             {
                 g.FillEllipse(b, rect);
-                g.DrawEllipse(Pens.DeepPink, rect);
+                g.DrawEllipse(Pens.Red, rect);
             }
         }
 
