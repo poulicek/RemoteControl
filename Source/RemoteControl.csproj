@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\Grip\IGripButton.cs" />
-    <Compile Include="Controllers\Grip\GripButtonMouse.cs" />
+    <Compile Include="Controllers\Mouse\GripButtonMouse.cs" />
     <Compile Include="Controllers\Grip\GripButtonKeys.cs" />
     <Compile Include="Controllers\Grip\GripController.cs" />
     <Compile Include="Controllers\Mouse\MouseController.cs" />

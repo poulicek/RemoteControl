@@ -13,8 +13,10 @@
     #view-gamepad .cross .button:nth-child(4) { border-radius: 5px 5px 100% 5px; }
 
     #view-gamepad .cross .circle { min-width: 20%; min-height: 20%; position: absolute; grid-row-start: 1; grid-row-end: 3; grid-column-start: 1; grid-column-end: 3; justify-self: center; align-self: center; border-radius: 100%; background: #0a1922; transform: rotate(-45deg); }
+    #view-gamepad .cross .circle.big { min-width: 40%; min-height: 40%; }
     #view-gamepad .cross .circle { transition: all .15s ease-out; }
     #view-gamepad .cross .circle.active { min-width: 100%; min-height: 100%; }
+    
 
     #view-gamepad .header { display: grid; grid-template-columns: 1fr 1fr; }
     #view-gamepad .header .button:nth-child(1) { display: grid; justify-self: left; }
@@ -57,7 +59,7 @@
             <a rel="down" class="icon button outline" href="?c=key&v=39&a="><span>&#58133;</span></a>
             <a rel="down" class="icon button outline" href="?c=key&v=37&a="><span>&#58132;</span></a>
             <a rel="hold" class="icon button outline" href="?c=mouse&v=sd"><span>&#xeb53;</span></a>
-            <a rel="grip" class="circle button outline icon" href="?c=mouse&v=grip" data-deadzone="0.05" data-sensitivity="0">&#xe323;</a>
+            <a rel="grip" class="circle button outline icon big" href="?c=mouse&v=grip" data-deadzone="0" data-sensitivity="0">&#xe323;</a>
         </div>
 
         <div id="narrow-middle" class="section">

@@ -2,14 +2,15 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
+using RemoteControl.Controllers.Grip;
 using RemoteControl.UI;
 using TrayToolkit.Helpers;
 
-namespace RemoteControl.Controllers.Grip
+namespace RemoteControl.Controllers.Mouse
 {
     public class GripButtonMouse : IGripButton
     {
-        private const int FRAME_DELAY = 20;
+        private const int FRAME_DELAY = 10;
         private const int MAX_INPUT_DELAY = 5;
         private const int MAX_CLICK_DELAY = 500;
         private const float SPEED = 10;
@@ -19,7 +20,8 @@ namespace RemoteControl.Controllers.Grip
 
         private bool isMoving;
         private bool hasMoved;
-        private PointF lastCoords;
+        private PointF latestCoords;
+        private PointF previousCoords;
 
         private DateTime lastPressTime;
         private DateTime lastMoveTime;
@@ -48,7 +50,7 @@ namespace RemoteControl.Controllers.Grip
         /// </summary>
         public void Press(PointF coords)
         {
-            this.lastCoords = coords;
+            this.latestCoords = coords;
             this.lastMoveTime = DateTime.Now;
 
             lock (this)
@@ -90,7 +92,8 @@ namespace RemoteControl.Controllers.Grip
         private void stopMoving()
         {
             this.isMoving = false;
-            this.lastCoords = PointF.Empty;
+            this.latestCoords = PointF.Empty;
+            this.previousCoords = PointF.Empty;
             this.timer?.Change(Timeout.Infinite, Timeout.Infinite);
             Pointer.HidePointer();
         }
@@ -111,22 +114,56 @@ namespace RemoteControl.Controllers.Grip
                 return;
             }
 
-            
-
             var pt = InputHelper.GetCursorPosition();
-            var shiftX = Math.Sign(this.lastCoords.X) * (int)Math.Floor(Math.Pow(Math.Abs(this.lastCoords.X) * SPEED, ACCELERATION));
-            var shiftY = Math.Sign(this.lastCoords.Y) * (int)Math.Floor(Math.Pow(Math.Abs(this.lastCoords.Y) * SPEED, ACCELERATION));
+            var shift = this.getPointerShift(pt, this.latestCoords, .8f);
 
             // returns if no movement is visible
-            if (shiftX != 0 || shiftY != 0)
+            if (!shift.IsEmpty)
             {
-
-                pt.Offset(shiftX, -shiftY);
+                pt.Offset(shift.Width, -shift.Height);
                 InputHelper.SetCursorPosition(pt.X, pt.Y);
                 this.hasMoved = true;
             }
 
             Pointer.ShowPointer(InputHelper.GetCursorPosition());
+        }
+
+
+        /// <summary>
+        /// Returns the shift of the pointer
+        /// </summary>
+        private Size getPointerShift(Point pt, PointF currentCoords, float gripZone)
+        {
+            if (currentCoords.IsEmpty)
+            {
+                this.previousCoords = PointF.Empty;
+                return Size.Empty;
+            }
+
+            // computing the difference from the previous position
+            var coords = new PointF(currentCoords.X - this.previousCoords.X, currentCoords.Y - this.previousCoords.Y);
+            if (coords.IsEmpty)
+                return Size.Empty;
+
+            var gripMode = Math.Abs(currentCoords.X) > gripZone && Math.Abs(currentCoords.Y) > gripZone;
+            var bounds = System.Windows.Forms.Screen.GetBounds(pt);
+
+            Debug.WriteLine(currentCoords);
+
+            var shift = gripMode
+                ? new Size(
+                    Math.Sign(coords.X) * (int)Math.Floor(Math.Pow(Math.Abs(coords.X) * SPEED, ACCELERATION)),
+                    Math.Sign(coords.Y) * (int)Math.Floor(Math.Pow(Math.Abs(coords.Y) * SPEED, ACCELERATION)))
+                : new Size(
+                    Math.Sign(coords.X) * (int)Math.Ceiling(Math.Pow(Math.Abs(coords.X), 1.25) * bounds.Width),
+                    Math.Sign(coords.Y) * (int)Math.Ceiling(Math.Pow(Math.Abs(coords.Y), 1.25) * bounds.Height));
+
+            // cropping the rememberd coords to keep the cursor moving in the extreme positions
+            this.previousCoords = new PointF(
+                Math.Sign(currentCoords.X) * Math.Min(gripZone, Math.Abs(currentCoords.X)),
+                Math.Sign(currentCoords.Y) * Math.Min(gripZone, Math.Abs(currentCoords.Y)));
+
+            return shift;
         }
     }
 }

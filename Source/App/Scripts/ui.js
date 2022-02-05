@@ -179,6 +179,7 @@ function sendKeyPress(e, applyDelay) {
 
 // starts the button press
 function sendKeyDown(e) {
+    setTouchOffset(e);
     initPress(e);
     sendRequest(getUrl(e.currentTarget.href, '&s=1'));
     return false;
@@ -194,8 +195,8 @@ function sendTouchCoords(e) {
         return false;
 
     var rect = el.getBoundingClientRect();
-    var ctrX = rect.left + rect.width / 2;
-    var ctrY = rect.top + rect.height / 2;
+    var ctrX = rect.left + Math.round(rect.width / 2) + el.touchOffsetX;
+    var ctrY = rect.top + Math.round(rect.height / 2) + el.touchOffsetY;
 
     var s = Math.sqrt(Math.pow(rect.width / 2, 2) / 2);
     var x = (touch.pageX - ctrX) / s;
@@ -207,8 +208,24 @@ function sendTouchCoords(e) {
         y = 0;
     }
 
-    sendRequest(getUrl(e.currentTarget.href, '&s=1&o=' + x.toFixed(2) + ',' + y.toFixed(2)));
+    sendRequest(getUrl(e.currentTarget.href, '&s=1&o=' + x.toFixed(3) + ',' + y.toFixed(3)));
     return false;
+};
+
+
+// sets the initial touch offset
+function setTouchOffset(e) {
+    var el = e.currentTarget;
+    var touch = getTouch(e, parseInt(el.dataset.sensitivity));
+    if (!touch)
+        return false;
+
+    var rect = el.getBoundingClientRect();
+    var ctrX = rect.left + Math.round(rect.width / 2);
+    var ctrY = rect.top + Math.round(rect.height / 2);
+
+    el.touchOffsetX = touch.pageX - ctrX;
+    el.touchOffsetY = touch.pageY - ctrY;
 };
 
 
