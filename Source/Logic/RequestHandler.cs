@@ -8,6 +8,7 @@ using RemoteControl.Controllers.Grip;
 using RemoteControl.Controllers.Keyboard;
 using RemoteControl.Controllers.Media;
 using RemoteControl.Controllers.Menu;
+using RemoteControl.Controllers.Mouse;
 using RemoteControl.Controllers.Rdp;
 using RemoteControl.Controllers.View;
 using RemoteControl.Server;
@@ -130,6 +131,7 @@ namespace RemoteControl.Logic
             this.controllers.Add("app", new AppController(this.AppVersion, () => this.ServerUrl));
             this.controllers.Add("view", new ViewController(() => this.ServerUrl));
             this.controllers.Add("key", new KeyboardController());
+            this.controllers.Add("mouse", new MouseController());
             this.controllers.Add("media", new MediaController());
             this.controllers.Add("grip", new GripController());
             this.controllers.Add("menu", new MenuController());

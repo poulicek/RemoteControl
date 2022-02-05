@@ -238,7 +238,7 @@ namespace RemoteControl.Controllers.Rdp
         private void perfromMouseClick(ScreenBounds screen, float xRatio, float yRatio, int btn)
         {
             var pt = screen.Project(new Point((int)(screen.X + xRatio * screen.Width), (int)(screen.Y + yRatio * screen.Height)));
-            InputHelper.MouseClick(pt.X, pt.Y, (InputHelper.MouseButton)btn);
+            InputHelper.MouseAction((InputHelper.MouseButton)btn, pt, InputHelper.MouseClickMode.Click);
         }
 
 

@@ -63,6 +63,7 @@
     <Compile Include="Controllers\Grip\GripButtonMouse.cs" />
     <Compile Include="Controllers\Grip\GripButtonKeys.cs" />
     <Compile Include="Controllers\Grip\GripController.cs" />
+    <Compile Include="Controllers\Mouse\MouseController.cs" />
     <Compile Include="Links\MenuLinkBase.cs" />
     <Compile Include="Links\MenuLinkCollection.cs" />
     <Compile Include="Links\AppMenuLink.cs" />

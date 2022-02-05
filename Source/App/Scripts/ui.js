@@ -20,7 +20,11 @@ function bindEvents() {
                 break;
 
             case 'press':
-                bindPressEvents(el);
+                bindPressEvents(el, true);
+                break;
+
+            case 'hold':
+                bindPressEvents(el, false);
                 break;
 
             case 'click':
@@ -106,8 +110,10 @@ function bindDownEvents(el) {
 
 
 // binds the press events
-function bindPressEvents(el) {
-    el.ontouchstart = el.onmousedown = sendKeyPress;
+function bindPressEvents(el, applyDelay) {
+    el.ontouchstart = el.onmousedown = function (e) {
+        sendKeyPress(e, applyDelay);
+    };
     el.ontouchend = el.ontouchcancel = el.onclick = el.onmouseup = el.onmouseout = cancelPress;
     el.ontouchmove = function(e) {
         if (!isTouched(e))
@@ -163,10 +169,10 @@ function sendKeyUp(e) {
 };
 
 // performs the button pressing
-function sendKeyPress(e) {
+function sendKeyPress(e, applyDelay) {
     e.currentTarget.xhttp = null;
     initPress(e);
-    keepPressing(e.currentTarget, true);
+    keepPressing(e.currentTarget, applyDelay);
     return false;
 };
 

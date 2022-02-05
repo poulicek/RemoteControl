@@ -56,6 +56,9 @@ namespace RemoteControl.Controllers.Grip
         }
 
 
+        /// <summary>
+        /// Peforming the click with the grip button
+        /// </summary>
         private void tryPerformClick()
         {
             // returns if the mouse has moved or the button was pressed too long
@@ -123,7 +126,7 @@ namespace RemoteControl.Controllers.Grip
                 this.hasMoved = true;
             }
 
-            Pointer.ShowPointer(pt);
+            Pointer.ShowPointer(InputHelper.GetCursorPosition());
         }
     }
 }

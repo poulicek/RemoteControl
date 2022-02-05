@@ -23,6 +23,7 @@
     #view-gamepad .narrow .cross { width: 85vmin; height: 85vmin; }
     #view-gamepad .narrow #narrow-middle { grid-template-columns: auto auto; align-items: center; }
     #view-gamepad .narrow #narrow-middle .button { margin: 15px; }
+    #view-gamepad .narrow #narrow-middle .button.small { font-size: .2in; }
     #view-gamepad .narrow #narrow-bottom { justify-items: left; grid-auto-flow: column; width: 100%; }
     #view-gamepad .narrow #narrow-bottom .button:last-child { justify-self: right; }
 
@@ -52,16 +53,16 @@
         </div>
 
         <div id="narrow-top" class="cross">
-            <a rel="down" class="icon button outline" href="?c=key&v=38&a="><span>&#58134;</span></a>
+            <a rel="hold" class="icon button outline" href="?c=mouse&v=su"><span>&#xeb2e;</span></a>
             <a rel="down" class="icon button outline" href="?c=key&v=39&a="><span>&#58133;</span></a>
             <a rel="down" class="icon button outline" href="?c=key&v=37&a="><span>&#58132;</span></a>
-            <a rel="down" class="icon button outline" href="?c=key&v=40&a="><span>&#58131;</span></a>
-            <a rel="grip" class="circle button outline icon" href="?c=grip&v=mouse" data-deadzone="0.05" data-sensitivity="0">&#xe323;</a>
+            <a rel="hold" class="icon button outline" href="?c=mouse&v=sd"><span>&#xeb53;</span></a>
+            <a rel="grip" class="circle button outline icon" href="?c=mouse&v=grip" data-deadzone="0.05" data-sensitivity="0">&#xe323;</a>
         </div>
 
         <div id="narrow-middle" class="section">
-            <a rel="down" class="button outline small" href="?c=key&v=32&a=">LB</a>
-            <a rel="down" class="button outline small" href="?c=key&v=32&a=">RB</a>
+            <a rel="down" class="button outline small" href="?c=mouse&v=lb">LB</a>
+            <a rel="down" class="button outline small" href="?c=mouse&v=rb">RB</a>
         </div>
 
         <div id="narrow-bottom" class="section">

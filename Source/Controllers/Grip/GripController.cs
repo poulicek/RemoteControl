@@ -11,7 +11,7 @@ namespace RemoteControl.Controllers.Grip
         private readonly Dictionary<string, IGripButton> buttons = new Dictionary<string, IGripButton>();
 
 
-        public void ProcessRequest(HttpContext context)
+        public virtual void ProcessRequest(HttpContext context)
         {
             var keyCodes = context.Request.Query["v"];
             var button = this.getButton(keyCodes);
@@ -42,12 +42,7 @@ namespace RemoteControl.Controllers.Grip
             lock (this.buttons)
             {
                 if (!this.buttons.TryGetValue(keyCodes, out var button))
-                {
-                    this.buttons[keyCodes] =
-                        button = keyCodes == "mouse"
-                            ? new GripButtonMouse()
-                            : new GripButtonKeys(this.parseKeys(keyCodes.Split(','))) as IGripButton;
-                }
+                    this.buttons.Add(keyCodes, button = new GripButtonKeys(this.parseKeys(keyCodes.Split(','))));
 
                 return button;
             }
@@ -58,7 +53,7 @@ namespace RemoteControl.Controllers.Grip
         /// <summary>
         /// Parses the pressed keys
         /// </summary>
-        private PointF parseCoords(string[] coords)
+        protected PointF parseCoords(string[] coords)
         {
             if (coords?.Length != 2 ||
                 !float.TryParse(coords[0], NumberStyles.Any, CultureInfo.InvariantCulture, out var x) ||
