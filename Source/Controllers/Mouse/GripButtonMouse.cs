@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using RemoteControl.Controllers.Grip;
@@ -13,7 +12,9 @@ namespace RemoteControl.Controllers.Mouse
         private const int FRAME_DELAY = 10;
         private const int MAX_INPUT_DELAY = 5;
         private const int MAX_CLICK_DELAY = 500;
-        private const float SPEED = 10;
+        private const float GRIP_ZONE = 0.8f;
+        private const float SPEED_GRIP = 10;
+        private const float SPEED_LINEAR = 1.25f;
         private const float ACCELERATION = 2f;        
 
         private readonly Timer timer;
@@ -115,7 +116,7 @@ namespace RemoteControl.Controllers.Mouse
             }
 
             var pt = InputHelper.GetCursorPosition();
-            var shift = this.getPointerShift(pt, this.latestCoords, .8f);
+            var shift = this.getPointerShift(pt, this.latestCoords, GRIP_ZONE);
 
             // returns if no movement is visible
             if (!shift.IsEmpty)
@@ -132,7 +133,7 @@ namespace RemoteControl.Controllers.Mouse
         /// <summary>
         /// Returns the shift of the pointer
         /// </summary>
-        private Size getPointerShift(Point pt, PointF currentCoords, float gripZone)
+        private Size getPointerShift(Point cursor, PointF currentCoords, float gripZone)
         {
             if (currentCoords.IsEmpty)
             {
@@ -145,25 +146,32 @@ namespace RemoteControl.Controllers.Mouse
             if (coords.IsEmpty)
                 return Size.Empty;
 
-            var gripMode = Math.Abs(currentCoords.X) > gripZone && Math.Abs(currentCoords.Y) > gripZone;
-            var bounds = System.Windows.Forms.Screen.GetBounds(pt);
-
-            Debug.WriteLine(currentCoords);
-
-            var shift = gripMode
-                ? new Size(
-                    Math.Sign(coords.X) * (int)Math.Floor(Math.Pow(Math.Abs(coords.X) * SPEED, ACCELERATION)),
-                    Math.Sign(coords.Y) * (int)Math.Floor(Math.Pow(Math.Abs(coords.Y) * SPEED, ACCELERATION)))
-                : new Size(
-                    Math.Sign(coords.X) * (int)Math.Ceiling(Math.Pow(Math.Abs(coords.X), 1.25) * bounds.Width),
-                    Math.Sign(coords.Y) * (int)Math.Ceiling(Math.Pow(Math.Abs(coords.Y), 1.25) * bounds.Height));
-
             // cropping the rememberd coords to keep the cursor moving in the extreme positions
             this.previousCoords = new PointF(
                 Math.Sign(currentCoords.X) * Math.Min(gripZone, Math.Abs(currentCoords.X)),
                 Math.Sign(currentCoords.Y) * Math.Min(gripZone, Math.Abs(currentCoords.Y)));
 
-            return shift;
+            var gripMode = Math.Abs(currentCoords.X) > gripZone && Math.Abs(currentCoords.Y) > gripZone;
+            return this.calculateShift(cursor, coords, gripMode);
+        }
+
+
+        /// <summary>
+        /// Caluclates the shift of the cursos
+        /// </summary>
+        private Size calculateShift(Point cursor, PointF coords, bool gripMode)
+        {
+            if (gripMode)
+            {
+                return new Size(
+                    Math.Sign(coords.X) * (int)Math.Floor(Math.Pow(Math.Abs(coords.X) * SPEED_GRIP, ACCELERATION)),
+                    Math.Sign(coords.Y) * (int)Math.Floor(Math.Pow(Math.Abs(coords.Y) * SPEED_GRIP, ACCELERATION)));
+            }
+
+            var bounds = System.Windows.Forms.Screen.GetBounds(cursor);
+            return new Size(
+                Math.Sign(coords.X) * (int)Math.Ceiling(Math.Pow(Math.Abs(coords.X), SPEED_LINEAR) * bounds.Width),
+                Math.Sign(coords.Y) * (int)Math.Ceiling(Math.Pow(Math.Abs(coords.Y), SPEED_LINEAR) * bounds.Height));
         }
     }
 }
