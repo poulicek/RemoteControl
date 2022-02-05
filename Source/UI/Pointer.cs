@@ -14,6 +14,13 @@ namespace RemoteControl.UI
 
         private DateTime firstPaint;
 
+
+        protected override bool ShowWithoutActivation
+        {
+            get { return true; }
+        }
+
+
         public Pointer()
         {
             this.SuspendLayout();
@@ -29,6 +36,7 @@ namespace RemoteControl.UI
 
             this.ResumeLayout(false);
         }
+
 
         protected override void OnLoad(EventArgs e)
         {
@@ -106,7 +114,12 @@ namespace RemoteControl.UI
             get
             {
                 CreateParams cp = base.CreateParams;
-                cp.ExStyle |= 0x00000020; //WS_EX_TRANSPARENT
+
+                const int WS_EX_NOACTIVATE = 0x08000000;
+                const int WS_EX_TOOLWINDOW = 0x00000080;
+                const int WS_EX_TRANSPARENT = 0x00000020;
+
+                cp.ExStyle |= (int)(WS_EX_TRANSPARENT | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW);
                 return cp;
             }
         }

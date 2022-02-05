@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using RemoteControl.UI;
@@ -9,15 +10,19 @@ namespace RemoteControl.Controllers.Grip
     public class GripButtonMouse : IGripButton
     {
         private const int FRAME_DELAY = 20;
-        private const float SPEED = 10;
-        private const float ACCELERATION = 2f;
         private const int MAX_INPUT_DELAY = 5;
+        private const int MAX_CLICK_DELAY = 500;
+        private const float SPEED = 10;
+        private const float ACCELERATION = 2f;        
 
         private readonly Timer timer;
 
         private bool isMoving;
+        private bool hasMoved;
         private PointF lastCoords;
-        private DateTime coordsTime;
+
+        private DateTime lastPressTime;
+        private DateTime lastMoveTime;
 
         public GripButtonMouse()
         {
@@ -31,7 +36,10 @@ namespace RemoteControl.Controllers.Grip
         public void Release()
         {
             lock (this)
+            {
                 this.stopMoving();
+                this.tryPerformClick();
+            }
         }
 
 
@@ -41,10 +49,20 @@ namespace RemoteControl.Controllers.Grip
         public void Press(PointF coords)
         {
             this.lastCoords = coords;
-            this.coordsTime = DateTime.Now;
+            this.lastMoveTime = DateTime.Now;
 
             lock (this)
                 this.startMoving();
+        }
+
+
+        private void tryPerformClick()
+        {
+            // returns if the mouse has moved or the button was pressed too long
+            if (this.hasMoved || (DateTime.Now - this.lastPressTime).TotalMilliseconds > MAX_CLICK_DELAY)
+                return;
+
+            InputHelper.MouseClick(InputHelper.MouseButton.Left);
         }
 
 
@@ -57,6 +75,8 @@ namespace RemoteControl.Controllers.Grip
                 return;
 
             this.isMoving = true;
+            this.hasMoved = false;
+            this.lastPressTime = DateTime.Now;
             this.timer.Change(0, FRAME_DELAY);
         }
 
@@ -82,19 +102,28 @@ namespace RemoteControl.Controllers.Grip
                 return;
 
             // aborting the movement if no new coords came in
-            if ((DateTime.Now - this.coordsTime).TotalSeconds > MAX_INPUT_DELAY)
+            if ((DateTime.Now - this.lastMoveTime).TotalSeconds > MAX_INPUT_DELAY)
             {
                 this.stopMoving();
                 return;
             }
 
-            var pt = InputHelper.GetCursorPosition();
-            var shiftX = Math.Sign(this.lastCoords.X) * (int)Math.Ceiling(Math.Pow(Math.Abs(this.lastCoords.X) * SPEED, ACCELERATION));
-            var shiftY = Math.Sign(this.lastCoords.Y) * (int)Math.Ceiling(Math.Pow(Math.Abs(this.lastCoords.Y) * SPEED, ACCELERATION));
+            
 
-            pt.Offset(shiftX, -shiftY);
-            InputHelper.SetCursorPosition(pt.X, pt.Y);
-            Pointer.ShowPointer(InputHelper.GetCursorPosition());
+            var pt = InputHelper.GetCursorPosition();
+            var shiftX = Math.Sign(this.lastCoords.X) * (int)Math.Floor(Math.Pow(Math.Abs(this.lastCoords.X) * SPEED, ACCELERATION));
+            var shiftY = Math.Sign(this.lastCoords.Y) * (int)Math.Floor(Math.Pow(Math.Abs(this.lastCoords.Y) * SPEED, ACCELERATION));
+
+            // returns if no movement is visible
+            if (shiftX != 0 || shiftY != 0)
+            {
+
+                pt.Offset(shiftX, -shiftY);
+                InputHelper.SetCursorPosition(pt.X, pt.Y);
+                this.hasMoved = true;
+            }
+
+            Pointer.ShowPointer(pt);
         }
     }
 }
