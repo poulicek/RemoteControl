@@ -59,7 +59,8 @@ namespace RemoteControl.Links
         /// </summary>
         public override void Launch()
         {
-            Process.Start(this.Link);
+            // commented as use of Process.Start is restricted on Microsoft Store
+            //Process.Start(this.Link);
         }
 
 

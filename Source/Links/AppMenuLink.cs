@@ -23,8 +23,9 @@ namespace RemoteControl.Links
         /// </summary>
         public override void Launch()
         {
-            if (this.process == null || this.process.HasExited)
-                this.process = Process.Start(this.Link);
+            // commented as use of Process.Start is restricted on Microsoft Store
+            //if (this.process == null || this.process.HasExited)
+            //    this.process = Process.Start(this.Link);
         }
 
 
